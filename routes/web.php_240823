@@ -1,0 +1,747 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::get('/', function () {
+    //return redirect(route('login'));
+    return redirect(route('home'));
+    
+});
+Route::get('/home', 'HomeController@homehome')->name('home.home');
+Route::get('/logout', 'HomeController@logout')->name('home.logout');
+Route::post('/logout', 'HomeController@logout')->name('home.logout');
+
+
+
+
+
+// PAGAMENTO
+Route::get('/pagamento', 'Pagamento\PagamentoController@prepareJson')->name('pagamento.prepareJson');
+Route::get('/geraboleto', 'Pagamento\PagamentoController@geraboleto')->name('pagamento.geraboleto');
+
+// Consulta Pagamento
+Route::get('/consultapagamento', 'Pagamento\PagamentoController@consultapagamento')->name('pagamento.consulta');
+
+// Processa
+Route::get('/processaRequisicao/{id}', 'Pagamento\PagamentoController@processaRequisicao')->name('pagamento.processaRequisicao');
+Route::get('/admin/pagamento/index', 'Pagamento\PagamentoController@index')->name('pagamento.index');
+Route::get('/admin/pagamento/create', 'Pagamento\PagamentoController@create')->name('pagamento.create');
+Route::get('/processaPagamentoRestante/{id}', 'Pagamento\PagamentoController@processaPagamentoRestante')->name('pagamento.processaPagamentoRestante');
+Route::get('/admin/pagamento/{id}/edit', 'Pagamento\PagamentoController@edit')->name('pagamento.edit');
+Route::post('/admin/pagamento/store', 'Pagamento\PagamentoController@store')->name('pagamento.store');
+Route::post('/admin/pagamento/update', 'Pagamento\PagamentoController@update')->name('pagamento.update');
+
+// UPLOAD
+Route::post('/upload', 'UsuarioController@upload')->name('upload');
+Route::post('testes', 'UsuarioController@testes')->name('testes');
+
+// MAIL 
+Route::get('/envio/confirmacao/hospedagem/{id}', 'Mail\MailController@confirmacaoHospedagem')->name('envia.confirmacao.hospedagem');
+Route::get('/mailable', function () {
+    $hospede = App\Hospede::where('id', 170)->with('user')->with('tipouh')->first();
+ 	//dd($user);
+    return new App\Mail\testedeMail($hospede);
+});
+Route::get('/mailable/mail', function () {
+
+    $user = App\Hospede::where('id', 165)->with('user')->with('tipouh')->first();
+ 
+    return new App\Mail\hospedagemLiberada($user);
+});
+
+
+
+Route::get('/envio/login/{id}', 'Mail\MailController@envialoginSenha')->name('envia.login.senha');
+Route::get('/envio/liberado/{id}', 'Mail\MailController@enviaMailOk')->name('envia.mail.ok');
+Route::get('/mail', 'Mail\MailController@testeEmail')->name('envia.mail.teste');
+Route::get('/envio/libera/{id}/acesso', 'Mail\MailController@liberaAcesso')->name('libera.acesso');
+
+//Route::get('/envio/negado/{id}', 'Mail\MailController@enviaMailNegado')->name('envia.mail.negado');
+Route::post('/envio/negado', 'Mail\MailController@enviaMailNegado')->name('envia.mail.negado');
+
+
+
+
+/* FINALIZAR CADASTRO */
+Route::get('/{id}/finalizarcadastro', 'HomeController@finalizarcadastro')->name('mail.finalizarcadastro');
+
+
+
+Route::get('/envios', function(){
+
+	//return new \App\Mail\newLaravelTips();
+
+	//\Illuminate\Support\Facades\Mail::send(new \App\Mail\newLaravelTips());
+
+});
+
+
+/* ROTA DE PEDIDO DE ACESSO AO SISTEMA  */
+Route::get('/solicitaacesso', 'HomeController@solicitaacesso')->name('solicitaacesso');
+/* RECEBE A SOLICITACAO DE PEDIDO E GRAVA NO BANCO */
+Route::post('/pedido', 'HomeController@pedido')->name('pedido.acesso');
+Route::get('/pedido', 'HomeController@pedido')->name('pedido.acesso');
+Route::get('/user/create/new', 'HomeController@UserCreateNew')->name('usuario.create.new');
+Route::post('/user/create/new', 'HomeController@UserCreateNew')->name('usuario.create.new');
+/* 	FIM PEDIDO	*/
+
+// CAPTCHA
+Route::get('/reload', 'HomeController@reload')->name('reload');
+
+
+
+
+// Carrega uma combo a partir do id selecionado de outra combo
+Route::get('/cascade/carregarCidades/{id}','Cascade\CascadeController@carregarCidades');
+Route::get('/cascade/carregarOm/{id}','Cascade\CascadeController@carregarOm'); 
+Route::get('/cascade/carregarPosto/{id}','Cascade\CascadeController@carregarPosto'); // Carrega as cidades a partir de uma UF informada Carrega as cidades a partir de uma UF informada
+Route::get('/cascade/carregarPostoSituacao/{id}','Cascade\CascadeController@carregarPostoSituacao'); // Carrega as cidades a partir de uma UF informada Carrega as cidades a partir de uma UF informada
+
+Route::get('/cascade/carregarUnidades/{id}','Cascade\CascadeController@carregarUnidadesHabtacionais'); // Carrega Unidades Habitacionais a partir de Grupo de Destino na tela Distribuição de UNIDADES
+
+// Carrega as cidades a partir de uma UF informada
+
+
+
+
+
+
+
+
+
+Auth::routes(['register' => false]);
+
+
+
+
+
+
+Route::get('/admin', 'HomeController@index')->name('home');
+
+
+/* ROTAS API */
+Route::get('/retornacidade/{id}', 'HomeController@listaCidadePorUF')->name('listaCidadePorUF');
+
+
+
+
+
+
+Route::group(['middleware'=>['role:administrador_geral']], function () {
+
+	//Route::get('profile', 'UsuarioController@showProfile')->name('profile');
+}); 
+
+Route::get('profile', 'UsuarioController@showProfile')->name('profile');
+
+/* 	ROTAS HOSPEDES*/
+Route::prefix('hospede')->group(function(){
+
+	Route::get('/', 'HomeController@index')->name('hospede');
+	Route::get('/solicitarinscricao', 'Hospede\HospedeController@index')->name('hospede.solicitarinscricao');
+	Route::get('/solicitarinscricao/edita/{id}', 'Hospede\HospedeController@solicitarinscricaoEdit')->name('hospede.solicitarinscricao.edit');
+	Route::post('/solicitarinscricao/edita/confirmar', 'Hospede\HospedeController@solicitarinscricaoEditConfirmar')->name('hospede.edita.confirmar');
+
+	Route::get('/store', 'Hospede\HospedeController@store')->name('hospede.store');
+	Route::post('/store', 'Hospede\HospedeController@store')->name('hospede.store');
+	
+	//Route::post('/confirmar', 'Hospede\HospedeController@ConfirmarDados')->name('hospede.confirmar');
+	Route::post('/confirmar', 'Hospede\HospedeController@ConfirmarDadosAntigo')->name('hospede.confirmar');
+
+	Route::get('/meuspedidos', 'Hospede\HospedeController@meuspedidos')->name('hospede.meuspedidos');
+	Route::get('/meuspedido/{id}', 'Hospede\HospedeController@meuspedido')->name('hospede.meupedido');
+
+	Route::get('/delete/meupedido/{id}', 'Hospede\HospedeController@deleteInscricao')->name('hospede.delete.pedido');
+
+	Route::get('/checkin/{id}', 'Hospede\HospedeController@checkin')->name('hospede.checkin');
+	Route::get('/checkout/{id}/{hospede}', 'Hospede\HospedeController@checkout')->name('hospede.checkout');
+
+	Route::get('/cancelar/hospedagem/{id}', 'Hospede\HospedeController@cancelarhospedagem')->name('cancelar.hospedagem');
+
+	Route::post('/uploadrecibo', 'Hospede\HospedeController@uploadComprovantePagamento')->name('hospede.uploadrecibo');
+	
+
+
+});
+/* */
+
+/* 	ROTAS USUARIO*/
+Route::prefix('usuario')->group(function(){
+
+	
+
+
+});
+/* */
+
+
+
+/* 	ROTAS ATENDENTES  */
+Route::prefix('atendente')->group(function(){
+
+	Route::get('/', 'HomeController@index')->name('atendente.home');
+	Route::get('/checkin', 'CheckIn\CheckInController@checkIn')->name('checkIn');
+	Route::get('/checkout', 'CheckIn\CheckInController@checkOut')->name('checkOut');
+	Route::get('/buscar', 'CheckIn\CheckInController@buscar')->name('buscar');
+	Route::post('/buscahospedagem', 'CheckIn\CheckInController@buscahospedagem')->name('buscahospedagem');
+
+
+});
+/* */
+
+
+
+
+/* 	ROTAS PRE CADASTRO*/
+Route::prefix('precadastro')->group(function(){
+
+	Route::get('/', 'HomeController@precadastro')->name('precadastro');
+	Route::get('/home', 'HomeController@homeUsuario')->name('usuario.home');
+
+});
+/* */
+
+
+
+
+
+
+
+
+
+
+//Route::prefix('admin')->group(function(){
+Route::prefix('admin')->group(function(){
+
+	
+
+
+	//	CALENDARIO
+
+		Route::get('/calendario/{id}', 'Calendario\CalendarioController@index')->name('calendario.index');
+		Route::get('/calendario/mes/{id}', 'Calendario\CalendarioController@calendarioMes')->name('calendario.mes');
+		Route::get('/calendario/unidade/{id}', 'Calendario\CalendarioController@calendarioUnidade')->name('calendario.unidade');
+		//Route::get('/calendario/unidade/{id}', 'Calendario\CalendarioController@calendarioporUnidade')->name('calendario.por.unidade');
+		Route::get('/calendario/unidade/json/{id}', 'Calendario\CalendarioController@calendarioUnidadeJson')->name('calendario.unidade.json');
+		
+	
+	
+
+	// FIM CALENDARIO
+
+
+
+
+
+
+
+
+
+	/* ROTAS DE HOSPEDAGEM */
+	Route::prefix('hospedagem')->group(function(){
+
+		/* HOSPEDAGEM */
+		Route::prefix('index')->group(function(){
+
+			Route::get('/', 'Hospedagem\HospedagemController@index')->name('hospedagem.index');
+			
+			
+
+		});
+
+		Route::prefix('distribuicao')->group(function(){
+		// DITRIBUIÇÃO
+		Route::get('/gen', 'Hospedagem\HospedagemController@distribuicaoGen')->name('hospedagem.distribuicao.gen');
+		Route::get('/ofsup', 'Hospedagem\HospedagemController@distribuicaoOfSup')->name('hospedagem.distribuicao.ofsup');
+		Route::get('/capten', 'Hospedagem\HospedagemController@distribuicaoCapTen')->name('hospedagem.distribuicao.capten');
+		Route::get('/subten', 'Hospedagem\HospedagemController@distribuicaoSubSgt')->name('hospedagem.distribuicao.subten');
+		//
+		});
+
+		Route::get('/configurar', 'ConfigurarHospedagem\ConfigurarHospedagemController@index')->name('configurarhospedagem.index');
+		Route::get('/create', 'ConfigurarHospedagem\ConfigurarHospedagemController@create')->name('configurarhospedagem.create');
+
+		Route::get('/createDia/{id}', 'ConfigurarHospedagem\ConfigurarHospedagemController@createDia')->name('configurarhospedagem.create.dia');
+		Route::post('/createDiaPost', 'ConfigurarHospedagem\ConfigurarHospedagemController@createDiaPost')->name('configurarhospedagem.create.dia.post');
+
+		Route::post('/store', 'ConfigurarHospedagem\ConfigurarHospedagemController@store')->name('configurarhospedagem.store');
+		Route::post('/{id}/destroy', 'ConfigurarHospedagem\ConfigurarHospedagemController@destroy')->name('configurarhospedagem.destroy');
+		Route::get('/{id}/destroy', 'ConfigurarHospedagem\ConfigurarHospedagemController@destroy')->name('configurarhospedagem.destroy');
+		
+		Route::get('/{id}/negar', 'Hospedagem\HospedagemController@negar')->name('hospedagem.negar');
+		Route::get('/liberar', 'Hospedagem\HospedagemController@liberar')->name('hospedagem.liberar');
+		Route::post('/liberar', 'Hospedagem\HospedagemController@liberar')->name('hospedagem.liberar');
+
+		Route::get('/{id}/verdados', 'Hospedagem\HospedagemController@verdados')->name('hospedagem.verdados');
+		Route::get('/aguardando', 'Hospedagem\HospedagemController@aguardando_liberacao')->name('hospedagem.aguardando_liberacao');
+		Route::get('/{id}/verdados_aguardando', 'Hospedagem\HospedagemController@verdados_aguardando_liberacao')->name('hospedagem.verdados_aguardando_liberacao');
+		Route::get('/{id}/liberar', 'Hospedagem\HospedagemController@liberar_uso')->name('hospedagem.liberar_uso');
+		Route::get('/{id}/negar/uso', 'Hospedagem\HospedagemController@negar_uso')->name('hospedagem.negar_uso');
+		
+		//Route::post('/liberar', 'Hospedagem\HospedagemController@verdados')->name('hospedagem.verdados');
+
+
+	});
+
+
+		/* ROTAS DE RELATORIO */
+	Route::prefix('relatorio')->group(function(){
+
+		/* RELATORIO */
+		
+		Route::get('/index', 'Relatorio\RelatorioController@index')->name('relatorio.index');
+		Route::post('/view', 'Relatorio\RelatorioController@view')->name('relatorio.view');
+		
+	
+
+	});
+
+
+
+
+
+	/* ROTAS DE ADMINISTRACAO */
+	Route::prefix('administracao')->group(function(){
+
+		/* TEMPOARADA */
+		Route::prefix('temporada')->group(function(){
+
+			Route::get('/', 'Temporada\TemporadaController@index')->name('temporada.index');
+			Route::get('/{id}/edit', 'Temporada\TemporadaController@edit')->name('temporada.edit');
+			Route::post('/update', 'Temporada\TemporadaController@update')->name('temporada.update');
+			Route::get('/create', 'Temporada\TemporadaController@create')->name('temporada.create');
+			Route::post('/store', 'Temporada\TemporadaController@store')->name('temporada.store');
+			Route::get('/{id}/delete', 'Temporada\TemporadaController@delete')->name('temporada.delete');
+			Route::post('/{id}/delete', 'Temporada\TemporadaController@delete')->name('temporada.delete');
+		});
+
+		/* HORARIO */
+		Route::prefix('horario')->group(function(){
+
+			Route::get('/', 'Horario\HorarioController@index')->name('horario.index');
+			Route::get('/{id}/edit', 'Horario\HorarioController@edit')->name('horario.edit');
+			Route::post('/update', 'Horario\HorarioController@update')->name('horario.update');
+			
+		});
+
+
+		/* DADOS GERAIS */
+		Route::prefix('dadosgerais')->group(function(){
+
+			Route::get('/', 'DadosGerais\DadosGeraisController@index')->name('dadosgerais.index');
+			Route::get('/{id}/edit', 'DadosGerais\DadosGeraisController@edit')->name('dadosgerais.edit');
+			Route::post('/update', 'DadosGerais\DadosGeraisController@update')->name('dadosgerais.update');
+			Route::get('/create', 'DadosGerais\DadosGeraisController@create')->name('dadosgerais.create');
+			Route::post('/store', 'DadosGerais\DadosGeraisController@store')->name('dadosgerais.store');
+			Route::get('/{id}/delete', 'DadosGerais\DadosGeraisController@delete')->name('dadosgerais.delete');
+			Route::post('/{id}/delete', 'DadosGerais\DadosGeraisController@delete')->name('dadosgerais.delete');
+		});
+		
+			/** GUARNICOES */
+			Route::get('/guarnicao', 'Guarnicao\GuarnicaoController@index')->name('guarnicao.index');
+			Route::post('/guarnicao', 'Guarnicao\GuarnicaoController@index')->name('guarnicao.index');
+			Route::get('/guarnicao/create', 'Guarnicao\GuarnicaoController@showFormCadastra')->name('showFormCadastra');
+			Route::post('/guarnicao/create', 'Guarnicao\GuarnicaoController@create')->name('guarnicao.create');
+			Route::get('/guarnicao/{id}/edit', 'Guarnicao\GuarnicaoController@edit')->name('guarnicao.edit');
+			Route::post('/guarnicao/update', 'Guarnicao\GuarnicaoController@update')->name('guarnicao.update');
+			Route::get('/guarnicao/{id}/destroy', 'Guarnicao\GuarnicaoController@destroy')->name('guarnicao.destroy');
+			/* FIM GUARNICOES */
+			
+			/** ROTAS UF */
+			Route::get('/uf', 'Uf\UfController@index')->name('indexuf');
+			Route::post('/uf', 'Uf\UfController@index')->name('indexuf');
+			Route::get('/uf/{id}/delete', 'Uf\UfController@deleteUf')->name('deleteuf');
+			Route::get('/uf/create', 'Uf\UfController@ufcreate')->name('uf.create');
+			Route::post('/uf/cadastrar', 'Uf\UfController@cadastruf')->name('cadastruf');
+			Route::get('/uf/{id}/edit', 'Uf\UfController@editUf')->name('edituf');
+			Route::post('/uf/update', 'Uf\UfController@ufupdate')->name('ufupdate');
+			/** FIM ROTAS UF */
+
+			/** ROTAS FORCA */
+			Route::get('/forca', 'Forca\ForcaController@index')->name('forca.index');
+			Route::post('/forca', 'Forca\ForcaController@index')->name('forca.index');
+			Route::get('/forca/{id}/delete', 'Forca\ForcaController@forcadelete')->name('forca.delete');
+			Route::get('/forca/create', 'Forca\ForcaController@forcacreate')->name('forca.create');
+			Route::post('/forca/create', 'Forca\ForcaController@forcacreate')->name('forca.create');
+
+			Route::post('/forca/cadastrar', 'Forca\ForcaController@forcacadastra')->name('forca.cadastra');
+			Route::get('/forca/{id}/edit', 'Forca\ForcaController@forcaedit')->name('forca.edit');
+			Route::post('/forca/update', 'Forca\ForcaController@forcaupdate')->name('forca.update');
+			/** FIM ROTAS FORCA */
+
+			/** CIDADES 	*/
+			Route::get('/cidade/{id}/index', 'Uf\Cidade\CidadeController@index')->name('cidade.index');
+			Route::post('/cidade/{id}/index', 'Uf\Cidade\CidadeController@index')->name('cidade.index');
+			Route::get('/cidade/{id}/{iduf}/create', 'Uf\Cidade\CidadeController@ShowFormCreate')->name('cidade.create.show');
+			Route::get('/cidade/create', 'Uf\Cidade\CidadeController@create')->name('cidade.create');
+			Route::post('/cidade/create', 'Uf\Cidade\CidadeController@create')->name('cidade.create');
+			Route::get('/cidade/{id}/{iduf}/edit', 'Uf\Cidade\CidadeController@edit')->name('cidade.edit');
+			Route::post('/cidade/update', 'Uf\Cidade\CidadeController@cidadeupdate')->name('cidade.update');
+			Route::get('/cidade/{id}/delete', 'Uf\Cidade\CidadeController@delete')->name('cidade.delete');
+			/** FIM CIDADES */
+
+			/*** INICIO POSTO GRADUACAO ***/
+			Route::get('/postograduacao', 'PostoGraduacao\PostoGraduacaoController@index')->name('postograduacao.index');
+			Route::post('/postograduacao', 'PostoGraduacao\PostoGraduacaoController@index')->name('postograduacao.index');
+			Route::get('/postograduacao/{id}/show', 'PostoGraduacao\PostoGraduacaoController@showFormCadastra')->name('postograduacao.create.show');
+			Route::get('/postograduacao/{id}/edit', 'PostoGraduacao\PostoGraduacaoController@edit')->name('postograduacao.edit');
+			Route::post('/postograduacao/update', 'PostoGraduacao\PostoGraduacaoController@update')->name('postograduacao.update');
+			Route::post('/postograduacao/create', 'PostoGraduacao\PostoGraduacaoController@create')->name('postograduacao.create');
+			Route::get('/postograduacao/{id}/destroy', 'PostoGraduacao\PostoGraduacaoController@destroy')->name('postograduacao.destroy');
+			Route::get('/postograduacao/list', 'PostoGraduacao\PostoGraduacaoController@list')->name('postograduacao.list');
+			
+			/* FIM POSTO GRADUACAO */
+
+			/*** Gerenciar OM */
+			Route::get('/om', 'GerenciarOm\GerenciarOmController@index')->name('gerenciarom.index');
+			Route::post('/om', 'GerenciarOm\GerenciarOmController@index')->name('gerenciarom.index');
+			Route::get('/om/{id}/create', 'GerenciarOm\GerenciarOmController@showFormCadastra')->name('gerenciarom.create.show');
+			Route::post('/om/create', 'GerenciarOm\GerenciarOmController@create')->name('gerenciarom.create');
+			Route::post('/om/update', 'GerenciarOm\GerenciarOmController@update')->name('gerenciarom.update');
+			Route::get('/om/{id}/edit', 'GerenciarOm\GerenciarOmController@edit')->name('gerenciarom.edit');
+			Route::get('/om/{id}/destroy', 'GerenciarOm\GerenciarOmController@destroy')->name('gerenciarom.destroy');
+			/*		    */
+			Route::get('/om', 'GerenciarOm\GerenciarOmController@listOMs')->name('gerenciarom.listOMs');
+			/* Gerenciar OM */
+
+	});
+	
+	/* ROTA USUARIOS */
+	Route::prefix('usuarios')->group(function(){
+				
+
+		Route::get('/solicitacoes/list', 'HomeController@listaPedidos')->name('lista.pedidos');
+		Route::get('/list', 'UsuarioController@index')->name('user.index');
+		Route::get('/list/inativos', 'UsuarioController@ListaInativos')->name('user.list.inativos');
+		
+		Route::get('/cadastra', 'UsuarioController@showFormNewUser')->name('usuario.novo');
+		Route::get('/{id}/index', 'UsuarioController@verDados')->name('usuario.verdados');
+		Route::get('/{id}/index/aguardando', 'UsuarioController@verDadosAguardando')->name('usuario.verdados.aguardando');
+		Route::get('/negados', 'UsuarioController@usuariosNegados')->name('usuarios.negados');
+
+		/* ATUALIZA DADOS USUARIO */
+		//Route::get('/update', 'HomeController@atualizaDadosUsuario')->name('atualiza.dados.usuario');
+		Route::post('/update', 'HomeController@atualizaDadosUsuario')->name('atualiza.dados.usuario');
+
+	});
+	
+	/* ROTA HABITACAO */
+	Route::prefix('habitacao')->group(function(){
+		
+
+		/* TARIFAS */
+		Route::prefix('tarifas')->group(function(){
+		
+			Route::get('/', 'Tarifas\TarifasUndController@index')->name('tarifas.index');
+			Route::get('/{id}/edit', 'Tarifas\TarifasUndController@edit')->name('tarifas.edit');
+			Route::post('/update', 'Tarifas\TarifasUndController@update')->name('tarifas.update');
+			Route::get('/create', 'Tarifas\TarifasUndController@create')->name('tarifas.create');
+			Route::post('/store', 'Tarifas\TarifasUndController@store')->name('tarifas.store');
+			Route::get('/{id}/delete', 'Tarifas\TarifasUndController@delete')->name('tarifas.delete');
+			Route::post('/{id}/delete', 'Tarifas\TarifasUndController@delete')->name('tarifas.delete');
+		
+		});
+		/* TARIFAS EXTRAS*/
+		Route::prefix('tarifasextras')->group(function(){
+		
+			Route::get('/', 'TarifaExtra\TarifaExtraController@index')->name('tarifaextra.index');
+			Route::get('/{id}/edit', 'TarifaExtra\TarifaExtraController@edit')->name('tarifaextra.edit');
+			Route::post('/update', 'TarifaExtra\TarifaExtraController@update')->name('tarifaextra.update');
+			Route::get('/create', 'TarifaExtra\TarifaExtraController@create')->name('tarifaextra.create');
+			Route::post('/store', 'TarifaExtra\TarifaExtraController@store')->name('tarifaextra.store');
+			Route::get('/{id}/delete', 'TarifaExtra\TarifaExtraController@delete')->name('tarifaextra.delete');
+			Route::post('/{id}/delete', 'TarifaExtra\TarifaExtraController@delete')->name('tarifaextra.delete');
+		
+		});
+		/* TIPO UNIDADE HABITACIONAL */
+		Route::prefix('tipouh')->group(function(){
+		
+			Route::get('/', 'TipoUndHab\TipoUndHabController@index')->name('habitacao.index');
+			Route::get('/{id}/edit', 'TipoUndHab\TipoUndHabController@edit')->name('habitacao.edit');
+			Route::post('/update', 'TipoUndHab\TipoUndHabController@update')->name('habitacao.update');
+			Route::get('/create', 'TipoUndHab\TipoUndHabController@create')->name('habitacao.create');
+			Route::post('/store', 'TipoUndHab\TipoUndHabController@store')->name('habitacao.store');
+			Route::get('/{id}/delete', 'TipoUndHab\TipoUndHabController@delete')->name('habitacao.delete');
+			Route::post('/{id}/delete', 'TipoUndHab\TipoUndHabController@delete')->name('habitacao.delete');
+		
+		});
+
+		/* CLASSE HABITACIONAL */
+		Route::prefix('classe_habitacional')->group(function(){
+		
+			Route::get('/', 'ClasseHabitacional\ClasseHabitacionalController@index')->name('classehabitacao.index');
+			Route::get('/{id}/edit', 'ClasseHabitacional\ClasseHabitacionalController@edit')->name('classehabitacao.edit');
+			Route::post('/update', 'ClasseHabitacional\ClasseHabitacionalController@update')->name('classehabitacao.update');
+			Route::get('/create', 'ClasseHabitacional\ClasseHabitacionalController@create')->name('classehabitacao.create');
+			Route::post('/store', 'ClasseHabitacional\ClasseHabitacionalController@store')->name('classehabitacao.store');
+			Route::get('/{id}/delete', 'ClasseHabitacional\ClasseHabitacionalController@delete')->name('classehabitacao.delete');
+			Route::post('/{id}/delete', 'ClasseHabitacional\ClasseHabitacionalController@delete')->name('classehabitacao.delete');
+		
+		});
+
+		/* GRUPO DESTINACAO */
+		Route::prefix('grupo_destinacao')->group(function(){
+		
+			Route::get('/', 'GrupoDestinacao\GrupoDestinacaoController@index')->name('grupo_destinacao.index');
+			Route::get('/{id}/edit', 'GrupoDestinacao\GrupoDestinacaoController@edit')->name('grupo_destinacao.edit');
+			Route::post('/update', 'GrupoDestinacao\GrupoDestinacaoController@update')->name('grupo_destinacao.update');
+			Route::get('/create', 'GrupoDestinacao\GrupoDestinacaoController@create')->name('grupo_destinacao.create');
+			Route::post('/store', 'GrupoDestinacao\GrupoDestinacaoController@store')->name('grupo_destinacao.store');
+			Route::get('/{id}/delete', 'GrupoDestinacao\GrupoDestinacaoController@delete')->name('grupo_destinacao.delete');
+			Route::post('/{id}/delete', 'GrupoDestinacao\GrupoDestinacaoController@delete')->name('grupo_destinacao.delete');
+		
+		});
+
+
+		/* GRUPO TARIFA */
+		Route::prefix('grupo_tarifa')->group(function(){
+		
+			Route::get('/', 'GrupoTarifa\GrupoTarifaController@index')->name('grupo_tarifa.index');
+			Route::get('/{id}/edit', 'GrupoTarifa\GrupoTarifaController@edit')->name('grupo_tarifa.edit');
+			Route::post('/update', 'GrupoTarifa\GrupoTarifaController@update')->name('grupo_tarifa.update');
+			Route::get('/create', 'GrupoTarifa\GrupoTarifaController@create')->name('grupo_tarifa.create');
+			Route::post('/store', 'GrupoTarifa\GrupoTarifaController@store')->name('grupo_tarifa.store');
+			Route::get('/{id}/delete', 'GrupoTarifa\GrupoTarifaController@delete')->name('grupo_tarifa.delete');
+			Route::post('/{id}/delete', 'GrupoTarifa\GrupoTarifaController@delete')->name('grupo_tarifa.delete');
+		
+		});
+
+		/* UNIDADE HABITACIONAL */
+		
+		Route::prefix('unidadehabitacional')->group(function(){
+		
+			Route::get('/', 'UnidadeHabitacional\UnidadeHabitacionalController@index')->name('uh.index');
+			Route::get('/{id}/edit', 'UnidadeHabitacional\UnidadeHabitacionalController@edit')->name('uh.edit');
+			Route::post('/update', 'UnidadeHabitacional\UnidadeHabitacionalController@update')->name('uh.update');
+			Route::get('/create', 'UnidadeHabitacional\UnidadeHabitacionalController@create')->name('uh.create');
+			Route::post('/store', 'UnidadeHabitacional\UnidadeHabitacionalController@store')->name('uh.store');
+			Route::get('/{id}/delete', 'UnidadeHabitacional\UnidadeHabitacionalController@delete')->name('uh.delete');
+			Route::post('/{id}/delete', 'UnidadeHabitacional\UnidadeHabitacionalController@delete')->name('uh.delete');
+		
+		});
+		
+	});
+
+	/* USUARIOS */
+	// INDEX //
+	Route::get('changeStatusUsuario/{id}', 'UsuarioController@changeStatus')->name('changeStatusUsuario');
+	Route::post('/users/create', 'UsuarioController@salvarUsuario')->name('usuario.create');
+	Route::post('/users/new', 'UsuarioController@NovoUsuario')->name('usuario.new');
+	
+	Route::get('/users/{id}/reset', 'UsuarioController@resetSenha')->name('usuario.reset');
+	// VER DADOS
+	//Route::get('/users/{id}/show', 'UsuarioController@showFormNewUser')->name('usuario.novo');
+	//
+
+	// Profile
+	//Route::get('/profile', 'UsuarioController@showProfile')->name('profile');
+	Route::get('profile/{id}/show', 'UsuarioController@showProfile')->name('profile.user');
+	Route::post('editProfile', 'UsuarioController@editProfile')->name('editProfile');
+	
+
+	
+	// Alteração de senha
+	Route::get('senha', 'UsuarioController@showSenha')->name('senha');
+	Route::post('editarSenha', 'UsuarioController@editarSenha')->name('editarSenha');
+	
+
+/* FIM USUARIOS */
+
+
+
+
+
+/*** ROTAS AREA */
+Route::get('/area', 'AreaController@index')->name('listArea');
+Route::post('/area', 'AreaController@index')->name('listArea');
+Route::get('/busca', 'AreaController@buscaarea')->name('buscaarea');
+Route::post('/busca', 'AreaController@buscaarea')->name('buscaarea');
+Route::get('/area/cadastra', 'AreaController@showFormCadastraArea')->name('showFormCadastraArea');
+//Route::post('/area/cadastra', 'AreaController@showFormCadastraArea')->name('showFormCadastraArea');
+Route::get('/area/{id}/show', 'AreaController@showArea')->name('showarea');
+Route::get('/area/{id}/edit', 'AreaController@editArea')->name('editarea');
+
+
+
+/** CRUD AREA */
+/*
+Route::get('/area/{id}/delete', 'AreaController@deleteArea')->name('deletearea');
+Route::post('/area/cadastrar', 'AreaController@cadastraarea')->name('cadastraarea');
+Route::get('/area/cadastrar', 'AreaController@cadastraarea')->name('cadastraarea');
+Route::post('/area/{id}/update', 'AreaController@updatearea')->name('updatearea');
+Route::get('/area/{id}/update', 'AreaController@updatearea')->name('updatearea');
+Route::post('/area/update', 'AreaController@areaupdate')->name('areaupdate');
+*/
+/** FIM CRUD AREA */
+
+
+
+
+
+/** CRUD AREA */
+Route::get('/area/{id}/delete', 'AreaController@deleteArea')->name('deletearea');
+Route::post('/area/cadastrar', 'AreaController@cadastraarea')->name('cadastraarea');
+//Route::get('/area/cadastrar', 'AreaController@cadastraarea')->name('cadastraarea');
+Route::post('/area/{id}/update', 'AreaController@updatearea')->name('updatearea');
+Route::get('/area/{id}/update', 'AreaController@updatearea')->name('updatearea');
+Route::post('/area/update', 'AreaController@areaupdate')->name('areaupdate');
+/** FIM CRUD AREA */
+
+/** SUBAREA */
+Route::get('/model', 'SubArea\SubAreaController@index')->name('indexsubarea');
+Route::get('/subarea/{id}/index', 'SubArea\SubAreaController@index')->name('subarea.index');
+Route::post('/subarea/{id}/index', 'SubArea\SubAreaController@index')->name('subarea.index');
+
+Route::post('/subarea/create', 'SubArea\SubAreaController@create')->name('subarea.create');
+Route::get('/subarea/{id}/edit', 'SubArea\SubAreaController@edit')->name('subarea.edit');
+Route::post('/subarea/update', 'SubArea\SubAreaController@subareaupdate')->name('subarea.update');
+Route::get('/subarea/{id}/create', 'SubArea\SubAreaController@ShowFormCreate')->name('subarea.create.show');
+Route::get('/subarea/{id}/delete', 'SubArea\SubAreaController@deleteSubArea')->name('deletesubarea');
+/** FIM SUBAREA */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*** ESTADO CIVIL */
+Route::get('/estadocivil', 'EstadoCivil\EstadoCivilController@index')->name('estadocivil.index');
+Route::post('/estadocivil', 'EstadoCivil\EstadoCivilController@index')->name('estadocivil.index');
+
+Route::get('/estadocivil/create', 'EstadoCivil\EstadoCivilController@showFormCadastra')->name('estadocivil.create.show');
+Route::post('/estadocivil/create', 'EstadoCivil\EstadoCivilController@create')->name('estadocivil.create');
+Route::post('/estadocivil/update', 'EstadoCivil\EstadoCivilController@update')->name('estadocivil.update');
+Route::get('/estadocivil/{id}/edit', 'EstadoCivil\EstadoCivilController@edit')->name('estadocivil.edit');
+Route::get('/estadocivil/{id}/destroy', 'EstadoCivil\EstadoCivilController@destroy')->name('estadocivil.destroy');
+/* FIM ESTADO CIVIL */
+
+
+
+/*** SITUACAO CANDIDATO */
+Route::get('/situacaocandidato', 'SituacaoCandidato\SituacaoCandidatoController@index')->name('situacaocandidato.index');
+Route::post('/situacaocandidato', 'SituacaoCandidato\SituacaoCandidatoController@index')->name('situacaocandidato.index');
+Route::get('/situacaocandidato/create', 'SituacaoCandidato\SituacaoCandidatoController@showFormCadastra')->name('situacaocandidato.create.show');
+Route::post('/situacaocandidato/create', 'SituacaoCandidato\SituacaoCandidatoController@create')->name('situacaocandidato.create');
+Route::post('/situacaocandidato/update', 'SituacaoCandidato\SituacaoCandidatoController@update')->name('situacaocandidato.update');
+Route::get('/situacaocandidato/{id}/edit', 'SituacaoCandidato\SituacaoCandidatoController@edit')->name('situacaocandidato.edit');
+Route::get('/situacaocandidato/{id}/destroy', 'SituacaoCandidato\SituacaoCandidatoController@destroy')->name('situacaocandidato.destroy');
+/* FIM SITUACAO CANDIDATO */
+
+
+/*** DOCUMENTO MILITAR */
+Route::get('/documentomilitar', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@index')->name('documentomilitar.index');
+Route::post('/documentomilitar', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@index')->name('documentomilitar.index');
+Route::get('/documentomilitar/create', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@showFormCadastra')->name('documentomilitar.create.show');
+Route::post('/documentomilitar/create', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@create')->name('documentomilitar.create');
+Route::post('/documentomilitar/update', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@update')->name('documentomilitar.update');
+Route::get('/documentomilitar/{id}/edit', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@edit')->name('documentomilitar.edit');
+Route::get('/documentomilitar/{id}/destroy', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@destroy')->name('documentomilitar.destroy');
+/* FIM DOCUMENTO MILITAR */
+
+/*** INICIO CATEGORIA ***/
+Route::get('/categoria', 'Categoria\CategoriaController@index')->name('categoria.index');
+Route::post('/categoria', 'Categoria\CategoriaController@index')->name('categoria.index');
+Route::get('/categoria/show', 'Categoria\CategoriaController@showFormCadastra')->name('categoria.create.show');
+Route::get('/categoria/{id}/edit', 'Categoria\CategoriaController@edit')->name('categoria.edit');
+Route::post('/categoria/update', 'Categoria\CategoriaController@update')->name('categoria.update');
+
+Route::post('/categoria/create', 'Categoria\CategoriaController@create')->name('categoria.create');
+
+
+Route::get('/categoria/{id}/destroy', 'Categoria\CategoriaController@destroy')->name('categoria.destroy');
+/* FIM CATEGORIA */
+
+
+
+
+
+/*** Título / Diploma */
+Route::get('/titulodiploma', 'TituloDiploma\TituloDiplomaController@index')->name('titulodiploma.index');
+Route::post('/titulodiploma', 'TituloDiploma\TituloDiplomaController@index')->name('titulodiploma.index');
+Route::get('/titulodiploma/create', 'TituloDiploma\TituloDiplomaController@showFormCadastra')->name('titulodiploma.create.show');
+Route::post('/titulodiploma/create', 'TituloDiploma\TituloDiplomaController@create')->name('titulodiploma.create');
+Route::post('/titulodiploma/update', 'TituloDiploma\TituloDiplomaController@update')->name('titulodiploma.update');
+Route::get('/titulodiploma/{id}/edit', 'TituloDiploma\TituloDiplomaController@edit')->name('titulodiploma.edit');
+Route::get('/titulodiploma/{id}/destroy', 'TituloDiploma\TituloDiplomaController@destroy')->name('titulodiploma.destroy');
+/* FIM Título / Diploma */
+
+
+/*** CURSO */
+Route::get('/curso', 'Curso\CursoController@index')->name('curso.index');
+Route::post('/curso', 'Curso\CursoController@index')->name('curso.index');
+Route::get('/curso/create', 'Curso\CursoController@showFormCadastra')->name('curso.create.show');
+Route::post('/curso/create', 'Curso\CursoController@create')->name('curso.create');
+Route::post('/curso/update', 'Curso\CursoController@update')->name('curso.update');
+Route::get('/curso/{id}/edit', 'Curso\CursoController@edit')->name('curso.edit');
+Route::get('/curso/{id}/destroy', 'Curso\CursoController@destroy')->name('curso.destroy');
+/* FIM CURSO */
+
+/*** Proficiencia */
+Route::get('/proficiencia', 'Proficiencia\ProficienciaController@index')->name('proficiencia.index');
+Route::post('/proficiencia', 'Proficiencia\ProficienciaController@index')->name('proficiencia.index');
+Route::get('/proficiencia/create', 'Proficiencia\ProficienciaController@showFormCadastra')->name('proficiencia.create.show');
+Route::post('/proficiencia/create', 'Proficiencia\ProficienciaController@create')->name('proficiencia.create');
+Route::post('/proficiencia/update', 'Proficiencia\ProficienciaController@update')->name('proficiencia.update');
+Route::get('/proficiencia/{id}/edit', 'Proficiencia\ProficienciaController@edit')->name('proficiencia.edit');
+Route::get('/proficiencia/{id}/destroy', 'Proficiencia\ProficienciaController@destroy')->name('proficiencia.destroy');
+/* FIM Proficiencia */
+
+
+/*** ConselhoProfissional */
+Route::get('/conselhoprofissional', 'ConselhoProfissional\ConselhoProfissionalController@index')->name('conselhoprofissional.index');
+Route::post('/conselhoprofissional', 'ConselhoProfissional\ConselhoProfissionalController@index')->name('conselhoprofissional.index');
+Route::get('/conselhoprofissional/create', 'ConselhoProfissional\ConselhoProfissionalController@showFormCadastra')->name('conselhoprofissional.create.show');
+Route::post('/conselhoprofissional/create', 'ConselhoProfissional\ConselhoProfissionalController@create')->name('conselhoprofissional.create');
+Route::post('/conselhoprofissional/update', 'ConselhoProfissional\ConselhoProfissionalController@update')->name('conselhoprofissional.update');
+Route::get('/conselhoprofissional/{id}/edit', 'ConselhoProfissional\ConselhoProfissionalController@edit')->name('conselhoprofissional.edit');
+Route::get('/conselhoprofissional/{id}/destroy', 'ConselhoProfissional\ConselhoProfissionalController@destroy')->name('conselhoprofissional.destroy');
+/* FIM ConselhoProfissional */
+
+
+
+/*** TipoPublicacao */
+Route::get('/tipopublicacao', 'TipoPublicacao\TipoPublicacaoController@index')->name('tipopublicacao.index');
+Route::post('/tipopublicacao', 'TipoPublicacao\TipoPublicacaoController@index')->name('tipopublicacao.index');
+Route::get('/tipopublicacao/create', 'TipoPublicacao\TipoPublicacaoController@showFormCadastra')->name('tipopublicacao.create.show');
+Route::post('/tipopublicacao/create', 'TipoPublicacao\TipoPublicacaoController@create')->name('tipopublicacao.create');
+Route::post('/tipopublicacao/update', 'TipoPublicacao\TipoPublicacaoController@update')->name('tipopublicacao.update');
+Route::get('/tipopublicacao/{id}/edit', 'TipoPublicacao\TipoPublicacaoController@edit')->name('tipopublicacao.edit');
+Route::get('/tipopublicacao/{id}/destroy', 'TipoPublicacao\TipoPublicacaoController@destroy')->name('tipopublicacao.destroy');
+/* FIM ConselhoProfissional */
+
+
+
+
+
+
+
+
+
+});
+//});
+
+Auth::routes();
+//Route::get('/home', 'HomeController@index')->name('home');

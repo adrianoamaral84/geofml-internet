@@ -1,0 +1,62 @@
+html, body{
+    height: 100% !important;
+    min-height: 100% !important;
+}
+
+body .container{
+    padding-bottom: 10em;
+}
+
+.jumbotron{
+    position: relative;
+}
+
+#div-select-ug{
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0px 0px 1px 0.4em;
+    background: rgba(0,0,50,0.2);
+    border-radius: 0px 0px 0px 9px;
+}
+
+#div-select-ug label{
+    margin-bottom: 0;
+}
+
+#div-select-ug select{
+    margin-right: 0px;
+    margin-top: 1px;
+    padding: 0.2em;
+    border-radius: 6px 0px 0px 6px;
+    border: none;
+    height: 31px;
+}
+
+#div-select-ug button{
+    margin-left: 0px;
+    margin-top: -2px;
+    border-radius: 0px 6px 0px 0px ;
+
+}
+
+
+
+footer{
+    position: fixed;
+    bottom: 0;
+    min-width: 100%;
+   ;
+}
+
+footer div{
+     background-color: rgba(200, 200, 200, 1.0) !important
+}
+
+label{
+    font-weight: bold;
+}
+
+footer a{
+    color: #069;
+}

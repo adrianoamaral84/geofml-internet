@@ -1,0 +1,63 @@
+@extends('layouts.solicita')
+
+@section('content')
+<p class="text-center">Solicitar Acesso ao Sistema</p>
+<form id="solicita-form" action="{{ route('pedido.acesso') }}" method="POST">
+    @csrf
+
+
+
+    <div class="form-group">
+        <label for="username">{{ __('Nome Completo') }}</label>
+        <input type="nome" class="form-control underlined @error('nome') is-invalid @enderror" value="{{ old('nome') }}" name="nome" id="nome" placeholder="Nome Completo" autofocus required>
+
+        @error('nome')
+            <span class="invalid-feedback" role="alert">
+                <strong>{{ $message }}</strong>
+            </span>
+        @enderror
+    </div>
+
+
+
+    <div class="form-group">
+        <label for="cpf">{{ __('CPF') }}</label>
+        <input type="cpf" class="form-control underlined @error('cpf') is-invalid @enderror" name="cpf" id="cpf" placeholder="Seu CPF" required maxlength="11" data-mask="000.000.000-00" autocomplete="off" onpaste="return false;" value="{{ old('cpf') }}">
+
+        @error('cpf')
+            <span class="invalid-feedback" role="alert">
+                <strong>{{ $message }}</strong>
+            </span>
+        @enderror
+    </div>
+
+   
+    <div class="form-group">
+        <label for="username">{{ __('E-mail') }}</label>
+        <input type="email" class="form-control underlined @error('email') is-invalid @enderror" value="{{ old('email') }}" name="email" id="email" placeholder="Seu e-mail" autofocus required>
+
+        @error('email')
+            <span class="invalid-feedback" role="alert">
+                <strong>{{ $message }}</strong>
+            </span>
+        @enderror
+    </div>
+
+
+   
+    <div class="form-group">
+        <button type="submit" class="btn btn-block btn-primary">{{ __('Solicitar Acesso') }}</button>
+         <a href="{{ route('login') }}" class="forgot-btn pull-left"><small>Voltar</small></a>
+    </div>    
+   
+
+    
+</form>
+
+
+
+@push('javascript')
+<script src="{{ asset('js/jquery.mask.min.js') }}"></script>
+@endpush
+
+@endsection

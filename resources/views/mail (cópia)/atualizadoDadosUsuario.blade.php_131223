@@ -1,0 +1,38 @@
+@component('mail::message')
+
+<center>
+<div style="color: red; font-size: 20px;">
+<b>Alteração de dados!</b>
+</div>
+</center>
+<br>
+<br><center>
+<b>Dados do Usuário</b>
+</center>
+<br>
+
+<center>
+
+@component('mail::table')
+
+| Nome	| CPF	|
+|:-----------:|:-----------:|
+|{{ $name }}  | {{ $cpf }}	|
+
+@endcomponent
+
+
+	
+
+</center>
+
+
+
+<center>
+{{ config('app.name') }}
+</center>
+<br>
+<div style="color: red; text-align: center;">
+<small>Atenção! Não responder este e-mail!</small>
+</div>
+@endcomponent

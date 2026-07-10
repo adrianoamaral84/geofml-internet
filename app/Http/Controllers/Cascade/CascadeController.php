@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Http\Controllers\Cascade;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Cidade;
+use App\GerenciarOm;
+use App\PostoGraduacao;
+
+class CascadeController extends Controller
+{
+    public function carregarCidades($id){
+        $listaCidades = Cidade::where('uf_id', $id)->get();
+        return json_encode($listaCidades);
+    }
+
+    public function carregarOm($id){
+        //$listaOm = GerenciarOm::where('forca_id', $id)->get();
+        $listaOm = GerenciarOm::where('cidade_id', $id)->get();
+        
+        return json_encode($listaOm);
+    }
+
+     public function carregarPosto($id){
+        $listaPosto = PostoGraduacao::where('forca_id', $id)->get();
+        return json_encode($listaPosto);
+    }
+
+    public function carregarPostoSituacao($id){
+        //dd($id);
+        $listaPosto = PostoGraduacao::where('situacao_id', $id)->whereNotIn('id', [59,60])->get();
+        return json_encode($listaPosto);
+    }
+
+    public function carregarPostoSituacaoTodos($id){
+        //dd($id);
+        $listaPosto = PostoGraduacao::where('situacao_id', $id)->get();
+        return json_encode($listaPosto);
+    }
+
+    public function carregarUnidadesHabtacionais($id){
+        $listaUnidades = \App\UnidadeHabitacional::where('grupo_destinacao_id', $id)->where('disponivel', 1)->with('tipohabitacao')->get();
+        return json_encode($listaUnidades);
+        
+    }
+
+
+}

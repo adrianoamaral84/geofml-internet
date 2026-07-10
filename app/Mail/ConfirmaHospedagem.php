@@ -1,0 +1,78 @@
+<?php
+
+namespace App\Mail;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
+use \App\User;
+use \App\Hospede;
+use Crypt;
+
+
+class ConfirmaHospedagem extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    private $hospede;
+    /**
+     * Create a new message instance.
+     *
+     * @return void
+     */
+    public function __construct(Hospede $hospede)
+    {
+        
+        //dd($hospede);
+    
+        return $this->hospede = $hospede;
+    }    
+
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+
+        $mensagem = \App\GerenciarEmails::where('id', 5)->first();
+        $this->subject($mensagem->assunto);
+        $this->to($this->hospede->user->email);
+        $name = $this->hospede->user->name;
+        $posto = $this->hospede->user->posto->sigla;
+        
+        $senha = mt_rand(100000,99999999);
+
+        $mes =  date('M', strtotime('+1 months', strtotime(date('M'))));
+        $assinaturaCMT = \App\Assinatura::where('id', 1)->first();
+        $assinaturaGestor = \App\Assinatura::where('id', 2)->first();
+ 
+
+        return $this->markdown('mail.confirmacaoHospedagem')->with([
+                    'user' => $this->hospede->id,
+                    'nome' => $name,
+                    'posto' => $posto,
+                    'unidade' => $this->hospede->tipouh->descricao,
+                    'data_inicio' => $this->hospede->data_inicio,
+                    'data_termino' => $this->hospede->data_termino,
+                    'tipo_unidade' => $this->hospede->und_habitacionais_id,
+                    'adultos' => $this->hospede->adultos,
+                    'criancas' => $this->hospede->criancas,
+                    'pne' => $this->hospede->pne,
+                    'pet' => $this->hospede->pet,
+                    'valor' => $this->hospede->valor,
+                    'valortarifa' => $this->hospede->valortarifa,
+                    'diarias' => $this->hospede->qntdiarias,
+                    'mes' => $mes,
+                    'posto' => $posto,
+                    'assinaturaCMT' => $assinaturaCMT,
+                    'assinaturaGestor' => $assinaturaGestor,
+                    'cabecalho' => $mensagem->cabecalho,  
+                    'corpo' => $mensagem->corpo,     
+                    
+                    
+                ]);
+    }
+}

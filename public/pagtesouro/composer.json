@@ -1,0 +1,20 @@
+{
+    "name": "rafaelmenezes/pagtesouro10",
+    "description": "Integraçao da API PagTesouro para OMs da 10ª Regiao Militar",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Rafael Menezes",
+            "email": "rafael.87@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "PagTesouro\\": "src/"
+        }
+    },
+    "require": {
+        "bissolli/validador-cpf-cnpj": "^1.2",
+        "waavi/sanitizer": "^1.0"
+    }
+}

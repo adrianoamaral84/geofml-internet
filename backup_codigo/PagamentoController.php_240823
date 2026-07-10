@@ -1,0 +1,519 @@
+<?php
+
+namespace App\Http\Controllers\Pagamento;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Crypt;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+
+class PagamentoController extends Controller
+{
+    
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    public function index(){
+
+
+        $consulta = \App\pagtesouro::all();
+
+        return view('pagtesouro.index', compact('consulta'));
+    }
+
+
+    public function create(){
+
+
+        return view('pagtesouro.create');
+    }
+
+
+    public function store(Request $request){
+
+        //dd($request->all());
+        $customMessages = [
+                      
+            'url.required' => 'Campo URL obrigatório',
+            'token.required' => 'Campo Token brigatório',
+           
+         
+        ];
+
+        $validatedData = [
+            'url' => 'required',
+            'token' => 'required',
+           
+        ];
+
+
+      $validatedData = $request->validate($validatedData, $customMessages);
+      $consulta = new \App\pagtesouro();
+      $consulta->url = $validatedData['url'];
+      $consulta->token = $validatedData['token'];
+      $consulta->save();
+
+      \Session::flash('message', ['msg'=>"Cadastrado com sucesso!", 'class'=>'success']);
+      
+
+      return redirect()->route('pagamento.index');
+
+
+    }
+
+    public function edit($id){
+
+        $id = Crypt::decrypt($id);
+        $consulta = \App\pagtesouro::find($id);
+        //dd($consulta);
+        return view('pagtesouro.edit', compact('consulta'));
+        //dd('edit');
+    }
+
+
+    public function update(Request $request){
+
+
+        $customMessages = [
+                      
+            'url.required' => 'Campo URL obrigatório',
+            'token.required' => 'Campo Token brigatório',
+            'codigoservico.required' => 'Campo Token brigatório',
+            'codigoservico.number' => 'Campo Numerico',
+            
+            
+        ];
+
+        $validatedData = [
+            'url' => 'required',
+            'token' => 'required',
+            'codservico' => 'required:number',   
+        ];
+
+
+        $validatedData = $request->validate($validatedData, $customMessages);
+
+
+      $consulta = \App\pagtesouro::findOrFail($request->id);
+      $consulta->url = $validatedData['url'];
+      $consulta->codservico = $validatedData['codservico'];
+      $consulta->token = $validatedData['token'];
+      $consulta->update();
+
+      \Session::flash('message', ['msg'=>"Atualizado com sucesso!", 'class'=>'success']);
+      
+
+      return redirect()->route('pagamento.index');
+
+    }
+
+    public function geraboleto(){
+
+
+            $pagtesouro = \App\pagtesouro::where('id', 2)->first();
+            $jsonEnvio = $this->prepareJson1();
+
+            dd($jsonEnvio);
+
+            $data_string = json_encode($jsonEnvio);
+
+            $ch = curl_init('https://pagtesouro.tesouro.gov.br/pagamentos/meios-pagamento/geracao-boleto');
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Authorization: Bearer ' . $pagtesouro->token));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            dd($result);
+            curl_close($ch);
+
+            
+
+            $result = json_decode($result);
+            dd($result);
+    }
+
+    public function consultapagamento(){
+
+
+
+
+            $pagtesouro = \App\pagtesouro::where('id', 2)->first();
+            $jsonEnvio = $this->prepareJson1();
+
+            //dd($jsonEnvio);
+
+            $data_string = json_encode($jsonEnvio);
+
+            $ch = curl_init('https://pagtesouro.tesouro.gov.br/api/gru/pagamentos/1BvAmpIRYZF55yg9D6WOTZ');
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Authorization: Bearer ' . $pagtesouro->token));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            curl_close($ch);
+
+            
+
+            $result = json_decode($result);
+            dd($result);
+    }
+     public function processaPagamentoRestante($id, $restante)
+    {
+        
+            //dd($restante);
+            $id = Crypt::decrypt($id);
+            $hospedagem = \App\Hospede::findOrFail($id);
+            
+            if(Auth::id() <> $hospedagem->user_id){
+                
+                //Log::warning('Usuario '. Auth::id(). ' Tentou acessar hospedagem que não é sua!');
+                //abort('401');
+
+            }
+            
+            $verifica = \App\Pagamento::where('hospedagem_id', $id)->count();
+            if($verifica > 0){
+            
+                //\Session::flash('message', ['msg'=>"Existe um pagamento cadastrado no sistema para essa hospedagem!", 'class'=>'danger']);
+                //return redirect()->back();
+            
+            }
+
+           
+            $pagtesouro = \App\pagtesouro::where('id', 2)->first();
+            $jsonEnvio = $this->prepareJsonPagamentoRestante($hospedagem, $restante);
+            //dd($jsonEnvio);
+
+            $data_string = json_encode($jsonEnvio);
+         
+            $timeout = 20;
+
+            $ch = curl_init($pagtesouro->url);            
+            
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_PROXY_SSL_VERIFYPEER, 0);
+            //curl_setopt($ch, CURLOPT_PROXYUSERPWD, "login:senha");
+            curl_setopt($ch, CURLOPT_PROXY, "http://192.168.3.22:3128");
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Authorization: Bearer ' . $pagtesouro->token));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+            
+            
+            
+            if(curl_exec($ch) === false)
+            {
+               \Session::flash('message', ['msg'=>"Houve um erro ao enviar os dados para a APi do PagTesouro!", 'class'=>'danger']);                
+               return redirect()->back();
+            }
+                      
+            $result = curl_exec($ch);
+            curl_close($ch);
+            
+            $result = json_decode($result);
+            foreach ($result as $key => $value) {
+               $mensagem = $value;
+            }
+            
+            if(isset($mensagem->descricao)){
+                     \Session::flash('message', ['msg'=>$mensagem->descricao, 'class'=>'danger']);                
+               return redirect()->back();
+            }
+           
+                    
+          
+            $sessao = str_replace('https://pagtesouro.tesouro.gov.br/#/pagamento?idSessao=', '', $result->proximaUrl);
+            return redirect()->to($result->proximaUrl);        
+    }
+
+    public function processaRequisicao($id)
+    {
+        
+           
+       
+            $id = Crypt::decrypt($id);
+            $hospedagem = \App\Hospede::findOrFail($id);
+            
+            if(Auth::id() <> $hospedagem->user_id){
+                
+                Log::warning('Usuario '. Auth::id(). 'Tentou acessar hospedagem que não é sua!');
+                abort('401');
+
+            }
+            
+            $verifica = \App\Pagamento::where('hospedagem_id', $id)->count();
+            if($verifica > 0){
+            
+                //\Session::flash('message', ['msg'=>"Existe um pagamento cadastrado no sistema para essa hospedagem!", 'class'=>'danger']);
+                //return redirect()->back();
+            
+            }
+
+           
+            $pagtesouro = \App\pagtesouro::where('id', 2)->first();
+            $jsonEnvio = $this->prepareJson($hospedagem);
+         
+            $data_string = json_encode($jsonEnvio);
+         
+            $timeout = 20;
+
+            $ch = curl_init($pagtesouro->url);            
+            
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_PROXY_SSL_VERIFYPEER, 0);
+            //curl_setopt($ch, CURLOPT_PROXYUSERPWD, "login:senha");
+            curl_setopt($ch, CURLOPT_PROXY, "http://192.168.3.22:3128");
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Authorization: Bearer ' . $pagtesouro->token));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+            
+            //dd($ch);
+            
+            if(curl_exec($ch) === false)
+            {
+               \Session::flash('message', ['msg'=>"Houve um erro ao enviar os dados para a APi do PagTesouro!", 'class'=>'danger']);                
+               return redirect()->back();
+            }
+                      
+            $result = curl_exec($ch);
+            curl_close($ch);
+            //dd($result);
+            $result = json_decode($result);
+            
+            if($result === false){
+                 
+            }
+
+            if(isset($result->codigo)){
+                     \Session::flash('message', ['msg'=>$result->descricao, 'class'=>'danger']);                
+               return redirect()->back();
+            }
+
+                    
+            
+            //$pagamento = new \App\Pagamento;
+            //$pagamento->idPagamento = $result->idPagamento;
+            //$pagamento->proximaUrl = $result->proximaUrl;
+            //$pagamento->hospedagem_id = $id;
+            
+            //if($pagamento->save()){
+                $valor_restante = $hospedagem->valor - $hospedagem->valortarifa;
+                $hospedagem->status = 5;
+                $hospedagem->valor_pago = $hospedagem->valortarifa;
+                $hospedagem->valor_restante =  $valor_restante;
+                $hospedagem->update();
+            //}
+
+            //dd($result->proximaUrl);
+            $sessao = str_replace('https://pagtesouro.tesouro.gov.br/#/pagamento?idSessao=', '', $result->proximaUrl);
+            //return redirect()->refresh();
+            return redirect()->to($result->proximaUrl);        
+    }
+
+
+
+    public function pagamentoCarrinho($id, $total)
+    {
+        
+        
+           
+
+            $id = Crypt::decrypt($id);
+            $total = Crypt::decrypt($total);
+            
+
+            $hospedagem = \App\Hospede::findOrFail($id);
+            //dd($hospedagem->user->name);
+            
+            if(Auth::id() <> $hospedagem->user_id){
+                
+                //Log::warning('Usuario '. Auth::id(). ' Tentou acessar hospedagem que não é sua!');
+                //abort('401');
+
+            }
+            
+            $verifica = \App\Pagamento::where('hospedagem_id', $id)->count();
+            if($verifica > 0){
+            
+                //\Session::flash('message', ['msg'=>"Existe um pagamento cadastrado no sistema para essa hospedagem!", 'class'=>'danger']);
+                //return redirect()->back();
+            
+            }
+
+           
+            $pagtesouro = \App\pagtesouro::where('id', 2)->first();
+            $jsonEnvio = $this->prepareJsonCarrinho($hospedagem, $total);
+            
+
+            $data_string = json_encode($jsonEnvio);
+            //dd($data_string);
+
+            $timeout = 20;
+
+            $ch = curl_init($pagtesouro->url);            
+            
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_PROXY_SSL_VERIFYPEER, 0);
+            //curl_setopt($ch, CURLOPT_PROXYUSERPWD, "login:senha");
+            curl_setopt($ch, CURLOPT_PROXY, "http://192.168.3.22:3128");
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Authorization: Bearer ' . $pagtesouro->token));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+            
+            //dd($ch);
+            
+            if(curl_exec($ch) === false)
+            {
+               \Session::flash('message', ['msg'=>"Houve um erro ao enviar os dados para a APi do PagTesouro!", 'class'=>'danger']);                
+               return redirect()->back();
+            }
+                   
+
+            
+
+
+   
+          
+            $result = curl_exec($ch);
+            curl_close($ch);
+            $result = json_decode($result);
+            
+           
+            if(isset($result->codigo)){
+                \Session::flash('message', ['msg'=>$result->descricao, 'class'=>'danger']);                
+                return redirect()->back();
+            }
+            
+            
+
+            
+            
+           
+
+            if($result === false){
+            
+            }   
+
+            
+
+            //$verificaHospedagem = \App\CheckOut::where('hospedagem_id', $id);
+            //$verificaHospedagem->delete();
+          
+            return redirect()->to($result->proximaUrl);        
+    }
+
+    private function resultadoTemErro($result): bool
+    {
+        return is_array($result);
+    }
+
+      public function prepareJson1()
+    {
+        return array(
+            "idSessao" => "3a7161fa-2d7f-4256-b6a1-efe3b3d73315",
+
+        );
+    }
+
+
+    public function prepareJson($hospedagem)
+    {
+        
+        
+        $codigo = \App\PagTesouro::all()->first();
+        //dd($codigo->codservico);
+        $today = Carbon::now()->addDays(4);
+        $vencimento = $today->format('dmY');
+
+
+        return array(
+            "codigoServico" => $codigo->codservico,
+            //"codigoServico" => "7897",
+            "referencia" => "",
+            "competencia" => "",
+            "vencimento" => $vencimento,
+            "cnpjCpf" => $hospedagem->user_cpf, // colocar o cpf do militar cadastrado
+            "nomeContribuinte" =>  $hospedagem->user->name, // Colocar o nome do militar 
+            "valorPrincipal" =>  $hospedagem->valortarifa,
+            "valorDescontos" => "",
+            "valorOutrasDeducoes" => "",
+            "valorMulta" => "",
+            "valorJuros" => "",
+            "valorOutrosAcrescimos" => "",
+            "modoNavegacao" => "2",
+            "urlNotificacao" => "https://valpagtesouro.tesouro.gov.br/api/simulador/ug/notificacao"
+        );
+    }
+    public function prepareJsonPagamentoRestante($hospedagem, $restante)
+    {
+        
+        
+        $codigo = \App\PagTesouro::all()->first();
+        
+        $today = Carbon::now()->addDays(4);
+        $vencimento = $today->format('dmY');
+       
+
+        return array(
+            "codigoServico" => $codigo->codservico,
+            //"codigoServico" => "7897",
+            "referencia" => "",
+            "competencia" => "",
+            "vencimento" => $vencimento,
+            "cnpjCpf" => $hospedagem->user_cpf, // colocar o cpf do militar cadastrado
+            "nomeContribuinte" =>  $hospedagem->user->name, // Colocar o nome do militar 
+            //"valorPrincipal" =>  $hospedagem->valor,
+            "valorPrincipal" =>  $restante,
+            "valorDescontos" => "",
+            "valorOutrasDeducoes" => "",
+            "valorMulta" => "",
+            "valorJuros" => "",
+            "valorOutrosAcrescimos" => "",
+            "modoNavegacao" => "2",
+            "urlNotificacao" => "https://valpagtesouro.tesouro.gov.br/api/simulador/ug/notificacao"
+        );
+    }
+
+     public function prepareJsonCarrinho($hospedagem, $total)
+    {
+        
+        
+        $codigo = \App\PagTesouro::all()->first();
+        $total = number_format((float)$total, 2, '.', '');
+        //dd($total);
+
+
+        return array(
+            "codigoServico" => $codigo->codservico,
+            //"codigoServico" => "7897",
+            "referencia" => "",
+            "competencia" => "",
+            "vencimento" => "",
+            "cnpjCpf" => $hospedagem->user_cpf, // colocar o cpf do militar cadastrado
+            "nomeContribuinte" =>  $hospedagem->user->name, // Colocar o nome do militar 
+            "valorPrincipal" =>  $total,
+            "valorDescontos" => "",
+            "valorOutrasDeducoes" => "",
+            "valorMulta" => "",
+            "valorJuros" => "",
+            "valorOutrosAcrescimos" => "",
+            "modoNavegacao" => "2",
+            "urlNotificacao" => "https://valpagtesouro.tesouro.gov.br/api/simulador/ug/notificacao"
+        );
+    }
+
+    
+}

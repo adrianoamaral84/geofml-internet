@@ -1,0 +1,39 @@
+.ugs{
+    list-style-type: none;
+}
+
+.item-ug{
+    position: relative;
+    padding: 1em;
+    border: 1px solid #CCC;
+    border-radius: 6px;
+}
+
+.item-ug p.token{
+    line-break: anywhere;
+}
+
+.botao-delete{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-weight: bold;
+}
+
+.btn-faded{
+    opacity: 0.4 !important;
+}
+
+.lista-parametros{
+}
+
+.lista-parametros li{
+    font-weight: bold;
+    margin-top: 0.5em;
+    font-size: 1.3rem;
+}
+
+.lista-parametros li ul li{
+    font-weight: normal;
+    margin-top: 0.5em;
+}
