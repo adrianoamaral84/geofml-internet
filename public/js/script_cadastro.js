@@ -279,7 +279,7 @@ $(document).ready(function(){
     $protocol = window.location.protocol;
     $host = $protocol+ '//'+$(location).attr('host');
     //$host = $protocol+ '//'+$(location).attr('host')+'/GEOFML_Internet_Producao/GEOFML/public';
-    alert($host);
+    //alert($host);
     $(".custom-file-input").on("change", function() {
     var fileName = $(this).val().split("\\").pop();
     $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
