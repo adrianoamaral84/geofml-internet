@@ -778,6 +778,10 @@
                                     @endif
                                     @endif
 
+                                    
+                                    
+                                    
+
                                     @if($hospedagem->status == 5 or $hospedagem->status == 4)
 
                                     <button type="submit" id="btnupload" class="btn btn-primary">
@@ -1142,15 +1146,97 @@ span.onclick = function() {
 } 
 </script>
 <script>
+let janelaPagamentoInicial = null;
+let monitorPagamentoInicial = null;
+
 function myFunction() {
-  window.open("{{ route('pagamento.processaRequisicao', ['id' => Crypt::encrypt($hospedagem->id)]) }}", "_blank", "status=no, location=no, menubar=no, fullscreen=no, toolbar=no,scrollbars=no,resizable=no,top=500,left=500,width=700,height=700");
-  
+    const urlPagamento = @json(route(
+        'pagamento.processaRequisicao',
+        ['id' => Crypt::encrypt($hospedagem->id)]
+    ));
 
-  window.setTimeout( function() {
-  window.location.reload();
-}, 5000); 
-  //setTimeout(reloadpagina(), 3000);
+    const urlStatus = @json(route(
+        'pagamento.inicial.status',
+        ['id' => Crypt::encrypt($hospedagem->id)]
+    ));
 
+    janelaPagamentoInicial = window.open(
+        urlPagamento,
+        'pagamentoInicialPagTesouro',
+        'width=760,height=760,scrollbars=yes,resizable=yes'
+    );
+
+    if (!janelaPagamentoInicial) {
+        alert(
+            'O navegador bloqueou a janela. Permita pop-ups e tente novamente.'
+        );
+
+        return;
+    }
+
+    janelaPagamentoInicial.focus();
+
+    let consultaEmAndamento = false;
+
+    const consultarPagamentoInicial = async function () {
+        if (consultaEmAndamento) {
+            return;
+        }
+
+        consultaEmAndamento = true;
+
+        try {
+            const resposta = await fetch(urlStatus, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin',
+                cache: 'no-store'
+            });
+
+            if (!resposta.ok) {
+                throw new Error(
+                    'Erro HTTP ' + resposta.status
+                );
+            }
+
+            const dados = await resposta.json();
+
+            if (dados.pagamento_confirmado === true) {
+                clearInterval(monitorPagamentoInicial);
+
+                if (
+                    janelaPagamentoInicial &&
+                    !janelaPagamentoInicial.closed
+                ) {
+                    janelaPagamentoInicial.close();
+                }
+
+                sessionStorage.setItem(
+                    'pagamento_confirmado',
+                    'Pagamento da diária inicial realizado com sucesso!'
+                );
+
+                window.location.reload();
+            }
+        } catch (erro) {
+            console.error(
+                'Erro ao consultar pagamento inicial:',
+                erro
+            );
+        } finally {
+            consultaEmAndamento = false;
+        }
+    };
+
+    consultarPagamentoInicial();
+
+    monitorPagamentoInicial = setInterval(
+        consultarPagamentoInicial,
+        5000
+    );
 }
 function myFunction2() {
   window.open("{{ route('pagamento.processaPagamentoRestante', ['id' => Crypt::encrypt($hospedagem->id), 'restante' => $valorPagarRestante]) }}", "_blank", "status=no, location=no, menubar=no, fullscreen=no, toolbar=no,scrollbars=no,resizable=no,top=500,left=500,width=700,height=700");

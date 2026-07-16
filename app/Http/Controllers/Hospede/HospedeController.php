@@ -1347,10 +1347,9 @@ class HospedeController extends Controller
         }else{
           
             $consulta->save();
-            //return new \App\Mail\ConfirmaHospedagem($consulta);
+             
             
-            
-            // este > $email = \Illuminate\Support\Facades\Mail::queue(new \App\Mail\ConfirmaHospedagem($consulta)); 
+            $email = \Illuminate\Support\Facades\Mail::queue(new \App\Mail\ConfirmaHospedagem($consulta)); 
 
 
             if($email == 0){
