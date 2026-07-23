@@ -560,7 +560,10 @@ class HospedeController extends Controller
 
         $today = Carbon::now();
         $hoje = $today->format('d');
-        
+
+
+
+
 
         if($today >= $data_inicio && $today <= $data_termino){
             $is_altaTemporada = true;
@@ -571,25 +574,52 @@ class HospedeController extends Controller
 
         // MES 12
         $a = [];
-        if($mesAtual == 12){
+        // MÊS 12
         
-            if($hoje <= $diaBloqueado->dia){               
-               // dd('ok');
-                $minDate = Carbon::today()->addMonths(1)->format('Y-m-01');
-                $maxDate = Carbon::today()->addMonths(2)->format('Y-m-'.$diaBloqueado->limitedia);
-                
+if ($mesAtual == 12) {
+
+    // Sempre inicia no primeiro dia do mês atual para evitar estouro de datas
+    $dataBase = Carbon::today()->startOfMonth();
     
-            }
+    
+    if ($hoje <= $diaBloqueado->dia) {
 
-            if($hoje > $diaBloqueado->dia && $hoje <= 31){
-                //dd('ok1');
-                $minDate = Carbon::today()->addMonths(2)->format('Y-m-01');
-                $maxDate = Carbon::today()->addMonths(3)->format('Y-m-'.$diaBloqueado->limitedia);
+        // Janeiro
+        $minDate = $dataBase->copy()
+            ->addMonth()
+            ->format('Y-m-01');
 
+        // Fevereiro
+        $mesLimite = $dataBase->copy()->addMonths(2);
 
-            }  
-        
-        }
+        $diaLimite = min(
+            (int) $diaBloqueado->limitedia,
+            (int) $mesLimite->copy()->endOfMonth()->format('d')
+        );
+
+        $maxDate = $mesLimite->format('Y-m-')
+            . str_pad($diaLimite, 2, '0', STR_PAD_LEFT);
+
+    } else {
+
+        // Fevereiro
+        $minDate = $dataBase->copy()
+            ->addMonths(2)
+            ->format('Y-m-01');
+
+        // Março
+        $mesLimite = $dataBase->copy()->addMonths(3);
+
+        $diaLimite = min(
+            (int) $diaBloqueado->limitedia,
+            (int) $mesLimite->copy()->endOfMonth()->format('d')
+        );
+
+        $maxDate = $mesLimite->format('Y-m-')
+            . str_pad($diaLimite, 2, '0', STR_PAD_LEFT);
+    }
+}
+
        
          //  MES 11
         if($mesAtual == 11){
@@ -633,7 +663,6 @@ class HospedeController extends Controller
                 $maxDate = Carbon::today()->addMonths(3)->format('Y-m-'.$diaBloqueado->limitedia);
             }
         }
-
 
 
 
@@ -722,7 +751,6 @@ class HospedeController extends Controller
 
         }
 
-
        ////////////////////////////////////////////////////////////
         // BLOQUEIO DE DIAS    
         $bloquearDias = \App\LockDays::where('tipo', 1)->get();
@@ -788,6 +816,7 @@ class HospedeController extends Controller
         $hospedagem = \App\Hospede::where('id', $id)->first();
         $peridoinicial = $hospedagem->data_inicio." - ".$hospedagem->data_termino;
 
+        
 
 
         return view('hospedagem.edit_inscricao', compact('peridoinicial','tipos', 'minDate', 'maxDate', 'hoje','a', 'horario', 'diaBloqueado', 'hospedagem', 'unidades'));
