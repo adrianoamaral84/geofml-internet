@@ -115,23 +115,7 @@ class HospedeController extends Controller
 
         }
         
-        /*
-        foreach ($grupoTarifa as $key => $value) {
-            foreach ($value->postos as $posto) {
-               // echo $posto->pivot->grupotarifa_id;
-                if($posto->id === Auth::user()->postograd_id){
-                    
-
-                    $tarifa = \App\Tarifas::where('tipoundhab_id', $request->tipo)
-                    ->where('grupo_destinacao_id', $posto->pivot->grupotarifa_id)
-                    ->first();
-
-                    
-                }
-            }
-            
-        }
-        */
+        
 
         // Tipo de Unidade por Posto de Graduação
         $tipos = \App\TipoUndHab::all();
@@ -169,26 +153,10 @@ class HospedeController extends Controller
         return strcmp($a['value'], $b['value']);
         //Se quiser inverter a ordem basta trocar por return strcmp($b['nome'], $a['nome']);
         });
-        //$unidadess = json_encode($unidadess);
-        //dd($unidadess);
-
-        //print_r($unidadess);
-
-
-        //dd('fim');
-
-        /*
-        asort($unidadess, 'value');
-        dd($unidadess);
-
-        foreach ($unidadess as $chave => $valor) {
-        $pos[] = $valor;
         
-        }
-        */
-
-        //dd($pos);
-
+        
+        
+        
 
         $altaTemporada = \App\Temporada::where('tipo_temporada_id', 1)->first();
         $data_inicio = $altaTemporada->data_inicio;
@@ -196,10 +164,12 @@ class HospedeController extends Controller
         $diaBloqueado = \App\BloqueioDia::where('id', 1)->first();
      
 
-      
-        $mesAtual = date("m");
-        //$mesAtual = "08";
-        $ano = date("Y");
+      $today = Carbon::now();
+
+$mesAtual = (int) $today->format('m');
+$ano = (int) $today->format('Y');
+$hoje = (int) $today->format('d');
+       
 
        
         if($mesAtual == 12){
@@ -231,8 +201,7 @@ class HospedeController extends Controller
         $ultimoDiadoProximoMes = date("Y-" . "$proximoMes". "-t");
       
 
-        $today = Carbon::now();
-        $hoje = $today->format('d');
+       
         
 
         if($today >= $data_inicio && $today <= $data_termino){
@@ -241,169 +210,246 @@ class HospedeController extends Controller
 
         $diaBloqueado = \App\BloqueioDia::where('id', 1)->first(); 
 
-        //$datetime = new Carbon('2023-12-11 14:53:20');
-        //$hoje = $datetime->format('d');
-        //dd($datetime);
-
-        
-
-
-       // dd($mesAtual);
-
-        // MES 12
-        $a = [];
-        if($mesAtual == 12){
-        
-            if($hoje <= $diaBloqueado->dia){               
-               // dd('ok');
-                $minDate = Carbon::today()->addMonths(1)->format('Y-m-01');
-                $maxDate = Carbon::today()->addMonths(2)->format('Y-m-'.$diaBloqueado->limitedia);
-                
-    
-            }
-
-            if($hoje > $diaBloqueado->dia && $hoje <= 31){
-                //dd('ok1');
-                $minDate = Carbon::today()->addMonths(2)->format('Y-m-01');
-                $maxDate = Carbon::today()->addMonths(3)->format('Y-m-'.$diaBloqueado->limitedia);
-
-
-            }  
-        
-        }
-        //dd($diaBloqueado->dia); 
-        //dd($minDate);
-       
-        //  MES 11
-        if($mesAtual == 11){
-
-       
-            if($hoje <= $diaBloqueado->dia){               
-                
-                $minDate = Carbon::today()->format('Y-m-01');            
-                $maxDate = Carbon::today()->addMonths(2)->format('Y-m-'.$diaBloqueado->limitedia);
-
-            
-            }
-
-
-            if($hoje > $diaBloqueado->dia && $hoje <= 30){
-
-                    
-                $a[] = [$ano.'-12-01', $ano.'-12-31'];
-                $minDate = Carbon::today()->format('Y-m-d');            
-                $maxDate = Carbon::today()->addMonths(3)->format('Y-m-'.$diaBloqueado->limitedia);
-            
-
-            }
-            
-
-        }
-
-
-
-
-         // MES 10
-        if($mesAtual == 10){
-
-            if($hoje <= $diaBloqueado->dia){                               
-                $minDate = Carbon::today()->format('Y-m-01');            
-                $maxDate = Carbon::today()->addMonths(2)->format('Y-m-'.$diaBloqueado->limitedia);
-            }
-
-            if($hoje > $diaBloqueado->dia && $hoje <= 31){             
-                $minDate = Carbon::today()->format('Y-m-01');            
-                $maxDate = Carbon::today()->addMonths(3)->format('Y-m-'.$diaBloqueado->limitedia);
-            }
-        }
-
-
-
-
-
-       
-        //  MES 09
-        if($mesAtual == "09" or $mesAtual == "08" or $mesAtual == "07" or $mesAtual == "06" or $mesAtual == "05" or $mesAtual == "04" or $mesAtual == "03"){
-
-        
-            if($hoje <= $diaBloqueado->dia){               
-                
                
-                $minDate = Carbon::today()->format('Y-m-01');            
-                $maxDate = Carbon::today()->addMonths(2)->format('Y-m-'.$diaBloqueado->limitedia);
-
-            
-            }
 
 
-            if($hoje > $diaBloqueado->dia && $hoje <= 31){
-            
-                $minDate = Carbon::today()->format('Y-m-01');            
-                $maxDate = Carbon::today()->addMonths(3)->format('Y-m-'.$diaBloqueado->limitedia);
-            
-
-            }
-            
-
-        }
-
-
-
-     
-      
-
-
-
-        //  MES 02
-        if($mesAtual == "02"){
+       
 
         
-            if($hoje <= $diaBloqueado->dia){               
-                
-                $minDate = Carbon::today()->addMonths(1)->format('Y-m-01');
-                $maxDate = Carbon::today()->addMonths(2)->format('Y-m-'.$diaBloqueado->limitedia);
-        
-            }
+// Para simular 28 de dezembro, use temporariamente:
+// $today = Carbon::create(2026, 12, 28, 12, 0, 0);
 
+$a = [];
 
-            if($hoje > $diaBloqueado->dia && $hoje <= 29){
-           
+/*
+|--------------------------------------------------------------------------
+| Função para montar uma data limite válida
+|--------------------------------------------------------------------------
+|
+| Impede datas inválidas, como 31 de fevereiro.
+|
+*/
 
-                $minDate = Carbon::today()->addMonths(2)->format('Y-m-01');
-                $maxDate = Carbon::today()->addMonths(3)->format('Y-m-'.$diaBloqueado->limitedia);
-            
+$montarDataLimite = function ($dataMes, $diaConfigurado) {
+    $ultimoDiaDoMes = (int) $dataMes
+        ->copy()
+        ->endOfMonth()
+        ->format('d');
 
-            }
-            
+    $diaValido = min(
+        (int) $diaConfigurado,
+        $ultimoDiaDoMes
+    );
 
-        }
+    return $dataMes
+        ->copy()
+        ->day($diaValido)
+        ->format('Y-m-d');
+};
 
+/*
+|--------------------------------------------------------------------------
+| Dezembro
+|--------------------------------------------------------------------------
+*/
 
+if ($mesAtual === 12) {
 
+    $dataBase = $today->copy()->startOfMonth();
 
-        //  MES 01
-        if($mesAtual == "01"){
+    if ($hoje <= (int) $diaBloqueado->dia) {
 
-            if($hoje <= $diaBloqueado->dia){               
-                
-                $minDate = Carbon::today()->addMonths(1)->format('Y-m-01');
-                $maxDate = Carbon::today()->addMonths(2)->format('Y-m-'.$diaBloqueado->limitedia);
-        
-            }
+        // Janeiro
+        $minDate = $dataBase->copy()
+            ->addMonthsNoOverflow(1)
+            ->startOfMonth()
+            ->format('Y-m-d');
 
+        // Fevereiro
+        $mesLimite = $dataBase->copy()
+            ->addMonthsNoOverflow(2);
 
-            if($hoje > $diaBloqueado->dia && $hoje <= 31){
-        
+    } else {
 
+        // Fevereiro
+        $minDate = $dataBase->copy()
+            ->addMonthsNoOverflow(2)
+            ->startOfMonth()
+            ->format('Y-m-d');
 
-                $minDate = Carbon::today()->addMonths(2)->format('Y-m-01');
-                $maxDate = Carbon::today()->addMonths(3)->format('Y-m-'.$diaBloqueado->limitedia);
-            
+        // Março
+        $mesLimite = $dataBase->copy()
+            ->addMonthsNoOverflow(3);
+    }
 
-            }
-            
+    $maxDate = $montarDataLimite(
+        $mesLimite,
+        $diaBloqueado->limitedia
+    );
 
-        }
+/*
+|--------------------------------------------------------------------------
+| Novembro
+|--------------------------------------------------------------------------
+*/
+
+} elseif ($mesAtual === 11) {
+
+    $dataBase = $today->copy()->startOfMonth();
+
+    if ($hoje <= (int) $diaBloqueado->dia) {
+
+        $minDate = $dataBase->copy()
+            ->startOfMonth()
+            ->format('Y-m-d');
+
+        $mesLimite = $dataBase->copy()
+            ->addMonthsNoOverflow(2);
+
+    } else {
+
+        $a[] = [
+            $ano . '-12-01',
+            $ano . '-12-31'
+        ];
+
+        $minDate = $today->copy()->format('Y-m-d');
+
+        $mesLimite = $dataBase->copy()
+            ->addMonthsNoOverflow(3);
+    }
+
+    $maxDate = $montarDataLimite(
+        $mesLimite,
+        $diaBloqueado->limitedia
+    );
+
+/*
+|--------------------------------------------------------------------------
+| Outubro
+|--------------------------------------------------------------------------
+*/
+
+} elseif ($mesAtual === 10) {
+
+    $dataBase = $today->copy()->startOfMonth();
+
+    $minDate = $dataBase->copy()
+        ->startOfMonth()
+        ->format('Y-m-d');
+
+    if ($hoje <= (int) $diaBloqueado->dia) {
+        $mesLimite = $dataBase->copy()
+            ->addMonthsNoOverflow(2);
+    } else {
+        $mesLimite = $dataBase->copy()
+            ->addMonthsNoOverflow(3);
+    }
+
+    $maxDate = $montarDataLimite(
+        $mesLimite,
+        $diaBloqueado->limitedia
+    );
+
+/*
+|--------------------------------------------------------------------------
+| Março até setembro
+|--------------------------------------------------------------------------
+*/
+
+} elseif ($mesAtual >= 3 && $mesAtual <= 9) {
+
+    $dataBase = $today->copy()->startOfMonth();
+
+    $minDate = $dataBase->copy()
+        ->startOfMonth()
+        ->format('Y-m-d');
+
+    if ($hoje <= (int) $diaBloqueado->dia) {
+        $mesLimite = $dataBase->copy()
+            ->addMonthsNoOverflow(2);
+    } else {
+        $mesLimite = $dataBase->copy()
+            ->addMonthsNoOverflow(3);
+    }
+
+    $maxDate = $montarDataLimite(
+        $mesLimite,
+        $diaBloqueado->limitedia
+    );
+
+/*
+|--------------------------------------------------------------------------
+| Fevereiro
+|--------------------------------------------------------------------------
+*/
+
+} elseif ($mesAtual === 2) {
+
+    $dataBase = $today->copy()->startOfMonth();
+
+    if ($hoje <= (int) $diaBloqueado->dia) {
+
+        $minDate = $dataBase->copy()
+            ->addMonthsNoOverflow(1)
+            ->startOfMonth()
+            ->format('Y-m-d');
+
+        $mesLimite = $dataBase->copy()
+            ->addMonthsNoOverflow(2);
+
+    } else {
+
+        $minDate = $dataBase->copy()
+            ->addMonthsNoOverflow(2)
+            ->startOfMonth()
+            ->format('Y-m-d');
+
+        $mesLimite = $dataBase->copy()
+            ->addMonthsNoOverflow(3);
+    }
+
+    $maxDate = $montarDataLimite(
+        $mesLimite,
+        $diaBloqueado->limitedia
+    );
+
+/*
+|--------------------------------------------------------------------------
+| Janeiro
+|--------------------------------------------------------------------------
+*/
+
+} elseif ($mesAtual === 1) {
+
+    $dataBase = $today->copy()->startOfMonth();
+
+    if ($hoje <= (int) $diaBloqueado->dia) {
+
+        $minDate = $dataBase->copy()
+            ->addMonthsNoOverflow(1)
+            ->startOfMonth()
+            ->format('Y-m-d');
+
+        $mesLimite = $dataBase->copy()
+            ->addMonthsNoOverflow(2);
+
+    } else {
+
+        $minDate = $dataBase->copy()
+            ->addMonthsNoOverflow(2)
+            ->startOfMonth()
+            ->format('Y-m-d');
+
+        $mesLimite = $dataBase->copy()
+            ->addMonthsNoOverflow(3);
+    }
+
+    $maxDate = $montarDataLimite(
+        $mesLimite,
+        $diaBloqueado->limitedia
+    );
+}
 
 
 
