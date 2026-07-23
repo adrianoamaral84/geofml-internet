@@ -106,20 +106,39 @@
 
 
 
-                         <div class="col-sm-4 col-md-4 col-lg-4 form-group ForcaOmPosto">
-                             
-                            <input type="hidden" name="posto" value="{{$user->postograd_id}}">
-                            <label class="control-label">{{ __('Posto / Graduação') }}</label>
-                                <select name="posto" id="posto" class="custom-select mr-sm-2 @error('posto') is-invalid @enderror" autocomplete="off" @if($user->situacao_id == 2 or $user->situacao_id == 4) readonly="readonly" tabindex="-1" aria-disabled="true" style="touch-action: none; pointer-events: none; background-color: #e9ecef;" @endif>
-                                <option value="">Selecione</option>
-                               
-                            </select>
-                            @error('posto')
-                                <span class="has-error" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
+                          <div class="col-sm-4 col-md-4 col-lg-4 form-group ForcaOmPosto">
+
+    <input
+        type="hidden"
+        id="posto_selecionado"
+        value="{{ old('posto', $user->postograd_id) }}"
+    >
+
+    <label class="control-label" id="nivel">
+        {{ __('Posto / Graduação') }}
+    </label>
+
+    <select
+        name="posto"
+        id="posto"
+        class="custom-select mr-sm-2 @error('posto') is-invalid @enderror"
+        autocomplete="off"
+        @if($user->situacao_id == 2)
+            aria-disabled="true"
+            tabindex="-1"
+            style="pointer-events: none;"
+        @endif
+    >
+        <option value="">Selecione</option>
+    </select>
+
+    @error('posto')
+        <span class="has-error" role="alert">
+            <strong>{{ $message }}</strong>
+        </span>
+    @enderror
+
+</div>
 
                         <div class="col-sm-4 col-md-4 col-lg-4 form-group militarAtiva">
                             <label class="control-label">{{ __('Data Última Promoção') }}</label>
@@ -208,64 +227,101 @@
 
                 </div>
   
-                     <div class="row has-error">
+                     
+
+               <div class="row has-error">
+
+    {{-- UF --}}
+    <div class="col-sm-4 col-md-4 col-lg-4 form-group">
+        <label class="control-label">UF</label>
+
+        <select
+            name="uf"
+            id="uf"
+            required
+            class="custom-select mr-sm-2 @error('uf') is-invalid @enderror"
+            autocomplete="off"
+        >
+            <option value="">Selecione UF</option>
+
+            @foreach($ufs as $uf)
+                <option
+                    value="{{ $uf->id }}"
+                    {{ old('uf', $user->uf_id) == $uf->id ? 'selected' : '' }}
+                >
+                    {{ $uf->sigla }}
+                </option>
+            @endforeach
+        </select>
+
+        @error('uf')
+            <span class="has-error" role="alert">
+                <strong>{{ $message }}</strong>
+            </span>
+        @enderror
+    </div>
 
 
-                             <div class="col-sm-4 col-md-4 col-lg-4 form-group">
-                                <label class="control-label">{{ __('UF') }}</label>
-                                <select name="uf" id="uf" required class="custom-select mr-sm-2 @error('uf') is-invalid @enderror" autocomplete="off">
-                                <option value="">Selecione UF</option>
-                                    @foreach($ufs as $uf)
-                                    
-                            <option value="{{$uf->id}}" @if($user->uf_id == $uf->id)selected @endif>{{$uf->sigla}}</option>
-                                   
-        
-                                    @endforeach
-                                </select>
+    {{-- Cidade --}}
+    <div class="col-sm-4 col-md-4 col-lg-4 form-group">
 
-                                @error('uf')
-                                    <span class="has-error" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+        <input
+            type="hidden"
+            id="cidade_selecionada"
+            value="{{ old('cidade', $user->cidade_id) }}"
+        >
 
-                              <div class="col-sm-4 col-md-4 col-lg-4 form-group">
-                                <input type="hidden" name="cidade" id="cidade" value="{{ ($user->cidade_id) ? $user->cidade_id : old('cidade') }}">
-                                
-                                <input type="hidden" name="cidadee" id="cidadee" value="{{ ($user->cidade_id) ? $user->cidade_id : old('cidade') }}">
-                                
-                                <label class="control-label">{{ __('Cidade') }}</label>
-                                <select name="cidade" id="cidade" required="required" class="custom-select mr-sm-2 @error('cidade') is-invalid @enderror" autocomplete="off">
-                                <option value="">Selecione Cidade</option>
-                                   
-                                </select>
+        <label class="control-label">Cidade</label>
 
-                                @error('cidade')
-                                    <span class="has-error" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+        <select
+            name="cidade"
+            id="cidade"
+            required
+            class="custom-select mr-sm-2 @error('cidade') is-invalid @enderror"
+            autocomplete="off"
+        >
+            <option value="">Selecione Cidade</option>
+        </select>
 
-                            <div class="col-sm-4 col-md-4 col-lg-4 form-group">
-                          
-                                <input type="hidden" name="om" value="{{$user->om_id}}">
-                                <label class="control-label">{{ __('OM') }}</label>
-                                <select name="om" id="om" required class="custom-select mr-sm-2 @error('om') is-invalid @enderror" autocomplete="off">
-                                <option value="">Selecione OM</option>
-                                
-                                                       
-                                </select>
+        @error('cidade')
+            <span class="has-error" role="alert">
+                <strong>{{ $message }}</strong>
+            </span>
+        @enderror
+    </div>
 
-                                @error('om')
-                                    <span class="has-error" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
 
-                    </div>
+    {{-- OM --}}
+    <div class="col-sm-4 col-md-4 col-lg-4 form-group">
+
+        <input
+            type="hidden"
+            id="om_selecionada"
+            value="{{ old('om', $user->om_id) }}"
+        >
+
+        <label class="control-label">OM</label>
+
+        <select
+            name="om"
+            id="om"
+            required
+            class="custom-select mr-sm-2 @error('om') is-invalid @enderror"
+            autocomplete="off"
+        >
+            <option value="">Selecione OM</option>
+        </select>
+
+        @error('om')
+            <span class="has-error" role="alert">
+                <strong>{{ $message }}</strong>
+            </span>
+        @enderror
+    </div>
+
+</div>
+
+
 
                  <div class="row has-error">
                          <div class="col-sm-6 col-md-8 col-lg-8 form-group">
