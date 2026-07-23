@@ -479,7 +479,6 @@ class HospedeController extends Controller
 
         public function solicitarinscricaoEditNOVO($id){
 
-        //dd('okl');
         $id = Crypt::decrypt($id);   
         date_default_timezone_set('America/Sao_Paulo');
         $usuarioAutenticado = Auth::user();
@@ -798,6 +797,15 @@ class HospedeController extends Controller
 
 
     }
+
+
+
+
+
+
+
+
+    
     public function solicitarinscricaoEdit($id){
 
         
@@ -2842,9 +2850,9 @@ class HospedeController extends Controller
 
 
     //////////////////////////////////////////////////////////////////////////////////////////
-    public function solicitarinscricaoEditConfirmar(Request $request){
+   public function solicitarinscricaoEditConfirmar(Request $request){
         
-            //dd("Edit Confirmar");
+            
             date_default_timezone_set('America/Sao_Paulo');
             //dd($request->all());
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2970,148 +2978,108 @@ class HospedeController extends Controller
            
 
             /*
-
-
-            COMECA AQUI
-
-
+            |--------------------------------------------------------------------------
+            | VALIDAÇÃO DO LIMITE DE RESERVAS NA EDIÇÃO
+            |--------------------------------------------------------------------------
             */
-            //dd($dataInicialPedidoMes);
+
+            $idUsuario = Auth::id();
+            $idPedidoAtual = $request->id;
+
+            $pedidoAtual = \App\Hospede::where('id', $idPedidoAtual)
+                ->where('user_id', $idUsuario)
+                ->first();
+
+            if (!$pedidoAtual) {
+                \Session::flash('message', [
+                    'msg' => "Pedido de hospedagem não encontrado ou não pertence ao usuário.",
+                    'class' => 'danger'
+                ]);
+
+                return redirect()->back();
+            }
+
             $verificaQuantidadeHospedagemMesAnoCount = \App\Hospede::where('user_id', $idUsuario)
+                ->where('id', '<>', $idPedidoAtual)
                 ->whereYear('data_inicio', '=', $dataInicialPedidoAno)
                 ->whereMonth('data_inicio', '=', $dataInicialPedidoMes)
                 ->count();
-
-             $verificaQuantidadeHospedagemMesAno = \App\Hospede::where('user_id', $idUsuario)
-                ->whereYear('data_inicio', '=', $dataInicialPedidoAno)
-                ->whereMonth('data_inicio', '=', $dataInicialPedidoMes)
-                ->where('id', $request->id)
-                ->count();
-
-
-            //dd($verificaQuantidadeHospedagemMesAno); 
 
             $verificaQuantidadeHospedagemMesAnoCountTipo = \App\Hospede::where('user_id', $idUsuario)
+                ->where('id', '<>', $idPedidoAtual)
                 ->whereYear('data_inicio', '=', $dataInicialPedidoAno)
                 ->whereMonth('data_inicio', '=', $dataInicialPedidoMes)
-                ->whereIn('tipo_und_id', [11,12])
+                ->whereIn('tipo_und_id', [11, 12])
                 ->count();
 
-            
-           
             $quantidadeReservas = \App\QuantidadeReserva::first();
-            
+
+            if (!$quantidadeReservas) {
+                \Session::flash('message', [
+                    'msg' => "Quantidade máxima de reservas não configurada. Contacte o administrador.",
+                    'class' => 'danger'
+                ]);
+
+                return redirect()->back();
+            }
 
             if ($is_altaTemporada == true) {
 
+                if ($request->tipo == 12 || $request->tipo == 11) {
 
-                $quantidadeReservas = \App\QuantidadeReserva::first();
-                
-                if($request->tipo == 12 or $request->tipo == 11){   
+                    if ($verificaQuantidadeHospedagemMesAnoCountTipo >= 2) {
+                        \Session::flash('message', [
+                            'msg' => "Você alcançou o limite máximo de 2 reservas para esse mês da alta temporada! Nas UH Camping e/ou Motor-Home",
+                            'class' => 'danger'
+                        ]);
 
-
-                    if($verificaQuantidadeHospedagemMesAnoCountTipo >= 2){
-
-
-                        \Session::flash('message', ['msg'=>"Você alcançou o limite máximo de 2 reservas para esse mês da alta temporada! Nas UH Camping e/ou Motor-Home", 'class'=>'danger']);
                         return redirect()->back();
-
-
                     }
 
+                } else {
 
+                    if ($verificaQuantidadeHospedagemMesAnoCount >= $quantidadeReservas->reservas) {
+                        \Session::flash('message', [
+                            'msg' => "Você alcançou o limite máximo de "
+                                . $quantidadeReservas->reservas
+                                . " reserva(s) para esse mês da alta temporada!",
+                            'class' => 'danger'
+                        ]);
 
-                }else{
-
-
-                    if($verificaQuantidadeHospedagemMesAnoCount >= $quantidadeReservas->reservas){
-
-                        
-                    
-                        
-                         if($verificaQuantidadeHospedagemMesAno == 0){
-
-                            
-
-                            \Session::flash('message', ['msg'=>"Você alcançou o limite máximo de ". $quantidadeReservas->reservas ." reserva para esse mês da alta temporada!", 'class'=>'danger']);
                         return redirect()->back();
-
-                        
-                         }
-
-
-
-                        
-
-
-
-
-
-
-
-
-
-
-
-                    
                     }
-
-
                 }
 
-                //dd($verificaQuantidadeHospedagemMesAnoCountTipo);
+            } else {
 
-                
+                if ($request->tipo == 12 || $request->tipo == 11) {
 
-            }else{
-                //dd('baixa');
-                if($request->tipo == 12 or $request->tipo == 11){
+                    if ($verificaQuantidadeHospedagemMesAnoCountTipo >= 2) {
+                        \Session::flash('message', [
+                            'msg' => "Você alcançou o limite máximo de 2 reservas para esse mês da baixa temporada! Nas UH Camping e/ou Motor-Home",
+                            'class' => 'danger'
+                        ]);
 
-                    if($verificaQuantidadeHospedagemMesAnoCountTipo >= 2){
-
-
-
-
-                        \Session::flash('message', ['msg'=>"Você alcançou o limite máximo de 2 reservas para esse mês da baixa temporada! Nas UH Camping e/ou Motor-Home", 'class'=>'danger']);
                         return redirect()->back();
-
-
                     }
 
+                } else {
 
+                    if ($verificaQuantidadeHospedagemMesAnoCount >= $quantidadeReservas->qnt_reservas_baixa_temporada) {
+                        \Session::flash('message', [
+                            'msg' => "Você alcançou o limite máximo de "
+                                . $quantidadeReservas->qnt_reservas_baixa_temporada
+                                . " reserva(s) para esse mês da baixa temporada!",
+                            'class' => 'danger'
+                        ]);
 
-
-                }else{
-
-                    if($verificaQuantidadeHospedagemMesAnoCount >= $quantidadeReservas->qnt_reservas_baixa_temporada){
-                        //dd('entrou');
-
-                        if($verificaQuantidadeHospedagemMesAno == 0){
-
-                            
-
-                            \Session::flash('message', ['msg'=>"Você alcançou o limite máximo de ". $quantidadeReservas->qnt_reservas_baixa_temporada ." reservas para esse mês da baixa temporada!", 'class'=>'danger']);
-                            return redirect()->back();
-
-
-                         }
-                           
-
+                        return redirect()->back();
                     }
-
                 }
-                
-            }      
+            }
 
-
-            /*  
-        
-
-
-            VERIFICA SE JÁ TEM PEDIDO DE HOSPEDAGEM NAQUELE MêS  
-
-
-
+            /*
+            VERIFICA SE JÁ TEM PEDIDO DE HOSPEDAGEM NAQUELE MêS
             */
 
 
@@ -3604,6 +3572,7 @@ class HospedeController extends Controller
 
 
     }
+    ////q////////////////////////////////////////
     public function solicitarinscricaoEditConfirmar2(Request $request){
 
 
