@@ -2,14 +2,14 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
 
-        <!--<script async src="https://www.googletagmanager.com/gtag/js?id=G-GCX8SQ34HM"></script>
+       <script async src="https://www.googletagmanager.com/gtag/js?id=G-GCX8SQ34HM"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', 'G-GCX8SQ34HM');
         </script>
--->
+
 
 
 
@@ -18,7 +18,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="app-url" content="{{ url('/') }}">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
-	<title>{{ config('app.name', 'Administrator FML') }}</title>
+	<title>@hasSection('title')@yield('title') | GeoFML @else GeoFML @endif</title>
 
             
   

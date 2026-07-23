@@ -1,5 +1,5 @@
 @extends('layouts.auth')
-
+@section('title', 'Redefinir Senha')
 @section('content')
 <p class="text-center">{{ __('REDEFINIR SENHA') }}</p>
 <p class="text-muted text-center"><small>Informe uma nova senha.</small></p>

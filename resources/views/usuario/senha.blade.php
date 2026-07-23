@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('title', 'Alterar Senha')
 
 @section('content')
 <div class="title-block">

@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('title', 'Confirmar dados da inscrição')
 
 @section('content')
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />

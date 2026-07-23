@@ -1,5 +1,5 @@
 @extends('layouts.solicita')
-
+@section('title', 'Solicitar Acesso ao Sistema')
 @section('content')
 <p class="text-center">Solicitar Acesso ao Sistema</p>
 <form id="solicita-form" action="{{ route('pedido.acesso') }}" method="POST">

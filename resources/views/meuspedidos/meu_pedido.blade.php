@@ -1,5 +1,5 @@
 @extends('layouts.app')
-
+@section('title', 'Dados do seu pedido')
 @section('content')
 
 <style type="text/css">

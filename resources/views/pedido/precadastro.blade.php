@@ -1,5 +1,5 @@
 @extends('layouts.precadastro')
-
+@section('title', 'Pre Cadastro')
 @section('content')
 <div class="title-block">
     <h3 class="title"> Cadastro </h3>

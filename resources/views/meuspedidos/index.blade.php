@@ -1,5 +1,5 @@
 @extends('layouts.app')
-
+@section('title', 'Minhas Solicitações')
 @section('content')
 <article class="items-list-page">
     <div class="title-search-block">

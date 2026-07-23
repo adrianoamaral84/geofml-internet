@@ -1,5 +1,5 @@
 @extends('layouts.auth')
-
+@section('title', 'Recuperar Senha')
 @section('content')
 <p class="text-center">{{ __('RECUPERAR SENHA') }}</p>
 <p class="text-muted text-center"><small>Digite seu endereço de e-mail para recuperar sua senha.</small></p>
