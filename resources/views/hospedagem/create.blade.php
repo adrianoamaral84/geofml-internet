@@ -1,5 +1,4 @@
 @extends('layouts.app')
-@section('title', 'Solicitar Inscrição')
 
 @section('content')
 
@@ -66,8 +65,7 @@
 
             </div>
 
-                                   
-
+          
 
             <div class="form-group col-sm-12 col-md-12 col-lg-6">
                             <label class="control-label">{{ __('Tipo Unidade Habitacional') }}</label>
@@ -166,7 +164,7 @@
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
-                            <span id="petmsg" style="display: none; color: red;">Unidades Habitacionais destinadas para PET: 2 para Of Sup; 2 para Cap/Ten e 4 para ST/Sgt</span>
+                            <span id="petmsg" style="display: none; color: red;">Unidades Habitacionais destinadas para PET (somente cães e gatos): 2 para Of Sup; 2 para Cap/Ten e 4 para ST/Sgt</span>
             </div>
            </div>
             
@@ -205,24 +203,6 @@
   
  
 <script src="{{ asset('js/jquery-ui.js')}}"></script> 
- <script>
- 
-  $(function() {
-    
-    var disabledDates = {!! $diasReservados !!}
-
-        $('#datepicker').datepicker({
-        beforeShowDay: function(date){
-        var string = jQuery.datepicker.formatDate('yy-mm-dd', date);
-        return [ disabledDates.indexOf(string) == -1 ]
-    }
-    });
-
-
-
-  });
- 
-</script>
 <script src="{{ asset('js/litepickerBudler.js')}}"></script>
 <script src="{{ asset('js/mobilefriendly.js')}}"></script>
 <script>

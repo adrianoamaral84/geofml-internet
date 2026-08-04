@@ -1,16 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
-<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
   <link rel="stylesheet" href="/resources/demos/style.css">
-  
+<link rel="stylesheet" href="{{ asset('css/jquery-ui.css') }}"/>  
+
 <link rel="stylesheet" href="{{ asset('css/litepicker.css') }}"/>
 <article class="items-list-page">
     <div class="title-search-block">
         <div class="title-block">
             <div class="row">
                 <div class="col-md-12">
-                    <h3 class="title"> Editar Inscrição </h3>
+                    <h3 class="title">Solicitar Inscrição</h3>
+                    
                     <small>Página destinada a inscrição para a Área de Lazer do Forte Marechal Luz.</small><br>
                     <small style="color: red;"><b>As inscrições serão aceitas até o dia <b>{{ $diaBloqueado->dia }}</b> do mês anterior ao mês pretendido.</b></small><br>
                     <small>Não há o número mínimo de diárias (pacotes) e a reserva será no máximo de <b>7 (sete)</b> diárias na alta temporada</small><br>
@@ -33,36 +35,27 @@
                     <div class="card-block">
                         <section class="example">
                             <div class="table-flip-scroll">
-
-                                <form id="password-form" action="{{ route('hospede.edita.confirmar') }}" method="POST">
-                                    @csrf
-                               
-                                <input type="hidden" id="id" name="id" value="{{ old('id',$hospedagem->id) }}">
                                 
 
+
+
+
+
+
+                                <form id="password-form" action="{{ route('hospede.confirmar') }}" method="POST">
+                                    @csrf
+                                
         <div class="row has-error">
- <div class="form-group col-sm-12 col-md-12 col-lg-6">
+
+
+            <div class="form-group col-sm-12 col-md-12 col-lg-6">
                
                  <label class="control-label">{{ __('Período de Entrada e Saída') }}</label>
                 
-                
 
-        
-                  <input
-    type="text"
-    name="peridoinicial"
-    id="peridoinicial"
-    value="{{ old(
-        'peridoinicial',
-        \Carbon\Carbon::parse($hospedagem->data_inicio)->format('d-m-Y')
-        . ' - ' .
-        \Carbon\Carbon::parse($hospedagem->data_termino)->format('d-m-Y')
-    ) }}"
-    class="form-control boxed @error('peridoinicial') is-invalid @enderror"
-    placeholder="Selecione o período"
-    readonly
-    required
->
+                 
+                 <input type="text" name="peridoinicial" id="peridoinicial" readonly="" value="" class="form-control boxed @error('peridoinicial') is-invalid @enderror" required onpaste="return false;" > 
+                
                  <small><b>Clica na data de início e arraste o mouse para a data de saída</b></small>
                             @error('peridoinicial')
                                 <span class="has-error" role="alert">
@@ -71,22 +64,23 @@
                             @enderror
 
             </div>
-           
 
-
+          
 
             <div class="form-group col-sm-12 col-md-12 col-lg-6">
                             <label class="control-label">{{ __('Tipo Unidade Habitacional') }}</label>
                 
                                 <select name="tipo" id="tipo" required class="custom-select mr-sm-2 @error('tipo') is-invalid @enderror" autocomplete="off">
                                      <option value="">Selecione</option>
-                                
+                                     @foreach($unidadess as $unidad)
 
-                                @foreach($unidades as $unidade)
+                                         <option value="{{$unidad['id']}}"> {{$unidad['value']}} </option>
+                                        
 
-                                         <option value="{!! $unidade->id !!}" @if($hospedagem->tipo_und_id == $unidade->id) selected @endif> {!! $unidade->descricao !!} </option>
+                                    @endforeach
+                                    
 
-                                @endforeach
+
 
                                     
                             </select>
@@ -97,22 +91,21 @@
                             @enderror
             </div>
 
+             
 
 
-
-           
-           
         </div>
 
-       
-      
+     <br>
+     
+    
        
         <div class="row form-group has-error">
 
-               <div class="form-group col-sm-12 col-md-12 col-lg-6">
+             <div class="form-group col-sm-12 col-md-12 col-lg-6">
                             <label class="control-label">{{ __('Adultos') }}</label>
                              <small>Quantidade de pessoas que ocuparão a UH</small>
-                            <input type="number" min="1" class="form-control boxed @error('adultos') is-invalid @enderror" value="{{ old('adultos', $hospedagem->adulto) }}" name="adultos" id="adultos" autofocus required maxlength="10" onpaste="return false;">
+                            <input type="number" min="1" class="form-control boxed @error('adultos') is-invalid @enderror" value="{{ old('adultos') }}" name="adultos" id="adultos" autofocus required maxlength="10" onpaste="return false;">
                             
                             @error('adultos')
                                 <span class="has-error" role="alert">
@@ -121,10 +114,10 @@
                             @enderror
             </div>
 
-           <div class="form-group col-sm-12 col-md-12 col-lg-6">
+            <div class="form-group col-sm-12 col-md-12 col-lg-6">
                             <label class="control-label">{{ __('Crianças até 5 anos') }}</label>
                             <small>Quantidade de crianças que ocuparão a UH</small>
-                            <input type="number" min="0" class="form-control boxed @error('criancas') is-invalid @enderror" value="{{ old('criancas', $hospedagem->crianca) }}" name="criancas" id="criancas" autofocus required maxlength="10" onpaste="return false;">
+                            <input type="number" min="0" class="form-control boxed @error('criancas') is-invalid @enderror" value="{{ old('criancas') }}" name="criancas" id="criancas" autofocus required maxlength="10" onpaste="return false;">
                             @error('criancas')
                                 <span class="has-error" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -133,8 +126,7 @@
             </div>
             
             
-
-            
+         
 
 
         </div>
@@ -143,18 +135,13 @@
 
         <div class="row has-error">
             
-            <div class="form-group col-sm-12 col-md-12 col-lg-12">
+            <div class="form-group col-sm-12 col-md-12 col-lg-6">
                             <label class="control-label">{{ __('Hospedará Portador de Necessidade Especial (PNE)?') }}</label>
                 
                                 <select name="pne" id="pne" required class="custom-select mr-sm-2 @error('pne') is-invalid @enderror" autocomplete="off">
                                      <option value="">Selecione Sala</option>
-
-                                        <option value="1" @if($hospedagem->pne == 1) selected @endif>Sim</option>
-                                        <option value="0" @if($hospedagem->pne == 0) selected @endif>Não</option>
-
-
-
-                                         
+                                        <option value="1">Sim</option>
+                                        <option value="0">Não</option>
                             </select>
                             @error('pne')
                                 <span class="has-error" role="alert">
@@ -162,31 +149,29 @@
                                 </span>
                             @enderror
             </div>
-           </div>
-            
-             <div class="row has-error">
-            
-            <div class="form-group col-sm-12 col-md-12 col-lg-12">
+
+
+            <div class="form-group col-sm-12 col-md-12 col-lg-6">
                             <label class="control-label">{{ __('Hospedará PET?') }}</label>
                 
                                 <select name="pet" id="pet" required class="custom-select mr-sm-2 @error('pet') is-invalid @enderror" autocomplete="off">
                                      <option value="">Selecione Sala</option>
-                                        <option value="1" @if($hospedagem->pet == 1) selected @endif>Sim</option>
-                                        <option value="0" @if($hospedagem->pet == 0) selected @endif>Não</option>
+                                        <option value="1">Sim</option>
+                                        <option value="0">Não</option>
                             </select>
                             @error('pet')
                                 <span class="has-error" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
-                            <span id="petmsg" style="display: none; color: red;">Unidade Habitacional destinadas para PET (somente cães e gatos): 2 para Of Sup; 2 para Cap/Ten e 4 para ST/Sgt</span>
+                            <span id="petmsg" style="display: none; color: red;">Unidades Habitacionais destinadas para PET (somente cães e gatos): 2 para Of Sup; 2 para Cap/Ten e 4 para ST/Sgt</span>
             </div>
            </div>
-
+            
             <div class="row has-error">
             <div class="form-group col-sm-12 col-md-12 col-lg-12">
                             <label class="control-label">{{ __('Observação') }}</label>
-                            <input type="text" class="form-control boxed @error('observacao') is-invalid @enderror" maxlength="250" value="{{ old('observacao', $hospedagem->observacao) }}" name="observacao" id="observacao" autofocus maxlength="250" onpaste="return false;">
+                            <input type="text" class="form-control boxed @error('observacao') is-invalid @enderror" value="{{ old('observacao') }}" name="observacao" id="observacao" autofocus maxlength="250" onpaste="return false;">
                             @error('observacao')
                                 <span class="has-error" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -215,59 +200,61 @@
     </section>
 </article>
 @push('javascript')
+  
+ 
+<script src="{{ asset('js/jquery-ui.js')}}"></script> 
 <script src="{{ asset('js/litepickerBudler.js')}}"></script>
 <script src="{{ asset('js/mobilefriendly.js')}}"></script>
-
-
 <script>
+
     window.disableLitepickerStyles = true;
     const picker = new Litepicker({ 
-        element: document.getElementById('peridoinicial'),
-        plugins: ['mobilefriendly','keyboardnav'],
-        keyboardnav: {
-            firstTabIndex: 2,
-        },
-        mobilefriendly: {
-            breakpoint: 480,
-        },
-        dropdowns: {
-            "minYear": {{ date('Y') }},
-            "maxYear": {{ date('Y') + 1 }},
-            "months": false,
-            "years": false,
-        },
-        singleMode: false, // Alterado para false para aceitar período (entrada e saída)
-        allowRepick: true,
-        numberOfMonths: 2,
-        autoRefresh: true,
-        disallowLockDaysInRange: true,
-        format: "DD-MM-YYYY",
-        lang: "pt-BR",
-        autoApply: true,
-        numberOfColumns: 2,
-        maxDate: "{{ $maxDate }}", // Certifique-se que o Controller envia esta variável
-        minDate: "{{ $minDate }}", // Certifique-se que o Controller envia esta variável (deve ser hoje)
-        lockDays: {!! $a !!},      // Datas já ocupadas vindas do Controller
-        tooltipText: {"one":"diária","other":"diárias"},
-        tooltipNumber: (totalDays) => {
-            return totalDays - 1;
-        },
+    element: document.getElementById('peridoinicial'),
+    //elementEnd: document.getElementById('final'),
+    plugins: ['mobilefriendly','keyboardnav'],
+    
+    keyboardnav: {
+        firstTabIndex: 2,
+    },
+    mobilefriendly: {
+        breakpoint: 480,
+    },
+    dropdowns: {
+        "minYear": {{ $minYear }},
+        "maxYear":{{ $maxYear }},
+        "months":false,
+        "years":false,
+    },
+
+    singleMode: false,
+    allowRepick: false,
+    numberOfMonths: 2,
+    autoRefresh: true,
+    disallowLockDaysInRange: true,
+    format: "DD-MM-YYYY",
+    //inlineMode: true,
+    lang: "pt-BR",
+    //maxDays: 7,
+    numberOfColumns: 2,
+    maxDate: "{{ $maxDate }}",
+    minDate: "{{ $minDate }}",
+    lockDays: {!! $a !!},
+    tooltipText: {"one":"diária","other":"diárias"},
+    tooltipNumber: (totalDays) => {
+    return totalDays - 1;
+    },
     });
+
+
+   
+
+
+
 </script>
 
 <script>
 $(document).ready(function(){
-    var pet = $('select[name="pet"] option:selected').val();
-    if(pet == 1){
-    $('#petmsg').show();
-
-    }else{
-        $('#petmsg').hide();
-
-
-    }
-    
-
+$('#petmsg').hide();
 $('#pet').on('change', ()=>{
     var pet = $('select[name="pet"] option:selected').val();
     if(pet == 1){
@@ -275,7 +262,6 @@ $('#pet').on('change', ()=>{
     
     }else{
     $('#petmsg').hide();
-
     }
 
     });
