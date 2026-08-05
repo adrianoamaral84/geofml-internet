@@ -55,7 +55,25 @@ class LoginController extends Controller
 
         return ['cpf' => $request->cpf, 'password' => $request->password, 'status' => [1,3,5,6]];
     }
-    
+    protected function validateLogin(Request $request)
+{
+    $rules = [
+        $this->username() => ['required', 'string'],
+        'password' => ['required', 'string'],
+    ];
+
+    if (config('services.recaptcha.enabled')) {
+        $rules['g-recaptcha-response'] = [
+            'required',
+            new ReCaptcha(),
+        ];
+    }
+
+    $request->validate($rules, [
+        'g-recaptcha-response.required' =>
+            'Marque a opção “Não sou um robô”.',
+    ]);
+}
 
     protected function authenticated(Request $request, $user)
     {
@@ -85,17 +103,6 @@ class LoginController extends Controller
 
     
     }
-
-
-    protected function validateLogin(Request $request)
-{
-    $request->validate([
-        $this->username() => 'required|string',
-        'password' => 'required|string',
-       // 'g-recaptcha-response' => ['required', new \App\Rules\ReCaptcha]
-        'g-recaptcha-response' => ['nullable']
-    ]);
-}
 
 
 }

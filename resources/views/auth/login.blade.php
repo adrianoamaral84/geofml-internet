@@ -13,7 +13,14 @@
   z-index: 2;
 }
 </style>
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+@if (config('services.recaptcha.enabled'))
+    <script
+        src="https://www.google.com/recaptcha/api.js"
+        async
+        defer
+    ></script>
+@endif
 
 <p class="text-center">Acesso ao Sistema</p>
 <form id="login-form" action="{{ route('login') }}" method="POST">
@@ -46,10 +53,15 @@
 
     <center>
 
-     @if (!app()->environment('local'))
-    <div class="g-recaptcha"
-         data-sitekey="{{ env('GOOGLE_RECAPTCHA_SITE_KEY') }}">
-    </div>
+
+
+
+
+@if (config('services.recaptcha.enabled'))
+    <div
+        class="g-recaptcha"
+        data-sitekey="{{ config('services.recaptcha.site_key') }}"
+    ></div>
 @endif
     </center>
 

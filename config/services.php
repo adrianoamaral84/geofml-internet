@@ -13,6 +13,11 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    'recaptcha' => [
+    'enabled' => env('RECAPTCHA_ENABLED', false),
+    'site_key' => env('GOOGLE_RECAPTCHA_SITE_KEY'),
+    'secret_key' => env('GOOGLE_RECAPTCHA_SECRET'),
+    ],
     'pagtesouro' => [
     'config_id' => env('PAGTESOURO_CONFIG_ID', 2),
     'modo_teste' => env('PAGTESOURO_MODO_TESTE', false),
