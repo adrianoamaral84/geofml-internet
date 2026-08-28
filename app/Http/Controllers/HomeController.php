@@ -393,7 +393,12 @@ class HomeController extends Controller
             'telefone.required' => 'Campo Telefone obrigatório',
             'documento_verso.max' => 'O Documento Verso precisa ter máximo MB.',
             'documento.max' => 'O Documento Frente precisa ter máximo 4MB.',
-          
+
+            'mesAnoFinal.required_if' =>
+            'O campo Mês/Ano Final é obrigatório quando PTTC estiver marcado.',
+            'mesAnoFinal.regex' =>
+            'Informe o Mês/Ano Final no formato MM/AAAA.',
+
 
         ];
 
@@ -410,6 +415,13 @@ class HomeController extends Controller
             'siape'  =>  'nullable',
             'nivel'  =>  'nullable',
             'om'  =>  'required',
+            
+            'mesAnoFinal' => [
+                'required_if:pttc,1',
+                'nullable',
+                'regex:/^(0[1-9]|1[0-2])\/[0-9]{4}$/',
+            ],
+            
             'mecenas' => 'nullable|boolean',
             'password' => 'required|max:15|min:6',
             'posto'  =>  'nullable',
@@ -444,7 +456,6 @@ class HomeController extends Controller
         $usuario->uf_id = $request['uf'];
         $usuario->cidade_id = $validatedData['cidade'];
         $usuario->situacao_id = $validatedData['situacao'];
-        $usuario->pttc = (!isset($validatedData['pttc']))? 0 : 1;
         $usuario->dtUltPromo = $request['dtUltPromo'];
         $usuario->forca_id = $request['forca'];
         $usuario->om_id = $request['om'];
@@ -455,7 +466,15 @@ class HomeController extends Controller
         $usuario->validade = $request->validade;
         $usuario->mecenas = $request->mecenas ? 1 : 0;
         $usuario->indeterminado = (!isset($request->indeterminado))? 0 : 1;
-        
+         $usuario->pttc = $request->has('pttc') ? 1 : 0;
+        if (
+            (int) $validatedData['situacao'] === 2 &&
+            $request->has('pttc')
+        ) {
+            $usuario->mesAnoFinal = $validatedData['mesAnoFinal'];
+        } else {
+            $usuario->mesAnoFinal = null;
+        }
 
 
        
@@ -477,61 +496,87 @@ class HomeController extends Controller
 
 
     
-            /*
-            $usuario->tipo_doc = $type;
-            $usuario->tipo_doc_verso = $type2;
-            $file_documento = $request->file('documento');
-            $file_documento_verso = $request->file('documento_verso');
-
-            $contents = $file_documento->openFile()->fread($file_documento->getSize());
-            $contents = base64_encode($contents);  
-            
-            $contents_documento_verso = $file_documento_verso->openFile()->fread($file_documento_verso->getSize());
-            $contents_documento_verso = base64_encode($contents_documento_verso);  
            
-            $usuario->documento = $contents;
-            $usuario->documento_verso = $contents_documento_verso; 
-            */
-            }
-        if($usuario->update()){
-            if($request->hasFile('documento')) {
-        $documentoService = new DocumentoService();
-        $documentoService->salvarFrente($usuario, $request->file('documento'));
-    }
-
-    if($request->hasFile('documento_verso')) {
-        $documentoService->salvarVerso($usuario, $request->file('documento_verso'));
-    }
-             
-                \Session::flash('message', ['msg'=>'Aguarde o Recebimento do E-mail de Confirmação para acessar o sistema Completo!', 'class'=>'success']);
-                $usuario->syncRoles(['5']);
-                return redirect()->route('usuario.home');     
-    
-        }else{
-
-                \Session::flash('message', ['msg'=>'Ocorreu um erro ao salvar os dados.', 'class'=>'danger']);
-                return redirect()->back();
-        
         }
+        
+        
+        try {
+    /*
+     * Atualiza os dados do usuário.
+     */
+    if (!$usuario->update()) {
+        \Session::flash('message', [
+            'msg' => 'Ocorreu um erro ao salvar os dados.',
+            'class' => 'danger',
+        ]);
+
+        return redirect()->back()->withInput();
+    }
+
+    /*
+     * Instancia o serviço caso exista frente ou verso.
+     */
+    if (
+        $request->hasFile('documento') ||
+        $request->hasFile('documento_verso')
+    ) {
+        $documentoService = new DocumentoService();
+
+        if ($request->hasFile('documento')) {
+            $documentoService->salvarFrente(
+                $usuario,
+                $request->file('documento')
+            );
+        }
+
+        if ($request->hasFile('documento_verso')) {
+            $documentoService->salvarVerso(
+                $usuario,
+                $request->file('documento_verso')
+            );
+        }
+    }
+
+    /*
+     * Define o perfil do usuário.
+     */
+    $usuario->syncRoles(['5']);
+
+    \Session::flash('message', [
+        'msg' => 'Aguarde o recebimento do e-mail de confirmação para acessar o sistema completo!',
+        'class' => 'success',
+    ]);
+
+    return redirect()->route('usuario.home');
+
+} catch (\Throwable $erro) {
+    /*
+     * Registra os detalhes em storage/logs/laravel.log.
+     */
+    \Illuminate\Support\Facades\Log::error(
+        'Erro ao atualizar cadastro ou salvar documentos.',
+        [
+            'usuario_id' => $usuario->id ?? null,
+            'erro' => $erro->getMessage(),
+            'arquivo' => $erro->getFile(),
+            'linha' => $erro->getLine(),
+        ]
+    );
+
+    \Session::flash('message', [
+        'msg' => 'Ocorreu um erro ao salvar os dados. Tente novamente.',
+        'class' => 'danger',
+    ]);
+
+    return redirect()->back()->withInput();
+}
        
         
         
 
         
 
-        /*
-        if($usuario->save()){
-        //$user = Pedido::where('cpf', $validatedData['cpf']);
-        //$user->delete();
-        }
-        */
-
-
-        //dd($usuario);
-        
-        //dd($request['cpf']);
-        //dd('ok');
-
+       
         
     }
 

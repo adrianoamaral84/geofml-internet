@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Profile')
+
 @section('content')
 
 <div class="title-block">
@@ -49,24 +49,38 @@
                     <div class="row has-error">
 
                         <div class="form-group col-sm-8 col-md-8 col-lg-8">
-                            <label class="control-label">{{ __('Situação') }}</label>
-                
-                                <select name="situacao" id="situacao" required class="custom-select mr-sm-2 @error('situacao') is-invalid @enderror" onpaste="return false;" @if($user->situacao_id == 2 or $user->situacao_id == 3 or $user->situacao_id == 4) readonly="readonly" tabindex="-1" aria-disabled="true" style="touch-action: none; pointer-events: none; background-color: #e9ecef;" @endif>
-                                     <option value="">Selecione Situação</option>
-                                
-                                    @foreach($situacoes as $situacao)
+    <label class="control-label" for="situacao">
+        {{ __('Situação') }}
+    </label>
 
-                                         <option value="{{$situacao->id}}" @if($user->situacao_id == $situacao->id)selected @endif>{{$situacao->situacao}}</option>
-                                    @endforeach
-                            </select>
-                            @error('situacao')
-                                <span class="has-error" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
+    <select
+        name="situacao"
+        id="situacao"
+        required
+        class="custom-select mr-sm-2 @error('situacao') is-invalid @enderror"
+        autocomplete="off"
+    >
+        <option value="">Selecione Situação</option>
 
-                         <div class="form-group col-sm-4 col-md-4 col-lg-4">
+        @foreach($situacoes as $situacao)
+            <option
+                value="{{ $situacao->id }}"
+                {{ old('situacao', $user->situacao_id) == $situacao->id
+                    ? 'selected'
+                    : '' }}
+            >
+                {{ $situacao->situacao }}
+            </option>
+        @endforeach
+    </select>
+
+    @error('situacao')
+        <span class="has-error" role="alert">
+            <strong>{{ $message }}</strong>
+        </span>
+    @enderror
+</div>
+                        <div class="form-group col-sm-4 col-md-4 col-lg-4">
     <label class="control-label">Mecenas</label>
 
     <select name="mecenas" class="form-control">
@@ -76,27 +90,82 @@
 </div>
 
 
+
+
                     </div>
                    
                
-                    <div class="row has-error milReserva">
-                            <div class="col-sm-12 col-md-12 col-lg-12">
-                               
-                            <label class="form-check">
-                            @if($user->pttc == 1)
-                            <input type="checkbox" readonly="readonly" tabindex="-1" aria-disabled="true" style="touch-action: none; pointer-events: none;" id="pttc" name="pttc" value="1" checked="" class="form-check-input">
-                            @else
-                            <input type="checkbox" id="pttc" name="pttc" value="1" class="form-check-input"> 
-                            @endif
-                            PTTC 
-                            </label>
-                                    @error('pttc')
-                                    <span class="has-error" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                    @enderror
-                            </div>
-                    </div>      
+                                <div class="row has-error milReserva align-items-start">
+
+    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+        <label class="control-label" for="pttc">
+            {{ __('PTTC') }}
+        </label>
+
+        <div
+            class="form-control boxed"
+            style="display: flex; align-items: center;"
+        >
+            <label
+                for="pttc"
+                style="
+                    margin: 0;
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                "
+            >
+                <input
+                    type="checkbox"
+                    id="pttc"
+                    name="pttc"
+                    value="1"
+                    style="margin: 0 8px 0 0;"
+                    {{ old('pttc', $user->pttc ?? 0) == 1
+                        ? 'checked'
+                        : '' }}
+                >
+
+                Sim
+            </label>
+        </div>
+
+        @error('pttc')
+            <span class="has-error" role="alert">
+                <strong>{{ $message }}</strong>
+            </span>
+        @enderror
+    </div>
+
+    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+        <label class="control-label" for="mesAnoFinal">
+            {{ __('Mês/Ano Final') }}
+        </label>
+
+        <input
+            type="text"
+            name="mesAnoFinal"
+            id="mesAnoFinal"
+            value="{{ old(
+                'mesAnoFinal',
+                $user->mesAnoFinal ?? ''
+            ) }}"
+            class="form-control boxed
+                @error('mesAnoFinal') is-invalid @enderror"
+            placeholder="MM/AAAA"
+            maxlength="7"
+            inputmode="numeric"
+            autocomplete="off"
+        >
+
+        @error('mesAnoFinal')
+            <span class="has-error" role="alert">
+                <strong>{{ $message }}</strong>
+            </span>
+        @enderror
+    </div>
+
+</div>
                   
                 
 
@@ -106,7 +175,7 @@
 
 
 
-                          <div class="col-sm-4 col-md-4 col-lg-4 form-group ForcaOmPosto">
+                         <div class="col-sm-4 col-md-4 col-lg-4 form-group ForcaOmPosto">
 
     <input
         type="hidden"
@@ -114,22 +183,18 @@
         value="{{ old('posto', $user->postograd_id) }}"
     >
 
-    <label class="control-label" id="nivel">
+    <label class="control-label" id="nivel" for="posto">
         {{ __('Posto / Graduação') }}
     </label>
 
     <select
         name="posto"
         id="posto"
-        class="custom-select mr-sm-2 @error('posto') is-invalid @enderror"
+        class="custom-select mr-sm-2
+            @error('posto') is-invalid @enderror"
         autocomplete="off"
-        @if($user->situacao_id == 2)
-            aria-disabled="true"
-            tabindex="-1"
-            style="pointer-events: none;"
-        @endif
     >
-        <option value="">Selecione</option>
+        <option value="">Selecione Posto / Graduação</option>
     </select>
 
     @error('posto')
@@ -139,7 +204,6 @@
     @enderror
 
 </div>
-
                         <div class="col-sm-4 col-md-4 col-lg-4 form-group militarAtiva">
                             <label class="control-label">{{ __('Data Última Promoção') }}</label>
                             <input type="date" class="form-control boxed @error('dtUltPromo') is-invalid @enderror" value="{{$user->dtUltPromo}}" name="dtUltPromo" id="dtUltPromo" autofocus onpaste="return false;" max='{{ $hoje }}' placeholder="dd-mm-yyyy" @if($user->situacao_id == 2) readonly="readonly" tabindex="-1" aria-disabled="true" style="touch-action: none; pointer-events: none;" @endif>
@@ -179,20 +243,7 @@
                             @enderror
                         </div>
 
-
-                        
-
-            
-                                
-
-                         
-
                   
-
-         
-
-
-                      
                         <div class="col-sm-4 col-md-4 col-lg-4 form-group siape">
                             <label class="control-label">{{ __('Siape') }}</label>
                                 <input type="text" class="form-control boxed @error('siape') is-invalid @enderror" value="{{ ($user->siape) ? $user->siape : old('siape') }}" name="siape" id="siape" autofocus maxlength="14" readonly="" onpaste="return false;" @if($user->siape) readonly @endif>
@@ -227,9 +278,8 @@
 
                 </div>
   
-                     
-
-               <div class="row has-error">
+                   
+                     <div class="row has-error">
 
     {{-- UF --}}
     <div class="col-sm-4 col-md-4 col-lg-4 form-group">
@@ -320,7 +370,6 @@
     </div>
 
 </div>
-
 
 
                  <div class="row has-error">
@@ -432,33 +481,30 @@
                                 <i class="fas fa-check-circle fa-sm"></i>  
                                     Salvar Alterações
                             </button>
+                            
                         </div>
                     </div>
 
 
                 </form>
-                <p></p>
-                <p></p>
-                <p></p>
-                <p></p>
-                
-                <p></p>
-                <p></p>
 
                 <p></p>
                 <p></p>
                 <p></p>
+                <p></p>   
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
 
-                <p>&nbsp;</p>
             </div>
         </div>
     </div>
 </section>
 
-
-
 @push('javascript')
-
 
     <script src="{{asset('lib/jquery-mask-plugin/dist/jquery.mask.min.js')}}"></script>
     <script src="{{ asset('js/script_cadastro.js') }}" ></script>   
@@ -468,8 +514,7 @@
 
         $('#pttc').on('change', ()=>{
 
-        //id_situacao = $('#pttc').val();
-        //changeFields(id_situacao);
+       
         
         if($('#pttc').is(':checked')){
          
@@ -489,25 +534,10 @@
         $('#dtUltPromo').attr('tabindex', '-1');        
         $('#dtUltPromo').css('touch-action', '');
         
-
-        //$('#dtUltPromo').attr('touch-action', 'none');
-        /*
-        $('#dtUltPromo').removeAttr('tabindex');
-        $('#dtUltPromo').attr('aria-disabled', true);
-        $('#dtUltPromo').css('touch-action', '');
-        $('#dtUltPromo').css('pointer-events', '');
-        */
-        
-    }
+        }
            
+        });
 
-        //alert('id_situacao');
-    });
-
-    
-
-    
-    
 
     $('#indeterminado').on('change', ()=>{
     
@@ -523,12 +553,11 @@
                 $('#documento_verso').prop('required', true);
                 $('#validade').attr('readonly', false);
                 alert('Confirma a data de validade da sua identidade militar? Atualmente a validade é de 10 anos.')
-                //alert('Favor Atualizar Documento!')
+              
                 
         }
             
     });
-
 
 
     $('#dtUltPromo').on('change', ()=>{
@@ -544,26 +573,8 @@
          $('#documento_verso').prop('required', true);
 
     });
+
     </script>
-
-    
-<script>
-//FilePond.registerPlugin(FilePondPluginImagePreview);
-
-//const inputElement = document.querySelector('[id="documento"]');
-//const pond = FilePond.create( inputElement );
-//FilePond.setOptions({
-  //  server: {
-    // url: '/GEOFML2.1/public',
-    // headers: {
-    //    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-    // }
-    // }
-// });
-</script>
-
-
-
 @endpush
 @endsection
 

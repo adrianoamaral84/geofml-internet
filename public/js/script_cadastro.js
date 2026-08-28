@@ -10,15 +10,25 @@ function validarUF(ufId) {
     var $cidade = $('#cidade');
     var $om = $('#om');
 
+    if (!$cidade.length) {
+        return;
+    }
+
     $cidade
         .prop('disabled', true)
         .empty()
         .append('<option value="">Carregando cidades...</option>');
 
-    $om
-        .prop('disabled', true)
-        .empty()
-        .append('<option value="">Selecione primeiro uma cidade</option>');
+    if ($om.length) {
+        $om
+            .prop('disabled', true)
+            .empty()
+            .append(
+                '<option value="">' +
+                    'Selecione primeiro uma cidade' +
+                '</option>'
+            );
+    }
 
     if (!ufId) {
         $cidade
@@ -42,6 +52,18 @@ function validarUF(ufId) {
                 .empty()
                 .append('<option value="">Selecione Cidade</option>');
 
+            if (!data || data.length === 0) {
+                $cidade
+                    .empty()
+                    .append(
+                        '<option value="">' +
+                            'Nenhuma cidade encontrada' +
+                        '</option>'
+                    );
+
+                return;
+            }
+
             $.each(data, function (index, cidade) {
                 var selected = '';
 
@@ -53,16 +75,16 @@ function validarUF(ufId) {
                 }
 
                 $cidade.append(
-                    '<option value="' + cidade.id + '"' + selected + '>' +
+                    '<option value="' +
+                        cidade.id +
+                        '"' +
+                        selected +
+                    '>' +
                         cidade.descricao +
                     '</option>'
                 );
             });
 
-            /*
-             * Na edição, se o usuário já possui uma cidade,
-             * carrega automaticamente as OMs daquela cidade.
-             */
             if (cidadeSelecionada) {
                 validaOM(cidadeSelecionada);
             }
@@ -78,7 +100,11 @@ function validarUF(ufId) {
             $cidade
                 .prop('disabled', false)
                 .empty()
-                .append('<option value="">Erro ao carregar cidades</option>');
+                .append(
+                    '<option value="">' +
+                        'Erro ao carregar cidades' +
+                    '</option>'
+                );
         }
     });
 }
@@ -93,6 +119,10 @@ function validarUF(ufId) {
 function validaOM(cidadeId) {
     var $om = $('#om');
 
+    if (!$om.length) {
+        return;
+    }
+
     $om
         .prop('disabled', true)
         .empty()
@@ -102,7 +132,11 @@ function validaOM(cidadeId) {
         $om
             .prop('disabled', false)
             .empty()
-            .append('<option value="">Selecione primeiro uma cidade</option>');
+            .append(
+                '<option value="">' +
+                    'Selecione primeiro uma cidade' +
+                '</option>'
+            );
 
         return;
     }
@@ -120,6 +154,18 @@ function validaOM(cidadeId) {
                 .empty()
                 .append('<option value="">Selecione OM</option>');
 
+            if (!data || data.length === 0) {
+                $om
+                    .empty()
+                    .append(
+                        '<option value="">' +
+                            'Nenhuma OM encontrada' +
+                        '</option>'
+                    );
+
+                return;
+            }
+
             $.each(data, function (index, om) {
                 var selected = '';
 
@@ -131,17 +177,15 @@ function validaOM(cidadeId) {
                 }
 
                 $om.append(
-                    '<option value="' + om.id + '"' + selected + '>' +
+                    '<option value="' +
+                        om.id +
+                        '"' +
+                        selected +
+                    '>' +
                         om.sigla +
                     '</option>'
                 );
             });
-
-            if (!data || data.length === 0) {
-                $om
-                    .empty()
-                    .append('<option value="">Nenhuma OM encontrada</option>');
-            }
         },
 
         error: function (xhr) {
@@ -154,7 +198,11 @@ function validaOM(cidadeId) {
             $om
                 .prop('disabled', false)
                 .empty()
-                .append('<option value="">Erro ao carregar OMs</option>');
+                .append(
+                    '<option value="">' +
+                        'Erro ao carregar OMs' +
+                    '</option>'
+                );
         }
     });
 }
@@ -173,10 +221,6 @@ function validaGrupo(grupoId, campoDestino) {
         return;
     }
 
-    $campo
-        .empty()
-        .append('<option value="">Carregando...</option>');
-
     if (!grupoId) {
         $campo
             .empty()
@@ -185,19 +229,33 @@ function validaGrupo(grupoId, campoDestino) {
         return;
     }
 
+    $campo
+        .empty()
+        .append('<option value="">Carregando...</option>');
+
     $.ajax({
         url: $host + '/cascade/carregarUnidades/' + grupoId,
         type: 'GET',
         dataType: 'json',
 
         success: function (data) {
-            var unidadeSelecionada = $(
-                '#unidade_selecionada'
-            ).val();
+            var unidadeSelecionada = $('#unidade_selecionada').val();
 
             $campo
                 .empty()
                 .append('<option value="">Selecione</option>');
+
+            if (!data || data.length === 0) {
+                $campo
+                    .empty()
+                    .append(
+                        '<option value="">' +
+                            'Nenhuma unidade encontrada' +
+                        '</option>'
+                    );
+
+                return;
+            }
 
             $.each(data, function (index, unidade) {
                 var selected = '';
@@ -210,17 +268,15 @@ function validaGrupo(grupoId, campoDestino) {
                 }
 
                 $campo.append(
-                    '<option value="' + unidade.id + '"' + selected + '>' +
+                    '<option value="' +
+                        unidade.id +
+                        '"' +
+                        selected +
+                    '>' +
                         unidade.sigla +
                     '</option>'
                 );
             });
-
-            if (!data || data.length === 0) {
-                $campo
-                    .empty()
-                    .append('<option value="">Nenhuma unidade encontrada</option>');
-            }
         },
 
         error: function (xhr) {
@@ -232,41 +288,117 @@ function validaGrupo(grupoId, campoDestino) {
 
             $campo
                 .empty()
-                .append('<option value="">Erro ao carregar unidades</option>');
+                .append(
+                    '<option value="">' +
+                        'Erro ao carregar unidades' +
+                    '</option>'
+                );
         }
     });
 }
 
 
+/*
+|--------------------------------------------------------------------------
+| SITUAÇÃO → POSTO/GRADUAÇÃO
+|--------------------------------------------------------------------------
+|
+| A situação é enviada diretamente para o controller:
+|
+| 1 = Militar da Ativa
+| 2 = Militar da Reserva Remunerado
+| 3 = Servidor Civil
+|
+|--------------------------------------------------------------------------
+*/
+
 function validaPostoSituacao(situacaoId) {
     var $posto = $('#posto');
 
+    if (!$posto.length) {
+        return;
+    }
+
+    /*
+     * Garante que o select esteja desbloqueado.
+     * Isso é necessário principalmente para situacao_id = 2.
+     */
     $posto
-        .prop('disabled', true)
-        .empty()
-        .append('<option value="">Carregando...</option>');
+        .css('pointer-events', '')
+        .removeAttr('readonly')
+        .removeAttr('aria-disabled')
+        .removeAttr('tabindex');
 
     if (!situacaoId) {
         $posto
             .prop('disabled', false)
             .empty()
-            .append('<option value="">Selecione Posto / Graduação</option>');
+            .append(
+                '<option value="">' +
+                    'Selecione Posto / Graduação' +
+                '</option>'
+            );
 
         return;
     }
 
+    var postoSelecionado = $('#posto_selecionado').val();
+
+    $posto
+        .prop('disabled', true)
+        .empty()
+        .append('<option value="">Carregando postos...</option>');
+
     $.ajax({
-        url: $host + '/cascade/carregarPostoSituacao/all/' + situacaoId,
+        url:
+            $host +
+            '/cascade/carregarPostoSituacao/all/' +
+            encodeURIComponent(situacaoId),
+
         type: 'GET',
         dataType: 'json',
+        cache: false,
 
         success: function (data) {
-            var postoSelecionado = $('#posto_selecionado').val();
+            /*
+             * Algumas versões do Laravel podem devolver um objeto.
+             * Converte para array quando necessário.
+             */
+            if (data && !Array.isArray(data)) {
+                data = Object.keys(data).map(function (chave) {
+                    return data[chave];
+                });
+            }
 
             $posto
                 .prop('disabled', false)
+                .css('pointer-events', '')
+                .removeAttr('readonly')
+                .removeAttr('aria-disabled')
+                .removeAttr('tabindex')
                 .empty()
-                .append('<option value="">Selecione</option>');
+                .append(
+                    '<option value="">' +
+                        'Selecione Posto / Graduação' +
+                    '</option>'
+                );
+
+            if (!data || data.length === 0) {
+                $posto
+                    .empty()
+                    .append(
+                        '<option value="">' +
+                            'Nenhum posto encontrado' +
+                        '</option>'
+                    );
+
+                console.warn(
+                    'Nenhum posto retornado para situacao_id:',
+                    situacaoId
+                );
+
+                return;
+            }
 
             $.each(data, function (index, posto) {
                 var selected = '';
@@ -279,41 +411,48 @@ function validaPostoSituacao(situacaoId) {
                 }
 
                 $posto.append(
-                    '<option value="' + posto.id + '"' + selected + '>' +
+                    '<option value="' +
+                        posto.id +
+                        '"' +
+                        selected +
+                    '>' +
                         posto.sigla +
                     '</option>'
                 );
             });
-
-            if (!data || data.length === 0) {
-                $posto
-                    .empty()
-                    .append('<option value="">Nenhum posto encontrado</option>');
-            }
-
-            // Mantém bloqueado para situação 2, caso essa seja a regra.
-            if (String($('#situacao').val()) === '2') {
-                $posto.css('pointer-events', 'none');
-            } else {
-                $posto.css('pointer-events', '');
-            }
         },
 
         error: function (xhr) {
             console.error(
-                'Erro ao carregar posto/graduação:',
+                'Erro ao carregar Posto/Graduação:',
                 xhr.status,
                 xhr.responseText
             );
 
             $posto
                 .prop('disabled', false)
+                .css('pointer-events', '')
+                .removeAttr('readonly')
+                .removeAttr('aria-disabled')
+                .removeAttr('tabindex')
                 .empty()
-                .append('<option value="">Erro ao carregar</option>');
+                .append(
+                    '<option value="">' +
+                        'Erro ao carregar postos' +
+                    '</option>'
+                );
+
+            alert(
+                'Não foi possível carregar os postos/graduações.'
+            );
         }
     });
 }
 
+
+/*
+ * Mantida para compatibilidade com chamadas antigas.
+ */
 function validaPostoSituacaoTodos(situacaoId) {
     validaPostoSituacao(situacaoId);
 }
@@ -332,10 +471,6 @@ function validaPosto(forcaId, campoDestino) {
         return;
     }
 
-    $campo
-        .empty()
-        .append('<option value="">Carregando...</option>');
-
     if (!forcaId) {
         $campo
             .empty()
@@ -344,17 +479,35 @@ function validaPosto(forcaId, campoDestino) {
         return;
     }
 
+    $campo
+        .empty()
+        .append('<option value="">Carregando...</option>');
+
     $.ajax({
         url: $host + '/cascade/carregarPosto/' + forcaId,
         type: 'GET',
         dataType: 'json',
 
         success: function (data) {
-            var postoSelecionado = $('input[name="postos"]').val();
+            var postoSelecionado =
+                $('#posto_selecionado').val() ||
+                $('input[name="postos"]').val();
 
             $campo
                 .empty()
                 .append('<option value="">Selecione</option>');
+
+            if (!data || data.length === 0) {
+                $campo
+                    .empty()
+                    .append(
+                        '<option value="">' +
+                            'Nenhum posto encontrado' +
+                        '</option>'
+                    );
+
+                return;
+            }
 
             $.each(data, function (index, posto) {
                 var selected = '';
@@ -367,7 +520,11 @@ function validaPosto(forcaId, campoDestino) {
                 }
 
                 $campo.append(
-                    '<option value="' + posto.id + '"' + selected + '>' +
+                    '<option value="' +
+                        posto.id +
+                        '"' +
+                        selected +
+                    '>' +
                         posto.sigla +
                     '</option>'
                 );
@@ -383,206 +540,14 @@ function validaPosto(forcaId, campoDestino) {
 
             $campo
                 .empty()
-                .append('<option value="">Erro ao carregar postos</option>');
+                .append(
+                    '<option value="">' +
+                        'Erro ao carregar postos' +
+                    '</option>'
+                );
         }
     });
 }
-
-
-/*
-|--------------------------------------------------------------------------
-| INICIALIZAÇÃO
-|--------------------------------------------------------------------------
-*/
-
-
-$(document).ready(function () {
-    $host = $('meta[name="app-url"]').attr('content');
-
-    if (!$host) {
-        console.error(
-            'A meta tag <meta name="app-url"> não foi encontrada.'
-        );
-
-        return;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Primeiro oculta e remove obrigatoriedades
-    |--------------------------------------------------------------------------
-    */
-
-    hiddenFields();
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Upload de arquivos
-    |--------------------------------------------------------------------------
-    */
-
-    $('.custom-file-input').on('change', function () {
-        var fileName = $(this).val().split('\\').pop();
-
-        $(this)
-            .siblings('.custom-file-label')
-            .addClass('selected')
-            .html(fileName);
-    });
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Situação inicial e posto/graduação
-    |--------------------------------------------------------------------------
-    */
-
-    var situacaoInicial = $('#situacao').val();
-
-    if (situacaoInicial) {
-        changeFields(situacaoInicial);
-        validaPostoSituacao(situacaoInicial);
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Alteração da situação
-    |--------------------------------------------------------------------------
-    */
-
-    $('#situacao').on('change', function () {
-        var situacaoId = $(this).val();
-
-        /*
-         * Ao trocar a situação, elimina o posto anterior,
-         * pois ele pode não pertencer à nova situação.
-         */
-        $('#posto_selecionado').val('');
-
-        changeFields(situacaoId);
-        validaPostoSituacao(situacaoId);
-    });
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Carregamento inicial: UF → Cidade → OM
-    |--------------------------------------------------------------------------
-    */
-
-    var ufInicial = $('#uf').val();
-
-    if (ufInicial) {
-        validarUF(ufInicial);
-    } else {
-        $('#cidade')
-            .empty()
-            .append('<option value="">Selecione Cidade</option>');
-
-        $('#om')
-            .empty()
-            .append(
-                '<option value="">Selecione primeiro uma cidade</option>'
-            );
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Alteração da UF
-    |--------------------------------------------------------------------------
-    */
-
-    $('#uf').on('change', function () {
-        $('#cidade_selecionada').val('');
-        $('#om_selecionada').val('');
-
-        validarUF($(this).val());
-    });
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Alteração da cidade
-    |--------------------------------------------------------------------------
-    */
-
-    $('#cidade').on('change', function () {
-        $('#om_selecionada').val('');
-
-        validaOM($(this).val());
-    });
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Alteração da OM
-    |--------------------------------------------------------------------------
-    */
-
-    $('#om').on('change', function () {
-        $('#om_selecionada').val($(this).val());
-    });
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Validade do documento
-    |--------------------------------------------------------------------------
-    */
-
-    $('#validade').on('change', function () {
-        $('#documento').prop('required', true);
-        $('#documento_verso').prop('required', true);
-    });
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Grupo de destinação
-    |--------------------------------------------------------------------------
-    */
-
-    var grupoInicial = $('select[name="grupodestinacao"]').val();
-
-    if (grupoInicial && $('select[name="unidade"]').length) {
-        validaGrupo(grupoInicial, 'unidade');
-    }
-
-    $('select[name="grupodestinacao"]').on('change', function () {
-        if ($('select[name="unidade"]').length) {
-            validaGrupo($(this).val(), 'unidade');
-        }
-    });
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Alteração manual do posto
-    |--------------------------------------------------------------------------
-    */
-
-    $('#posto').on('change', function () {
-        /*
-         * Atualiza o posto selecionado para evitar perder
-         * a seleção caso o campo seja recarregado.
-         */
-        $('#posto_selecionado').val($(this).val());
-
-        if ($('#dtUltPromo').length) {
-            $('#dtUltPromo').val('');
-        }
-
-        $('#documento').prop('required', true);
-        $('#documento_verso').prop('required', true);
-
-        alert('É necessário anexar um novo documento.');
-    });
-});
-
-
 
 
 /*
@@ -592,27 +557,24 @@ $(document).ready(function () {
 */
 
 function changeFields(idSituacao) {
-    if (!idSituacao || Number(idSituacao) === 0) {
-        $('.milReserva').hide();
-        $('.militarAtiva').hide();
-        $('.siape').hide();
-        $('.ForcaOmPosto').hide();
-        $('.identidade').hide();
+    idSituacao = String(idSituacao || '');
 
-        removerObrigatoriedadeCampos();
+    if (idSituacao === '' || idSituacao === '0') {
+        hiddenFields();
 
         return;
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Militar da ativa
+    | MILITAR DA ATIVA
     |--------------------------------------------------------------------------
     */
 
-    if (Number(idSituacao) === 1) {
+    if (idSituacao === '1') {
         $('.milReserva').hide();
         $('.siape').hide();
+
         $('.militarAtiva').show();
         $('.ForcaOmPosto').show();
         $('.identidade').show();
@@ -620,22 +582,29 @@ function changeFields(idSituacao) {
         $('#nivel').text('Posto / Graduação');
         $('#texto').text('Identidade Militar');
 
+        $('#pttc').prop('checked', false);
+
+        $('#mesAnoFinal')
+            .prop('required', false)
+            .val('');
+
         if ($.fn.mask) {
             $('#idtMil').mask('000.000.000-00');
         }
 
         militarAtiva();
+        atualizarObrigatoriedadeMesAno();
 
         return;
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Militar da reserva
+    | MILITAR DA RESERVA REMUNERADO — ID 2
     |--------------------------------------------------------------------------
     */
 
-    if (Number(idSituacao) === 2) {
+    if (idSituacao === '2') {
         $('.milReserva').show();
         $('.militarAtiva').show();
         $('.ForcaOmPosto').show();
@@ -645,22 +614,33 @@ function changeFields(idSituacao) {
         $('#nivel').text('Posto / Graduação');
         $('#texto').text('Identidade Militar');
 
+        /*
+         * Remove qualquer bloqueio colocado anteriormente no posto.
+         */
+        $('#posto')
+            .prop('disabled', false)
+            .css('pointer-events', '')
+            .removeAttr('readonly')
+            .removeAttr('aria-disabled')
+            .removeAttr('tabindex');
+
         if ($.fn.mask) {
             $('#idtMil').mask('000.000.000-00');
         }
 
         militarReserva();
+        atualizarObrigatoriedadeMesAno();
 
         return;
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Servidor civil
+    | SERVIDOR CIVIL
     |--------------------------------------------------------------------------
     */
 
-    if (Number(idSituacao) === 3) {
+    if (idSituacao === '3') {
         $('.milReserva').hide();
         $('.militarAtiva').hide();
         $('.siape').show();
@@ -670,18 +650,25 @@ function changeFields(idSituacao) {
         $('#texto').text('Identidade Civil');
         $('#nivel').text('Nível');
 
+        $('#pttc').prop('checked', false);
+
+        $('#mesAnoFinal')
+            .prop('required', false)
+            .val('');
+
         if ($.fn.mask) {
-            $('#idtMil').mask('000.000.000-00');
+            $('#idtMil').mask('00.000.000-0');
         }
 
         servidorCivil();
+        atualizarObrigatoriedadeMesAno();
 
         return;
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Pensionista ou outras situações
+    | PENSIONISTA OU OUTRAS SITUAÇÕES
     |--------------------------------------------------------------------------
     */
 
@@ -694,17 +681,24 @@ function changeFields(idSituacao) {
     $('#nivel').text('Posto / Graduação');
     $('#texto').text('Identidade Militar');
 
+    $('#pttc').prop('checked', false);
+
+    $('#mesAnoFinal')
+        .prop('required', false)
+        .val('');
+
     if ($.fn.mask) {
         $('#idtMil').mask('000.000.000-00');
     }
 
     pensionista();
+    atualizarObrigatoriedadeMesAno();
 }
 
 
 /*
 |--------------------------------------------------------------------------
-| OCULTAR CAMPOS INICIALMENTE
+| OCULTAR CAMPOS
 |--------------------------------------------------------------------------
 */
 
@@ -728,12 +722,14 @@ function hiddenFields() {
 
 function removerObrigatoriedadeCampos() {
     $('#pttc').prop('required', false);
+    $('#mesAnoFinal').prop('required', false);
     $('#dtUltPromo').prop('required', false);
     $('#forca').prop('required', false);
     $('#posto').prop('required', false);
     $('#siape').prop('required', false);
     $('#idtMil').prop('required', false);
 }
+
 
 function militarAtiva() {
     removerObrigatoriedadeCampos();
@@ -744,6 +740,7 @@ function militarAtiva() {
     $('#idtMil').prop('required', true);
 }
 
+
 function militarReserva() {
     removerObrigatoriedadeCampos();
 
@@ -751,7 +748,10 @@ function militarReserva() {
     $('#forca').prop('required', true);
     $('#posto').prop('required', true);
     $('#idtMil').prop('required', true);
+
+    atualizarObrigatoriedadeMesAno();
 }
+
 
 function pensionista() {
     removerObrigatoriedadeCampos();
@@ -761,6 +761,7 @@ function pensionista() {
     $('#idtMil').prop('required', true);
 }
 
+
 function servidorCivil() {
     removerObrigatoriedadeCampos();
 
@@ -768,12 +769,356 @@ function servidorCivil() {
     $('#idtMil').prop('required', true);
 }
 
-function requiredField(field, state) {
-    var input = $(field);
 
-    if (state === true || state === 'TRUE') {
-        input.prop('required', true);
+function requiredField(field, state) {
+    var $input = $(field);
+
+    if (
+        state === true ||
+        String(state).toUpperCase() === 'TRUE'
+    ) {
+        $input.prop('required', true);
     } else {
-        input.prop('required', false);
+        $input.prop('required', false);
     }
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| PTTC E MÊS/ANO FINAL
+|--------------------------------------------------------------------------
+*/
+
+function atualizarObrigatoriedadeMesAno() {
+    var situacaoId = String($('#situacao').val() || '');
+    var pttcMarcado = $('#pttc').is(':checked');
+
+    var $mesAnoFinal = $('#mesAnoFinal');
+    var $label = $('label[for="mesAnoFinal"]');
+
+    if (situacaoId === '2' && pttcMarcado) {
+        $mesAnoFinal.prop('required', true);
+
+        $label.html(
+            'Mês/Ano Final ' +
+            '<span class="text-danger">*</span>'
+        );
+    } else {
+        $mesAnoFinal.prop('required', false);
+        $label.text('Mês/Ano Final');
+    }
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| INICIALIZAÇÃO
+|--------------------------------------------------------------------------
+*/
+
+$(document).ready(function () {
+    /*
+     * Primeiro tenta utilizar a meta tag do Laravel.
+     */
+    $host = $('meta[name="app-url"]').attr('content');
+
+    /*
+     * Caso a meta tag não exista, usa protocolo e domínio atuais.
+     */
+    if (!$host) {
+        $host =
+            window.location.protocol +
+            '//' +
+            window.location.host;
+    }
+
+    /*
+     * Remove a barra final para evitar URLs com duas barras.
+     */
+    $host = String($host).replace(/\/+$/, '');
+
+    hiddenFields();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPLOAD DE ARQUIVOS
+    |--------------------------------------------------------------------------
+    */
+
+    $('.custom-file-input').on('change', function () {
+        var fileName = $(this).val().split('\\').pop();
+
+        $(this)
+            .siblings('.custom-file-label')
+            .addClass('selected')
+            .html(fileName);
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | MÁSCARA MÊS/ANO
+    |--------------------------------------------------------------------------
+    */
+
+    if ($.fn.mask) {
+        $('#mesAnoFinal').mask('00/0000');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SITUAÇÃO INICIAL E POSTO/GRADUAÇÃO
+    |--------------------------------------------------------------------------
+    */
+
+    var situacaoInicial = $('#situacao').val();
+
+    if (situacaoInicial) {
+        changeFields(situacaoInicial);
+        validaPostoSituacao(situacaoInicial);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ALTERAÇÃO DA SITUAÇÃO
+    |--------------------------------------------------------------------------
+    */
+
+    $('#situacao').on('change', function () {
+        var situacaoId = $(this).val();
+
+        /*
+         * Limpa o posto antigo, pois pode não pertencer
+         * à situação recém-selecionada.
+         */
+        $('#posto_selecionado').val('');
+
+        /*
+         * Libera o select para todas as situações,
+         * inclusive Militar da Reserva, ID 2.
+         */
+        $('#posto')
+            .prop('disabled', false)
+            .css('pointer-events', '')
+            .removeAttr('readonly')
+            .removeAttr('aria-disabled')
+            .removeAttr('tabindex');
+
+        changeFields(situacaoId);
+        validaPostoSituacao(situacaoId);
+        atualizarObrigatoriedadeMesAno();
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ALTERAÇÃO DO PTTC
+    |--------------------------------------------------------------------------
+    */
+
+    $('#pttc').on('change', function () {
+        atualizarObrigatoriedadeMesAno();
+
+        /*
+         * Se PTTC estiver marcado, libera a data de promoção.
+         */
+        if ($(this).is(':checked')) {
+            $('#dtUltPromo')
+                .prop('readonly', false)
+                .removeAttr('tabindex')
+                .removeAttr('aria-disabled')
+                .css('pointer-events', '');
+        } else {
+            $('#dtUltPromo')
+                .prop('readonly', true)
+                .attr('tabindex', '-1')
+                .attr('aria-disabled', 'true');
+        }
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CARREGAMENTO INICIAL: UF → CIDADE → OM
+    |--------------------------------------------------------------------------
+    */
+
+    var ufInicial = $('#uf').val();
+
+    if (ufInicial) {
+        validarUF(ufInicial);
+    } else {
+        $('#cidade')
+            .empty()
+            .append('<option value="">Selecione Cidade</option>');
+
+        $('#om')
+            .empty()
+            .append(
+                '<option value="">' +
+                    'Selecione primeiro uma cidade' +
+                '</option>'
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ALTERAÇÃO DA UF
+    |--------------------------------------------------------------------------
+    */
+
+    $('#uf').on('change', function () {
+        $('#cidade_selecionada').val('');
+        $('#om_selecionada').val('');
+
+        validarUF($(this).val());
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ALTERAÇÃO DA CIDADE
+    |--------------------------------------------------------------------------
+    */
+
+    $('#cidade').on('change', function () {
+        $('#cidade_selecionada').val($(this).val());
+        $('#om_selecionada').val('');
+
+        validaOM($(this).val());
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ALTERAÇÃO DA OM
+    |--------------------------------------------------------------------------
+    */
+
+    $('#om').on('change', function () {
+        $('#om_selecionada').val($(this).val());
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | GRUPO DE DESTINAÇÃO
+    |--------------------------------------------------------------------------
+    */
+
+    var grupoInicial =
+        $('select[name="grupodestinacao"]').val();
+
+    if (
+        grupoInicial &&
+        $('select[name="unidade"]').length
+    ) {
+        validaGrupo(grupoInicial, 'unidade');
+    }
+
+    $('select[name="grupodestinacao"]').on(
+        'change',
+        function () {
+            if ($('select[name="unidade"]').length) {
+                validaGrupo(
+                    $(this).val(),
+                    'unidade'
+                );
+            }
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ALTERAÇÃO MANUAL DO POSTO
+    |--------------------------------------------------------------------------
+    */
+
+    $('#posto').on('change', function () {
+        $('#posto_selecionado').val($(this).val());
+
+        if ($('#dtUltPromo').length) {
+            $('#dtUltPromo').val('');
+        }
+
+        $('#documento').prop('required', true);
+        $('#documento_verso').prop('required', true);
+
+        /*
+         * Evita mostrar o alerta no carregamento automático.
+         */
+        if ($(this).val()) {
+            alert('É necessário anexar um novo documento.');
+        }
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDADE DO DOCUMENTO
+    |--------------------------------------------------------------------------
+    */
+
+    $('#validade').on('change', function () {
+        $('#documento').prop('required', true);
+        $('#documento_verso').prop('required', true);
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDADE INDETERMINADA
+    |--------------------------------------------------------------------------
+    */
+
+    $('#indeterminado').on('change', function () {
+        var marcado = $(this).is(':checked');
+
+        $('#validade').prop('readonly', marcado);
+        $('#documento').prop('required', true);
+        $('#documento_verso').prop('required', true);
+
+        alert(
+            'Confirma a data de validade da sua identidade militar? ' +
+            'Atualmente a validade é de 10 anos.'
+        );
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | DATA DA ÚLTIMA PROMOÇÃO
+    |--------------------------------------------------------------------------
+    */
+
+    $('#dtUltPromo').on('change', function () {
+        $('#documento').prop('required', true);
+        $('#documento_verso').prop('required', true);
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ESTADO INICIAL DOS CAMPOS PTTC E MÊS/ANO
+    |--------------------------------------------------------------------------
+    */
+
+    atualizarObrigatoriedadeMesAno();
+
+    /*
+     * Dispara a regra do PTTC na abertura sem gerar o evento change.
+     */
+    if ($('#pttc').is(':checked')) {
+        $('#dtUltPromo')
+            .prop('readonly', false)
+            .removeAttr('tabindex')
+            .removeAttr('aria-disabled')
+            .css('pointer-events', '');
+    }
+});

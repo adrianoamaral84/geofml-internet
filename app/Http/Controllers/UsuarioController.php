@@ -262,9 +262,10 @@ class UsuarioController extends Controller
         //return view('usuario.verdados', compact('id'));
     }      
 
+    
     public function editProfile(Request $request) {
 
-
+        //dd($request->all());
         if($request->indeterminado == 1){
             $request->validade = null;
         }
@@ -294,7 +295,7 @@ class UsuarioController extends Controller
         $dataForm = $request->all();
         $dataForm['pttc'] = (!isset($dataForm['pttc']))? 0 : 1;
 
-        //dd($dataForm['pttc']);
+        
 
         if (isset($request['cpf'])) 
             $request['cpf'] = str_replace([".","-"], "", $request['cpf']);
@@ -321,6 +322,11 @@ class UsuarioController extends Controller
             'uf.required' => 'Campo obrigatório',
 
             'cidade.required' => 'Campo obrigatório',
+            'mesAnoFinal.required_if' =>
+            'O campo Mês/Ano Final é obrigatório quando PTTC estiver marcado.',
+            
+            'mesAnoFinal.regex' =>
+            'Informe o Mês/Ano Final no formato MM/AAAA.',
 
             'situacao.required' => 'Campo obrigatório',
 
@@ -346,9 +352,14 @@ class UsuarioController extends Controller
             'siape'  =>  'nullable',
             'perfil_id'  =>  'nullable',
             'dtUltPromo'  =>  'nullable',
+            'mecenas' => 'nullable|boolean',
             'forca'  =>  'nullable',
             'om'  =>  'nullable',
-            'mecenas' => 'nullable|boolean',
+            'mesAnoFinal' => [
+                'required_if:pttc,1',
+                'nullable',
+                'regex:/^(0[1-9]|1[0-2])\/[0-9]{4}$/',
+            ],
             'nivel' => 'nullable',
             'pttc' => 'nullable',
             'validade' => 'nullable',
@@ -358,7 +369,7 @@ class UsuarioController extends Controller
 
 
         if(!$this->validarCPF($validatedData['cpf'])){
-            return back()->withInput()->withErrors(['CPF inválido.']);
+           // return back()->withInput()->withErrors(['CPF inválido.']);
         }
         
         if(!$this->verificarCPFCadastrado($validatedData['cpf'], null, true)){
@@ -369,14 +380,12 @@ class UsuarioController extends Controller
         if(!$this->verificarEmailCadastrado($validatedData['email'], $validatedData['email'])){
             return back()->withInput()->withErrors(['Este E-mail já está cadastrado no sistema.']);
         }
-        //dd($validatedData['nivel']);
-        //dd($validatedData['email']);
-        //dd(Auth::user()->dtUltPromo);
+       
         $usuario =  Auth::user();
-        //$campos[] = '';
-
-        //dd($request->all());
         
+         if($usuario->indeterminado != $request->indeterminado){
+            $campos[] = "Trocou Indeterminado";
+        }
         if($usuario->email != $validatedData['email']){
             $campos[] = "E-mail: ".$validatedData['email'];
         }
@@ -386,7 +395,12 @@ class UsuarioController extends Controller
         }
 
         if($usuario->postograd_id != $request['posto']){
-            $campos[] = "Trocou o Posto / Graduação";
+            $campos[] = "Trocou o Posto/Graduação";
+        }
+
+       if($usuario->mecenas != $validatedData['mecenas']){
+          
+                $campos[] = "Trocou Mecenas";
         }
 
         if(!empty($validatedData['dtUltPromo'])){
@@ -408,6 +422,9 @@ class UsuarioController extends Controller
             $campos[] = "Alteração de Identidade: ".$validatedData['idtMil'];
         }
 
+        if($usuario->mesAnoFinal != $validatedData['mesAnoFinal']){
+            $campos[] = "Alteração de Mês/Ano Final: ".$validatedData['mesAnoFinal'];
+        }
         if($usuario->uf_id != $validatedData['uf']){
             $campos[] = "Trocou o UF";
         }
@@ -418,7 +435,6 @@ class UsuarioController extends Controller
         }
         }
 
-        //dd($usuario->pttc);
         if(isset($validatedData['pttc'])){
             if($usuario->pttc != $validatedData['pttc']){
             $campos[] = "Trocou o PTTC";
@@ -449,55 +465,28 @@ class UsuarioController extends Controller
             
         }
 
-        
-
-
-
-
-        
-
-
-
-
-
-
-
-
-        //dd($request->all());
-
-
-
-
-
-        //dd('stop');
-
-
-
-
-
-
-
-
-
-
-
-        //dd($usuario);
         $usuario->name = strtoupper($validatedData['nome']);
         $usuario->email = $validatedData['email'];
-        //$usuario->cpf = $validatedData['cpf'];
         $usuario->idtMil = $validatedData['idtMil'];
         $usuario->telefone = $validatedData['telefone'];
         $usuario->uf_id = $request['uf'];
         $usuario->cidade_id = $validatedData['cidade'];
         $usuario->situacao_id = $validatedData['situacao'];
-        $usuario->pttc = (!isset($validatedData['pttc']))? 0 : 1;
         $usuario->dtUltPromo = $validatedData['dtUltPromo'];
         $usuario->validade = $request->validade;
         $usuario->mecenas = $request->mecenas ? 1 : 0;
         $usuario->indeterminado = (!isset($request->indeterminado))? 0 : 1;
+        $usuario->pttc = $request->has('pttc') ? 1 : 0;
+        if (
+            (int) $validatedData['situacao'] === 2 &&
+            $request->has('pttc')
+        ) {
+            $usuario->mesAnoFinal = $validatedData['mesAnoFinal'];
+        } else {
+            $usuario->mesAnoFinal = null;
+        }
         
-
-
+        
         if($request->nivel){
         $usuario->nivel = $validatedData['nivel'];
         }
@@ -510,101 +499,109 @@ class UsuarioController extends Controller
         $usuario->postograd_id = $request['posto'];
         $usuario->siape = $validatedData['siape'];
     
-
         if(isset($validatedData['pttc']) == 1 and $validatedData['situacao'] == 2){
             $usuario->dtUltPromo = $validatedData['dtUltPromo'];
-        }else{
-        
         }
-        
-        
-        
         if($request->hasFile('documento') || $request->hasFile('documento_verso')){
-            
-            
-            $user = User::where('email', $request->email)->first();
-            $user->password = Hash::make($request->password);
-            $user->update();
-            /*
-            $usuario->tipo_doc = $type;
-            $usuario->tipo_doc_verso = $type2;
-            $file_documento = $request->file('documento');
-            $file_documento_verso = $request->file('documento_verso');
+         
 
-            $contents = $file_documento->openFile()->fread($file_documento->getSize());
-            $contents = base64_encode($contents);  
-            
-            $contents_documento_verso = $file_documento_verso->openFile()->fread($file_documento_verso->getSize());
-            $contents_documento_verso = base64_encode($contents_documento_verso);  
-            */    
 
-            //dd($usuario->documento);
+
+
+   
             $campos[] = "Documento Frente";
             $campos[] = "Documento Verso";
-
-           //  if($usuario->documento != $contents){
-            //$campos[] = "Documento Frente";
-            //}
-
-            //if($usuario->documento_verso != $contents_documento_verso){
-            //$campos[] = "Documento Verso";
-            //}
-
-            //$usuario->documento = $contents;
-            //$usuario->documento_verso = $contents_documento_verso; 
-
-
-
-        }else{
-            //$campos[] = "Não Houve Alteração do documento";
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-        if($usuario->update()){
-
-
-            $documentoService = new DocumentoService();
-
-if ($request->hasFile('documento')) {
-    $documentoService->salvarFrente($usuario, $request->file('documento'));
-}
-
-if ($request->hasFile('documento_verso')) {
-    $documentoService->salvarVerso($usuario, $request->file('documento_verso'));
-}
-
-
-
-            if(isset($campos)){
             
-            //$mail = \Illuminate\Support\Facades\Mail::queue(new \App\Mail\AtualizacaoDadosUsuario($usuario, $campos));         
-            }else{
-            $campos[] = "Não Houve Alteração";
-            
-            //$mail = \Illuminate\Support\Facades\Mail::queue(new \App\Mail\AtualizacaoDadosUsuario($usuario, $campos));         
-            }
-
-            \Session::flash('message', ['msg'=>'Dados pessoais alterados com sucesso.', 'class'=>'success']);
-            return redirect()->route('profile');
-        }else{
-             \Session::flash('message', ['msg'=>'Ocorreu um erro ao salvar os dados.', 'class'=>'danger']);
-             return redirect()->back();
-        }
    
-       
+        }
+
+       if ($usuario->update()) {
+
+    /*
+     * Salva os documentos.
+     * O serviço é criado quando houver frente ou verso.
+     */
+    if (
+        $request->hasFile('documento') ||
+        $request->hasFile('documento_verso')
+    ) {
+        $documentoService = new DocumentoService();
+
+        if ($request->hasFile('documento')) {
+            $documentoService->salvarFrente(
+                $usuario,
+                $request->file('documento')
+            );
+        }
+
+        if ($request->hasFile('documento_verso')) {
+            $documentoService->salvarVerso(
+                $usuario,
+                $request->file('documento_verso')
+            );
+        }
+    }
+
+    /*
+     * Garante que $campos sempre seja um array.
+     */
+    if (!isset($campos) || empty($campos)) {
+        $campos = ['Não houve alteração'];
+    }
+
+    /*
+     * Tenta enviar o e-mail sem interromper o restante do processo.
+     */
+    try {
+        \Illuminate\Support\Facades\Mail::queue(
+            new \App\Mail\AtualizacaoDadosUsuario(
+                $usuario,
+                $campos
+            )
+        );
+
+        \Session::flash('message', [
+            'msg' => 'Dados pessoais alterados com sucesso.',
+            'class' => 'success'
+        ]);
+
+    } catch (\Throwable $erro) {
+
+        // Registra o erro em storage/logs/laravel.log
+        \Illuminate\Support\Facades\Log::error(
+            'Erro ao enviar e-mail de atualização dos dados do usuário.',
+            [
+                'usuario_id' => $usuario->id,
+                'email' => $usuario->email,
+                'erro' => $erro->getMessage()
+            ]
+        );
+
+        \Session::flash('message', [
+            'msg' => 'Dados pessoais alterados com sucesso, mas não foi possível enviar o e-mail.',
+            'class' => 'warning'
+        ]);
+    }
+
+    return redirect()->route('profile');
+
+} else {
+
+    \Session::flash('message', [
+        'msg' => 'Ocorreu um erro ao salvar os dados.',
+        'class' => 'danger'
+    ]);
+
+    return redirect()->back()->withInput();
+}
         
         return redirect()->route('profile');
     }
+
+
+
+
+
 
     /**
      * Show the application dashboard.
