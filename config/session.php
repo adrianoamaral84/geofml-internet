@@ -79,8 +79,9 @@ return [
     | Session Database Table
     |--------------------------------------------------------------------------
     |
-    | When using the "database" driver, you may specify the table we should
-    | use to manage the sessions. Of course, a sensible default is provided.
+    | When using the "database" session driver, you may specify the table we
+    | should use to manage the sessions. Of course, a sensible default is
+    | provided for you; however, you are free to change this as needed.
     |
     */
 
@@ -160,8 +161,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | By setting this option to true, session cookies will only be sent back
-    | to the server if the browser has a HTTPS connection. This will keep the
-    | cookie from being sent to you if it can not be done securely.
+    | to the server if the browser has a HTTPS connection. This will keep
+    | the cookie from being sent to you if it can not be done securely.
     |
     */
 
