@@ -100,7 +100,7 @@ class LoginController extends Controller
 
                 \Session::flash('message', [
                     'msg' => 'Seu acesso foi bloqueado por inatividade superior a 90 dias. Procure o administrador do sistema para reativar sua conta.',
-                    'class' => 'warning',
+                    'class' => 'danger',
                 ]);
 
                 return redirect('/login');
