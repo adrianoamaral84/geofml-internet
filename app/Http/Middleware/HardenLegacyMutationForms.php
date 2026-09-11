@@ -15,7 +15,11 @@ class HardenLegacyMutationForms
             return $response;
         }
 
-        if (!$request->routeIs('hospede.meuspedidos') && !$request->routeIs('hospede.meupedido')) {
+        if (
+            !$request->routeIs('hospede.meuspedidos') &&
+            !$request->routeIs('hospede.meupedido') &&
+            !$request->routeIs('usuario.verdados')
+        ) {
             return $response;
         }
 
@@ -49,6 +53,24 @@ class HardenLegacyMutationForms
             $content = str_replace(
                 '<form action="" id="checkout" method="get">',
                 '<form action="" id="checkout" method="post">',
+                $content
+            );
+        }
+
+        if ($request->routeIs('usuario.verdados')) {
+            $token = e(csrf_token());
+
+            $content = preg_replace_callback(
+                '#<a\s+href="([^"]*/users/[^"/]+/reset)"\s+class="btn btn-dark">(.*?)Resetar Senha!\s*</a>#s',
+                function ($matches) use ($token) {
+                    $action = e($matches[1]);
+
+                    return '<form action="' . $action . '" method="post" style="display:inline-block;">'
+                        . '<input type="hidden" name="_token" value="' . $token . '">'
+                        . '<button type="submit" class="btn btn-dark" onclick="return confirm(\'Enviar link seguro de redefinição de senha para o e-mail deste usuário?\');">'
+                        . '<i class="fas fa-check-circle fa-sm"></i> Resetar Senha!'
+                        . '</button></form>';
+                },
                 $content
             );
         }
