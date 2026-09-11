@@ -428,29 +428,34 @@ public function processaRequisicao($id)
             ->orderByDesc('id')
             ->first();
 
-    if ($pagamentoAtual && in_array($pagamentoAtual->situacao, ['CRIADO', 'INICIADO'], true)) {
-        $pagamentoAtual->situacao = 'SUBSTITUIDO';
-        $pagamentoAtual->save();
-    }
+            if ($pagamentoAtual && in_array($pagamentoAtual->situacao, ['CRIADO', 'INICIADO'], true)) {
+                $pagamentoAtual->situacao = 'SUBSTITUIDO';
+                $pagamentoAtual->save();
+            }
 
-    if ($pagamentoAtual && in_array(
-        $pagamentoAtual->situacao,
-        ['CONCLUIDO', 'PAGO', 'PAGAMENTO_CONCLUIDO'],
-        true
-    )) {
-        return response('O pagamento restante já foi confirmado. Esta janela pode ser fechada.', 200);
-    }
+            if ($pagamentoAtual && in_array(
+                $pagamentoAtual->situacao,
+                ['CONCLUIDO', 'PAGO', 'PAGAMENTO_CONCLUIDO'],
+                true
+            )) {
+                return response('O pagamento restante já foi confirmado. Esta janela pode ser fechada.', 200);
+            }
 
 
            $valorDiaria = round(
-    (float) $hospedagem->valorTarifaComDesconto(),
-    2
-);
-/*
- * Modo de teste local:
- * não chama o PagTesouro e não precisa de token.
- */
-if (config('services.pagtesouro.modo_teste')) {
+            (float) $hospedagem->valorTarifaComDesconto(),
+            2
+            );
+
+
+            /*
+            * Modo de teste local:
+            * não chama o PagTesouro e não precisa de token.
+            */
+          
+            
+
+            if (config('services.pagtesouro.modo_teste')) {
 
 
 
@@ -473,7 +478,6 @@ if (config('services.pagtesouro.modo_teste')) {
         ]
     );
 }
-
 /*
  * Daqui para baixo só executa em produção/homologação.
  */

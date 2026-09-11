@@ -25,7 +25,7 @@
 
 
                             <input type="hidden" name="status" id="status" value="{{ $user->status }}" placeholder="">
-
+                            
                             @error('nome')
                                 <span class="has-error" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -42,7 +42,7 @@
                                 </span>
                             @enderror
                         </div>
-
+              
                     </div>
 
 
@@ -81,7 +81,7 @@
     @enderror
 </div>
                         <div class="form-group col-sm-4 col-md-4 col-lg-4">
-    <label class="control-label">Mecenas DECEx / MHEx</label>
+    <label class="control-label">Mecenas DCEx / MHEx</label>
 
     <select name="mecenas" class="form-control">
         <option value="0" @if(old('mecenas', $user->mecenas ?? 0) == 0) selected @endif>Não</option>
@@ -93,8 +93,8 @@
 
 
                     </div>
-
-
+                   
+               
                                 <div class="row has-error milReserva align-items-start">
 
     <div class="col-sm-6 col-md-6 col-lg-6 form-group">
@@ -166,10 +166,10 @@
     </div>
 
 </div>
+                  
+                
 
-
-
-
+               
 
                     <div class="row has-error">
 
@@ -232,7 +232,7 @@
                         <input type="checkbox" name="indeterminado" id="indeterminado" value="1"> <label for="indeterminado">
                             Indeterminada
                         @endif
-
+                        
                         </label> </small></div>
 
                             <input type="date" class="form-control boxed @error('validade') is-invalid @enderror" value="{{$user->validade}}" name="validade" id="validade" placeholder="dd-mm-yyyy" min="{{$min}}" required="required" onpaste="return false;" @if($user->indeterminado == 1) readonly="readonly" @endif>
@@ -243,7 +243,7 @@
                             @enderror
                         </div>
 
-
+                  
                         <div class="col-sm-4 col-md-4 col-lg-4 form-group siape">
                             <label class="control-label">{{ __('Siape') }}</label>
                                 <input type="text" class="form-control boxed @error('siape') is-invalid @enderror" value="{{ ($user->siape) ? $user->siape : old('siape') }}" name="siape" id="siape" autofocus maxlength="14" readonly="" onpaste="return false;" @if($user->siape) readonly @endif>
@@ -257,17 +257,17 @@
 
                                        <div class="col-sm-4 col-md-4 col-lg-4 form-group nivelescola">
                             <label class="control-label">{{ __('Nivel') }}</label>
-
+                
                                 <select name="nivel" id="nivel" class="custom-select mr-sm-2 @error('nivel') is-invalid @enderror" autocomplete="off">
                                      <option value="">Nivel </option>
-
+                                
                                     @foreach($nivels as $nivel)
 
                                          <option value="{{$nivel->id}}" @if($user->nivel == $nivel->id)selected @endif>{{$nivel->nivel}}</option>
                                     @endforeach
 
-
-
+                                         
+                                    
                             </select>
                             @error('nivel')
                                 <span class="has-error" role="alert">
@@ -277,8 +277,8 @@
                         </div>
 
                 </div>
-
-
+  
+                   
                      <div class="row has-error">
 
     {{-- UF --}}
@@ -382,10 +382,10 @@
                                 </span>
                             @enderror
                         </div>
-
+                        
                         <div class="col-sm-6 col-md-4 col-lg-4 form-group">
                             <label class="control-label">{{ __('Telefone C/ WhatsApp') }}</label>
-                            <input type="text" class="form-control boxed @error('telefone') is-invalid @enderror"
+                            <input type="text" class="form-control boxed @error('telefone') is-invalid @enderror" 
                             value="@if($user->telefone){{$user->telefone}}@endif" name="telefone" id="telefone" maxlength="11" onpaste="return false;" required="required" data-mask="(00) 00000-0000" autocomplete="off">
                             @error('telefone')
                                 <span class="has-error" role="alert">
@@ -425,9 +425,9 @@
         Verso
     </a>
 @endif
-
+                            
                         </div>
-
+                          
                     </div>
 
 
@@ -436,7 +436,7 @@
                             <label class="control-label">{{ __('Anexar Documento de Identidade Militar Frente') }}</label>
 
                             <p class="title-description"> Imagem da Identidade no formato .JPG, .PNG, .PDF até 4MB ou PRINT aplicativo EBCIM</p>
-
+                        
                         <div class="custom-file">
 
                         <input type="file" class="custom-file-input" name="documento" id="documento" accept=".jpg,.png,.pdf" @if(!$user->documentoFrente) required="" @endif>
@@ -453,35 +453,35 @@
                         <div class="col-xl-12 col-sm-12 col-md-12 col-lg-12 form-group">
                             <label class="control-label">{{ __('Anexar Documento de Identidade Militar Verso') }}</label>
                              <p class="title-description"> Imagem da Identidade no formato .JPG, .PNG, .PDF até 4MB ou PRINT aplicativo EBCIM </p>
-
+                        
                         <div class="custom-file">
 
                          <input type="file" class="custom-file-input" name="documento_verso" id="documento_verso" accept=".jpg,.png,.pdf" @if(!$user->documentoVerso) required="" @endif>
                             <label class="custom-file-label" for="customFile">Escolha o arquivo</label>
-
+                        
                         </div>
-
+                        
                         @error('documento_verso')
                         <span class="has-error" role="alert">
                         <strong>{{ $message }}</strong>
                         </span>
                         @enderror
                        </div>
-                    </div>
-
-
+                    </div> 
+                      
+                    
 
                     <hr>
                     <div class="form-group row">
                         <div class="col-sm-12 col-xl-12">
-                            <p class="title-description">
+                            <p class="title-description"> 
 
                              </p><br>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-check-circle fa-sm"></i>
+                                <i class="fas fa-check-circle fa-sm"></i>  
                                     Salvar Alterações
                             </button>
-
+                            
                         </div>
                     </div>
 
@@ -491,7 +491,7 @@
                 <p></p>
                 <p></p>
                 <p></p>
-                <p></p>
+                <p></p>   
                 <p></p>
                 <p></p>
                 <p></p>
@@ -507,18 +507,18 @@
 @push('javascript')
 
     <script src="{{asset('lib/jquery-mask-plugin/dist/jquery.mask.min.js')}}"></script>
-    <script src="{{ asset('js/script_cadastro.js') }}" ></script>
-    <script>
+    <script src="{{ asset('js/script_cadastro.js') }}" ></script>   
+    <script>  
 
-
+        
 
         $('#pttc').on('change', ()=>{
 
-
-
+       
+        
         if($('#pttc').is(':checked')){
-
-
+         
+        
         $('#dtUltPromo').prop('readonly', null);
         $('#dtUltPromo').removeAttr('touch-action');
         $('#dtUltPromo').removeAttr('tabindex');
@@ -531,18 +531,18 @@
 
         $('#dtUltPromo').prop('readonly', true);
         $('#dtUltPromo').attr('aria-disabled', true);
-        $('#dtUltPromo').attr('tabindex', '-1');
+        $('#dtUltPromo').attr('tabindex', '-1');        
         $('#dtUltPromo').css('touch-action', '');
-
+        
         }
-
+           
         });
 
 
     $('#indeterminado').on('change', ()=>{
-
+    
         if($('#indeterminado').is(':checked')){
-
+            
                 $('#validade').attr('readonly', true);
                 $('#documento').prop('required', true);
                 $('#documento_verso').prop('required', true);
@@ -553,10 +553,10 @@
                 $('#documento_verso').prop('required', true);
                 $('#validade').attr('readonly', false);
                 alert('Confirma a data de validade da sua identidade militar? Atualmente a validade é de 10 anos.')
-
-
+              
+                
         }
-
+            
     });
 
 
@@ -565,7 +565,7 @@
          $('#documento').prop('required', true);
          $('#documento_verso').prop('required', true);
 
-    });
+    }); 
 
     $('#validade').on('change', ()=>{
         //alert('Precisa Anexar o Documento!');
