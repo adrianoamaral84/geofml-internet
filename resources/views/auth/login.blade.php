@@ -43,7 +43,7 @@
     </div>
     <div class="form-group">
         <label for="password">{{ __('Senha') }}</label>
-        <input type="password" class="form-control underlined @error('password') is-invalid @enderror" name="password" id="password" placeholder="Sua senha" required maxlength="15"><i toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password" style="margin-left: -30px; cursor: pointer;"></i>
+        <input type="password" class="form-control underlined @error('password') is-invalid @enderror" name="password" id="password" placeholder="Sua senha" required maxlength="64"><i toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password" style="margin-left: -30px; cursor: pointer;"></i>
         @error('password')
             <span class="invalid-feedback" role="alert">
                 <strong>{{ $message }}</strong>
