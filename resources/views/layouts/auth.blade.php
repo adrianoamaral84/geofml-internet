@@ -31,12 +31,15 @@
             <div style="width: 100%; height: 5px; background-color: #85CE36;"></div>
             <div class="auth-container">
 
-
-
-                
-                
-
-
+                @if(Session::has('message'))
+                <div>
+                    <div class="alert alert-{{ Session::get('message')['class'] }}" role="alert">
+                        <div align="center" class="card-content">
+                            {{ Session::get('message')['msg'] }}
+                        </div>
+                    </div>
+                </div>
+                @endif
 
                 <div class="card">
                     <div style="width: 100%; height: 5px; background-color: #85CE36;"></div>
@@ -76,7 +79,17 @@
     </div>
 @endif
 
+@if (\Session::has('status'))
+    <div class="alert alert-success" role="alert">
+        {!! \Session::get('status') !!}
+    </div>
+@endif
 
+@if (\Session::has('erro'))
+    <div class="alert alert-danger" role="alert">
+        {!! \Session::get('erro') !!}
+    </div>
+@endif
 
         @yield('content')
    
