@@ -61,6 +61,12 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware('web')
             ->namespace($this->namespace)
             ->group(base_path('routes/web.php'));
+
+        // Rotas de hardening carregadas por último para substituir
+        // endpoints legados sensíveis sem reescrever o web.php inteiro.
+        Route::middleware('web')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/security_hardening.php'));
     }
 
     /**
