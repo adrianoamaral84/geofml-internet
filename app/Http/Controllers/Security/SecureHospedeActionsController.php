@@ -30,7 +30,7 @@ class SecureHospedeActionsController extends Controller
         return redirect()->route('hospede.meuspedidos');
     }
 
-    public function cancelarHospedagem($id)
+    public function cancelarReserva($id)
     {
         $hospedagemId = Crypt::decrypt($id);
 
@@ -38,13 +38,11 @@ class SecureHospedeActionsController extends Controller
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        $statusPermitidos = [2, 3, 5, 7];
-
-        if (!in_array((int) $hospedagem->status, $statusPermitidos, true)) {
-            abort(403, 'Esta reserva não pode ser cancelada neste status.');
+        if (!in_array((int) $hospedagem->status, [2, 3, 5, 7], true)) {
+            abort(403, 'Esta reserva não pode ser cancelada no estado atual.');
         }
 
-        if (!is_null($hospedagem->checkin)) {
+        if ($hospedagem->checkin !== null) {
             abort(403, 'Não é possível cancelar uma reserva após o check-in.');
         }
 
@@ -69,8 +67,59 @@ class SecureHospedeActionsController extends Controller
         }
 
         $hospedagem->status = 6;
-        $hospedagem->update();
+        $hospedagem->save();
 
         return redirect()->route('hospede.meuspedidos');
+    }
+
+    public function checkin($id)
+    {
+        $hospedagemId = Crypt::decrypt($id);
+        $hospedagem = \App\Hospede::findOrFail($hospedagemId);
+
+        if ((int) $hospedagem->status !== 2) {
+            abort(403, 'O check-in só pode ser realizado em uma reserva aprovada.');
+        }
+
+        if ($hospedagem->checkin !== null) {
+            abort(409, 'Esta hospedagem já possui movimentação de check-in/check-out.');
+        }
+
+        $hospedagem->checkin = 1;
+        $hospedagem->checkin_at = now();
+        $hospedagem->save();
+
+        \Session::flash('message', [
+            'msg' => 'Check-In realizado com sucesso!',
+            'class' => 'success',
+        ]);
+
+        return redirect()->route('checkIn');
+    }
+
+    public function checkout($id)
+    {
+        $hospedagemId = Crypt::decrypt($id);
+        $hospedagem = \App\Hospede::findOrFail($hospedagemId);
+
+        if ((int) $hospedagem->status !== 2) {
+            abort(403, 'O check-out só pode ser realizado em uma reserva aprovada.');
+        }
+
+        if ((int) $hospedagem->checkin !== 1) {
+            abort(409, 'O check-out exige um check-in ativo.');
+        }
+
+        $hospedagem->checkin = 2;
+        $hospedagem->checkout_user_id = Auth::id();
+        $hospedagem->checkout_at = now();
+        $hospedagem->save();
+
+        \Session::flash('message', [
+            'msg' => 'Check-Out realizado com sucesso!',
+            'class' => 'success',
+        ]);
+
+        return redirect()->route('checkOut');
     }
 }
