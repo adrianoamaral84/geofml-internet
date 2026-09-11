@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 use App\Rules\ReCaptcha;
 use App\Auth\AuthenticatesUsers;
+use Carbon\Carbon;
 
 class LoginController extends Controller
 {
@@ -89,17 +90,21 @@ class LoginController extends Controller
         }
 
         // Bloqueia contas que ficaram mais de 90 dias sem login.
-        if ($user->last_login_at && $user->last_login_at->lt(now()->subDays(90))) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
+        if ($user->last_login_at) {
+            $ultimoAcesso = Carbon::parse($user->last_login_at);
 
-            \Session::flash('message', [
-                'msg' => 'Seu acesso foi bloqueado por inatividade superior a 90 dias. Procure o administrador do sistema para reativar sua conta.',
-                'class' => 'warning',
-            ]);
+            if ($ultimoAcesso->lt(now()->subDays(90))) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
 
-            return redirect('/login');
+                \Session::flash('message', [
+                    'msg' => 'Seu acesso foi bloqueado por inatividade superior a 90 dias. Procure o administrador do sistema para reativar sua conta.',
+                    'class' => 'warning',
+                ]);
+
+                return redirect('/login');
+            }
         }
 
         $user->last_login_at = now();
