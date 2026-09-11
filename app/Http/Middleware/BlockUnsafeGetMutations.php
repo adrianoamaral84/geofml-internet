@@ -19,8 +19,6 @@ class BlockUnsafeGetMutations
             '#^/hospede/cancelar/hospedagem/[^/]+$#',
             '#^/hospede/checkin/[^/]+$#',
             '#^/hospede/checkout/[^/]+/[^/]+$#',
-            '#^/changeStatusUsuario/[^/]+$#',
-            '#^/users/[^/]+/reset$#',
         ];
 
         foreach ($patterns as $pattern) {
