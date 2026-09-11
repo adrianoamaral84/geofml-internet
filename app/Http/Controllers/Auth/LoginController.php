@@ -88,6 +88,20 @@ class LoginController extends Controller
             return redirect('/login');
         }
 
+        // Bloqueia contas que ficaram mais de 90 dias sem login.
+        if ($user->last_login_at && $user->last_login_at->lt(now()->subDays(90))) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            \Session::flash('message', [
+                'msg' => 'Seu acesso foi bloqueado por inatividade superior a 90 dias. Procure o administrador do sistema para reativar sua conta.',
+                'class' => 'warning',
+            ]);
+
+            return redirect('/login');
+        }
+
         $user->last_login_at = now();
         $user->save();
 
