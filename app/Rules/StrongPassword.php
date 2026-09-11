@@ -37,7 +37,7 @@ class StrongPassword implements Rule
             return false;
         }
 
-        if (!preg_match('/[^A-Za-z0-9]/', $value)) {
+        if (!preg_match('/[^A-Za-z0-9\s]/', $value)) {
             $this->message = 'A senha deve conter pelo menos um símbolo.';
             return false;
         }
@@ -55,6 +55,10 @@ class StrongPassword implements Rule
         $compactPassword = preg_replace('/[^a-z0-9]/i', '', $normalized);
         $request = request();
         $user = auth()->user();
+
+        if (!$user && $request->filled('email')) {
+            $user = \App\User::where('email', $request->input('email'))->first();
+        }
 
         $cpf = preg_replace('/\D+/', '', (string) ($request->input('cpf') ?: optional($user)->cpf));
         if (strlen($cpf) >= 6 && strpos($compactPassword, $cpf) !== false) {
