@@ -388,11 +388,16 @@
 
                 </div>
 
+                <div class="alert alert-info" role="alert" style="margin-bottom: 15px;">
+                    <strong>Requisitos da senha:</strong>
+                    use de 8 a 15 caracteres, com pelo menos 1 letra maiúscula, 1 letra minúscula, 1 número e 1 símbolo.
+                </div>
+
                  <div class="row has-error">
                          
                          <div class="col-sm-6 col-md-6 col-lg-6 form-group">
-                            <label class="control-label">{{ __('Senha') }}</label><small> ( min. 6 caracteres max 15)</small>
-                            <input type="password" class="form-control boxed @error('password') is-invalid @enderror" value="" name="password" id="password" required maxlength="15" minlength="6" onpaste="return false;">
+                            <label class="control-label">{{ __('Senha') }}</label><small> (mín. 8 caracteres)</small>
+                            <input type="password" class="form-control boxed @error('password') is-invalid @enderror" value="" name="password" id="password" required maxlength="15" minlength="8" onpaste="return false;" autocomplete="new-password">
                             @error('password')
                                 <span class="has-error" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -401,9 +406,9 @@
                         </div>
                         
                         <div class="col-sm-6 col-md-6 col-lg-6 form-group">
-                            <label class="control-label">{{ __('Confirmar Senha') }}</label><small> ( min. 6 caracteres max 15)</small>
+                            <label class="control-label">{{ __('Confirmar Senha') }}</label><small> (repita a mesma senha)</small>
                             <input type="password" class="form-control boxed @error('resenha') is-invalid @enderror" 
-                            value="" name="resenha" id="resenha" maxlength="15" minlength="6" onpaste="return false;" required="required">
+                            value="" name="resenha" id="resenha" maxlength="15" minlength="8" onpaste="return false;" required="required" autocomplete="new-password">
                             @error('resenha')
                                 <span class="has-error" role="alert">
                                     <strong>{{ $message }}</strong>
