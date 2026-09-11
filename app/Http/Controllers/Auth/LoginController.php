@@ -59,6 +59,10 @@ class LoginController extends Controller
     {
         // Migra com segurança contas antigas que ainda utilizam o CPF como senha.
         if ($user->cpf && $this->passwordMatches($user->cpf, $user->password)) {
+            // Invalida imediatamente a senha baseada em CPF para que ela não possa ser reutilizada.
+            $user->password = Hash::make(\Illuminate\Support\Str::random(64));
+            $user->save();
+
             if ($user->email) {
                 try {
                     Password::broker()->sendResetLink(['email' => $user->email]);
@@ -76,8 +80,8 @@ class LoginController extends Controller
 
             \Session::flash('message', [
                 'msg' => $user->email
-                    ? 'Por segurança, sua senha antiga precisa ser substituída. Enviamos um link para o seu e-mail para criar uma nova senha.'
-                    : 'Por segurança, sua senha antiga precisa ser substituída. Procure o administrador para redefinir seu acesso.',
+                    ? 'Por segurança, sua senha antiga foi invalidada. Enviamos um link para o seu e-mail para criar uma nova senha.'
+                    : 'Por segurança, sua senha antiga foi invalidada. Procure o administrador para redefinir seu acesso.',
                 'class' => 'warning',
             ]);
 
