@@ -15,6 +15,10 @@ class HardenLegacyMutationForms
             return $response;
         }
 
+        if (!$request->routeIs('hospede.meuspedidos') && !$request->routeIs('hospede.meupedido')) {
+            return $response;
+        }
+
         $content = $response->getContent();
 
         if (!is_string($content)) {
@@ -33,6 +37,18 @@ class HardenLegacyMutationForms
             $content = str_replace(
                 '<form action="" id="cancelar" method="get">',
                 '<form action="" id="cancelar" method="post">',
+                $content
+            );
+
+            $content = str_replace(
+                '<form action="" id="checkin" method="get">',
+                '<form action="" id="checkin" method="post">',
+                $content
+            );
+
+            $content = str_replace(
+                '<form action="" id="checkout" method="get">',
+                '<form action="" id="checkout" method="post">',
                 $content
             );
         }
