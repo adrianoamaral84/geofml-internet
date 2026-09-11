@@ -15,21 +15,27 @@ class HardenLegacyMutationForms
             return $response;
         }
 
-        if (!$request->routeIs('hospede.meuspedidos')) {
-            return $response;
-        }
-
         $content = $response->getContent();
 
         if (!is_string($content)) {
             return $response;
         }
 
-        $content = str_replace(
-            '<form action="" id="deletearea" method="get">',
-            '<form action="" id="deletearea" method="post">',
-            $content
-        );
+        if ($request->routeIs('hospede.meuspedidos')) {
+            $content = str_replace(
+                '<form action="" id="deletearea" method="get">',
+                '<form action="" id="deletearea" method="post">',
+                $content
+            );
+        }
+
+        if ($request->routeIs('hospede.meupedido')) {
+            $content = str_replace(
+                '<form action="" id="cancelar" method="get">',
+                '<form action="" id="cancelar" method="post">',
+                $content
+            );
+        }
 
         $response->setContent($content);
 
