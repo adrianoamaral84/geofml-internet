@@ -50,9 +50,12 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
-     * Define the "web" routes for the application.
+     * Define the web routes used by the Internet portal.
      *
-     * These routes all receive session state, CSRF protection, etc.
+     * The historical routes/web.php contains administrative and attendant
+     * routes copied from the intranet/admin application, including references
+     * to controllers that do not exist in this project. It remains in the
+     * repository only as legacy reference and is no longer registered.
      *
      * @return void
      */
@@ -60,10 +63,10 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::middleware('web')
             ->namespace($this->namespace)
-            ->group(base_path('routes/web.php'));
+            ->group(base_path('routes/internet.php'));
 
-        // Rotas de hardening carregadas por último para substituir
-        // endpoints legados sensíveis sem reescrever o web.php inteiro.
+        // Hardening is loaded last so the protected replacements keep
+        // precedence over compatibility/legacy paths.
         Route::middleware('web')
             ->namespace($this->namespace)
             ->group(base_path('routes/security_hardening.php'));
