@@ -28,12 +28,12 @@ Route::get('/solicitaacesso', 'HomeController@solicitaacesso')->name('solicitaac
 Route::get('/reload', 'HomeController@reload')->name('reload');
 
 /* Combos usados no pré-cadastro e no fluxo de hospedagem. */
-Route::get('/cascade/carregarCidades/{id}', 'Cascade\CascadeController@carregarCidades');
-Route::get('/cascade/carregarOm/{id}', 'Cascade\CascadeController@carregarOm');
-Route::get('/cascade/carregarPosto/{id}', 'Cascade\CascadeController@carregarPosto');
-Route::get('/cascade/carregarPostoSituacao/{id}', 'Cascade\CascadeController@carregarPostoSituacao');
-Route::get('/cascade/carregarPostoSituacao/all/{id}', 'Cascade\CascadeController@carregarPostoSituacaoTodos');
-Route::get('/cascade/carregarUnidades/{id}/{tipo}', 'Cascade\CascadeController@carregarUnidadesHabtacionais');
+Route::get('/cascade/carregarCidades/{id}', 'Cascade\\CascadeController@carregarCidades');
+Route::get('/cascade/carregarOm/{id}', 'Cascade\\CascadeController@carregarOm');
+Route::get('/cascade/carregarPosto/{id}', 'Cascade\\CascadeController@carregarPosto');
+Route::get('/cascade/carregarPostoSituacao/{id}', 'Cascade\\CascadeController@carregarPostoSituacao');
+Route::get('/cascade/carregarPostoSituacao/all/{id}', 'Cascade\\CascadeController@carregarPostoSituacaoTodos');
+Route::get('/cascade/carregarUnidades/{id}/{tipo}', 'Cascade\\CascadeController@carregarUnidadesHabtacionais');
 Route::get('/retornacidade/{id}', 'HomeController@listaCidadePorUF')->name('listaCidadePorUF');
 
 /* Perfil e alteração voluntária de senha do próprio usuário. */
@@ -51,31 +51,31 @@ Route::middleware('auth')->prefix('precadastro')->group(function () {
 
 /* Calendário/consulta de disponibilidade utilizados pelo portal. */
 Route::middleware('auth')->group(function () {
-    Route::get('/calendario/{id}', 'Calendario\CalendarioController@index')->name('calendario.index');
-    Route::get('/calendario/mes/{id}', 'Calendario\CalendarioController@calendarioMes')->name('calendario.mes');
-    Route::get('/calendario/unidade/{unidade}/{data_ini}/{data_final}', 'Calendario\CalendarioController@calendarioUnidade')->name('calendario.unidade');
-    Route::get('/calendario/unidade/json/{id}', 'Calendario\CalendarioController@calendarioUnidadeJson')->name('calendario.unidade.json');
+    Route::get('/calendario/{id}', 'Calendario\\CalendarioController@index')->name('calendario.index');
+    Route::get('/calendario/mes/{id}', 'Calendario\\CalendarioController@calendarioMes')->name('calendario.mes');
+    Route::get('/calendario/unidade/{unidade}/{data_ini}/{data_final}', 'Calendario\\CalendarioController@calendarioUnidade')->name('calendario.unidade');
+    Route::get('/calendario/unidade/json/{id}', 'Calendario\\CalendarioController@calendarioUnidadeJson')->name('calendario.unidade.json');
 });
 
 /* Fluxo operacional do hóspede. */
 Route::middleware(['auth', 'role:hospede'])->prefix('hospede')->group(function () {
-    Route::get('/', 'Hospede\HospedeController@index')->name('hospede.index');
+    Route::get('/', 'Hospede\\HospedeController@index')->name('hospede.index');
 
-    Route::get('/pedido', 'Pedidos\PedidosController@chamaFormularioPedido')->name('hospede.solicitarinscricao');
-    Route::post('/pedido/confirmar', 'Pedidos\PedidosController@confimrarPedido')->name('hospede.confirmar');
-    Route::post('/pedido/store', 'Pedidos\PedidosController@store')->name('hospede.store');
+    Route::get('/pedido', 'Pedidos\\PedidosController@chamaFormularioPedido')->name('hospede.solicitarinscricao');
+    Route::post('/pedido/confirmar', 'Pedidos\\PedidosController@confimrarPedido')->name('hospede.confirmar');
+    Route::post('/pedido/store', 'Pedidos\\PedidosController@store')->name('hospede.store');
 
-    Route::get('/pedido/edita/{id}', 'EditarPedido\EditarPedidoController@index')->name('hospede.solicitarinscricao.edit');
-    Route::post('/pedido/edita/confirmar', 'EditarPedido\EditarPedidoController@confirmaEdicao')->name('hospede.edita.confirmar');
-    Route::post('/pedido/edita/store', 'EditarPedido\EditarPedidoController@gravaEdicao')->name('hospede.storeEdit.edita');
+    Route::get('/pedido/edita/{id}', 'EditarPedido\\EditarPedidoController@index')->name('hospede.solicitarinscricao.edit');
+    Route::post('/pedido/edita/confirmar', 'EditarPedido\\EditarPedidoController@confirmaEdicao')->name('hospede.edita.confirmar');
+    Route::post('/pedido/edita/store', 'EditarPedido\\EditarPedidoController@gravaEdicao')->name('hospede.storeEdit.edita');
 
-    Route::get('/meuspedidos', 'Hospede\HospedeController@meuspedidos')->name('hospede.meuspedidos');
-    Route::get('/meupedido/{id}', 'Hospede\HospedeController@meuspedido')->name('hospede.meupedido');
-    Route::post('/uploadrecibo', 'Hospede\HospedeController@uploadComprovantePagamento')->name('hospede.uploadrecibo');
+    Route::get('/meuspedidos', 'Hospede\\HospedeController@meuspedidos')->name('hospede.meuspedidos');
+    Route::get('/meupedido/{id}', 'Hospede\\HospedeController@meuspedido')->name('hospede.meupedido');
+    Route::post('/uploadrecibo', 'Hospede\\HospedeController@uploadComprovantePagamento')->name('hospede.uploadrecibo');
 });
 
 /* Consulta/visualização de documentos do próprio usuário. */
-Route::get('/usuarios/{user}/documentos/{tipo}', 'UserDocumento\UserDocumentoController@show')
+Route::get('/usuarios/{user}/documentos/{tipo}', 'UserDocumento\\UserDocumentoController@show')
     ->middleware('auth')
     ->name('usuarios.documentos.show');
 
@@ -84,18 +84,20 @@ Route::get('/usuarios/ver/documento/{id}/{doc}/{tipo}/arquivo', 'UsuarioControll
     ->middleware('auth')
     ->name('documentos.verdocumento');
 
-/* PagTesouro: somente simulador/status ficam aqui. As criações de pagamento
- * são POSTs seguros registrados em security_hardening.php. */
+/* PagTesouro: status é sempre necessário. O simulador só existe quando
+ * o modo de teste estiver explicitamente habilitado. */
 Route::middleware(['auth', 'role:hospede'])->group(function () {
-    Route::get('/pagamento/simulador/{id}', 'Pagamento\PagamentoController@simulador')
-        ->name('pagamento.simulador');
-
-    Route::post('/pagamento/simulador/{id}/aprovar', 'Pagamento\PagamentoController@aprovarSimulacao')
-        ->name('pagamento.simulador.aprovar');
-
-    Route::post('/pagamento/simulador/{id}/cancelar', 'Pagamento\PagamentoController@cancelarSimulacao')
-        ->name('pagamento.simulador.cancelar');
-
-    Route::get('/pagamento/inicial/{id}/status', 'Pagamento\PagamentoController@consultarStatusPagamentoInicial')
+    Route::get('/pagamento/inicial/{id}/status', 'Pagamento\\PagamentoController@consultarStatusPagamentoInicial')
         ->name('pagamento.inicial.status');
+
+    if (config('services.pagtesouro.modo_teste')) {
+        Route::get('/pagamento/simulador/{id}', 'Pagamento\\PagamentoController@simulador')
+            ->name('pagamento.simulador');
+
+        Route::post('/pagamento/simulador/{id}/aprovar', 'Pagamento\\PagamentoController@aprovarSimulacao')
+            ->name('pagamento.simulador.aprovar');
+
+        Route::post('/pagamento/simulador/{id}/cancelar', 'Pagamento\\PagamentoController@cancelarSimulacao')
+            ->name('pagamento.simulador.cancelar');
+    }
 });
