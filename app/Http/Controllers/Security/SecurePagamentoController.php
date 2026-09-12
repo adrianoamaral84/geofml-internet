@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers\Security;
 
-use App\Http\Controllers\Pagamento\PagamentoController;
+use App\Http\Controllers\Controller;
 use App\Services\CalculoHospedagemService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class SecurePagamentoController extends PagamentoController
+class SecurePagamentoController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function processaRequisicao($id)
     {
         try {
@@ -157,6 +163,262 @@ class SecurePagamentoController extends PagamentoController
         return redirect()->to($resultado->proximaUrl);
     }
 
+    public function consultarStatusPagamentoInicial($id)
+    {
+        try {
+            try {
+                $hospedagemId = Crypt::decrypt($id);
+            } catch (\Throwable $e) {
+                abort(404);
+            }
+
+            $hospedagem = \App\Hospede::findOrFail($hospedagemId);
+            $this->assertOwnership($hospedagem);
+
+            $pagamento = \App\Pagamento::where('hospedagem_id', $hospedagem->id)
+                ->where('tipo', 'diaria_inicial')
+                ->where('situacao', '<>', 'SUBSTITUIDO')
+                ->orderByDesc('id')
+                ->firstOrFail();
+
+            $situacoesConfirmadas = [
+                'CONCLUIDO',
+                'PAGO',
+                'PAGAMENTO_CONCLUIDO',
+            ];
+
+            if (config('services.pagtesouro.modo_teste')) {
+                $hospedagem->refresh();
+                $pagamento->refresh();
+
+                $confirmado = in_array($pagamento->situacao, $situacoesConfirmadas, true);
+
+                return response()->json([
+                    'sucesso' => true,
+                    'pagamento_confirmado' => $confirmado,
+                    'situacao' => $pagamento->situacao,
+                    'valor_pago' => (float) ($hospedagem->valor_pago ?? 0),
+                    'valor_restante' => (float) ($hospedagem->valor_restante ?? 0),
+                    'mensagem' => $confirmado
+                        ? 'Pagamento inicial de teste confirmado.'
+                        : 'Pagamento de teste aguardando aprovação.',
+                ]);
+            }
+
+            if (in_array($pagamento->situacao, $situacoesConfirmadas, true)) {
+                return response()->json([
+                    'sucesso' => true,
+                    'pagamento_confirmado' => true,
+                    'situacao' => $pagamento->situacao,
+                    'valor_pago' => (float) ($hospedagem->valor_pago ?? 0),
+                    'valor_restante' => (float) ($hospedagem->valor_restante ?? 0),
+                    'mensagem' => 'Pagamento inicial já confirmado.',
+                ]);
+            }
+
+            $dados = $this->consultarPagTesouro($pagamento->idPagamento);
+            $situacaoPagTesouro = $dados->situacao->codigo ?? null;
+            $pagamentoConfirmado = in_array($situacaoPagTesouro, $situacoesConfirmadas, true);
+
+            if (!$pagamentoConfirmado) {
+                if (!empty($situacaoPagTesouro)) {
+                    $pagamento->situacao = $situacaoPagTesouro;
+                    $pagamento->save();
+                }
+
+                return response()->json([
+                    'sucesso' => true,
+                    'pagamento_confirmado' => false,
+                    'situacao' => $situacaoPagTesouro,
+                    'mensagem' => 'Pagamento ainda não confirmado.',
+                ]);
+            }
+
+            DB::transaction(function () use (
+                $pagamento,
+                $hospedagem,
+                $dados,
+                $situacaoPagTesouro,
+                $situacoesConfirmadas
+            ) {
+                $pagamentoBanco = \App\Pagamento::where('id', $pagamento->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $hospedagemBanco = \App\Hospede::where('id', $hospedagem->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $jaContabilizado = in_array(
+                    $pagamentoBanco->situacao,
+                    $situacoesConfirmadas,
+                    true
+                );
+
+                $pagamentoBanco->situacao = $situacaoPagTesouro;
+
+                if (isset($dados->valor)) {
+                    $pagamentoBanco->valor = round((float) $dados->valor, 2);
+                }
+
+                $pagamentoBanco->save();
+
+                if (!$jaContabilizado) {
+                    $valorDiaria = round(
+                        (float) ($pagamentoBanco->valor ?? $hospedagemBanco->valorTarifaComDesconto()),
+                        2
+                    );
+                    $valorTotal = round((float) ($hospedagemBanco->valor ?? 0), 2);
+                    $valorPagoAtual = round((float) ($hospedagemBanco->valor_pago ?? 0), 2);
+                    $novoValorPago = min($valorTotal, round($valorPagoAtual + $valorDiaria, 2));
+                    $novoValorRestante = max(0, round($valorTotal - $novoValorPago, 2));
+
+                    $hospedagemBanco->status = 5;
+                    $hospedagemBanco->valor_pago = $novoValorPago;
+                    $hospedagemBanco->valor_restante = $novoValorRestante;
+                    $hospedagemBanco->save();
+                }
+            });
+
+            $hospedagem->refresh();
+
+            return response()->json([
+                'sucesso' => true,
+                'pagamento_confirmado' => true,
+                'situacao' => $situacaoPagTesouro,
+                'valor_pago' => (float) ($hospedagem->valor_pago ?? 0),
+                'valor_restante' => (float) ($hospedagem->valor_restante ?? 0),
+                'mensagem' => 'Pagamento da diária inicial confirmado e registrado.',
+            ]);
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+            throw $exception;
+        } catch (\Throwable $exception) {
+            Log::error('Erro ao consultar pagamento da diária inicial.', [
+                'erro' => $exception->getMessage(),
+            ]);
+
+            return response()->json([
+                'sucesso' => false,
+                'pagamento_confirmado' => false,
+                'mensagem' => 'Não foi possível consultar o pagamento inicial.',
+            ], 500);
+        }
+    }
+
+    public function simulador($id)
+    {
+        abort_unless(config('services.pagtesouro.modo_teste'), 404);
+
+        try {
+            $pagamentoId = Crypt::decrypt($id);
+        } catch (\Throwable $e) {
+            abort(404);
+        }
+
+        $pagamento = \App\Pagamento::findOrFail($pagamentoId);
+        $hospedagem = \App\Hospede::findOrFail($pagamento->hospedagem_id);
+        $this->assertOwnership($hospedagem);
+
+        return view('pagamento.simulador', compact('pagamento', 'hospedagem'));
+    }
+
+    public function aprovarSimulacao($id)
+    {
+        abort_unless(config('services.pagtesouro.modo_teste'), 404);
+
+        try {
+            $pagamentoId = Crypt::decrypt($id);
+        } catch (\Throwable $e) {
+            abort(404);
+        }
+
+        DB::transaction(function () use ($pagamentoId) {
+            $pagamento = \App\Pagamento::where('id', $pagamentoId)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $hospedagem = \App\Hospede::where('id', $pagamento->hospedagem_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $this->assertOwnership($hospedagem);
+
+            if (in_array(
+                $pagamento->situacao,
+                ['PAGO', 'CONCLUIDO', 'PAGAMENTO_CONCLUIDO'],
+                true
+            )) {
+                return;
+            }
+
+            $valorPagamento = round((float) ($pagamento->valor ?? 0), 2);
+            $valorTotal = round((float) ($hospedagem->valor ?? 0), 2);
+            $valorPagoAtual = round((float) ($hospedagem->valor_pago ?? 0), 2);
+            $novoValorPago = min($valorTotal, round($valorPagoAtual + $valorPagamento, 2));
+            $novoValorRestante = max(0, round($valorTotal - $novoValorPago, 2));
+
+            $pagamento->situacao = 'PAGO';
+            $pagamento->save();
+
+            $hospedagem->valor_pago = $novoValorPago;
+            $hospedagem->valor_restante = $novoValorRestante;
+
+            if ($pagamento->tipo === 'diaria_inicial') {
+                $hospedagem->status = 5;
+            }
+
+            if ($novoValorRestante <= 0) {
+                $hospedagem->situacao_pgto_id = 1;
+            }
+
+            $hospedagem->save();
+        });
+
+        return view('pagamento.simulador_resultado', [
+            'titulo' => 'Pagamento aprovado',
+            'mensagem' => 'Pagamento de teste confirmado. Esta janela pode ser fechada.',
+            'sucesso' => true,
+        ]);
+    }
+
+    public function cancelarSimulacao($id)
+    {
+        abort_unless(config('services.pagtesouro.modo_teste'), 404);
+
+        try {
+            $pagamentoId = Crypt::decrypt($id);
+        } catch (\Throwable $e) {
+            abort(404);
+        }
+
+        DB::transaction(function () use ($pagamentoId) {
+            $pagamento = \App\Pagamento::where('id', $pagamentoId)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $hospedagem = \App\Hospede::where('id', $pagamento->hospedagem_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $this->assertOwnership($hospedagem);
+
+            if (!in_array(
+                $pagamento->situacao,
+                ['PAGO', 'CONCLUIDO', 'PAGAMENTO_CONCLUIDO'],
+                true
+            )) {
+                $pagamento->situacao = 'CANCELADO';
+                $pagamento->save();
+            }
+        });
+
+        return view('pagamento.simulador_resultado', [
+            'titulo' => 'Pagamento cancelado',
+            'mensagem' => 'O pagamento de teste foi cancelado. Esta janela pode ser fechada.',
+            'sucesso' => false,
+        ]);
+    }
+
     private function assertOwnership($hospedagem)
     {
         if ((int) Auth::id() !== (int) $hospedagem->user_id) {
@@ -182,6 +444,11 @@ class SecurePagamentoController extends PagamentoController
         $scheme = parse_url($pagtesouro->url, PHP_URL_SCHEME);
         if (strtolower((string) $scheme) !== 'https') {
             abort(500, 'A integração com o PagTesouro exige HTTPS.');
+        }
+
+        if (empty($pagtesouro->token)) {
+            Log::error('Token do PagTesouro não configurado no ambiente.');
+            abort(500, 'Configuração do PagTesouro incompleta.');
         }
 
         return $pagtesouro;
@@ -211,33 +478,7 @@ class SecurePagamentoController extends PagamentoController
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-
-        $proxy = config('services.pagtesouro.proxy');
-        if (!empty($proxy)) {
-            curl_setopt($ch, CURLOPT_PROXY, $proxy);
-        }
-
-        $caBundle = config('services.pagtesouro.ca_bundle');
-        if (!empty($caBundle)) {
-            if (!is_readable($caBundle)) {
-                curl_close($ch);
-
-                Log::error('CA bundle do PagTesouro não está acessível.', [
-                    'ca_bundle' => $caBundle,
-                ]);
-
-                \Session::flash('message', [
-                    'msg' => 'A configuração de certificado do PagTesouro está inválida.',
-                    'class' => 'danger',
-                ]);
-
-                return null;
-            }
-
-            curl_setopt($ch, CURLOPT_CAINFO, $caBundle);
-        }
+        $this->aplicarTlsSeguro($ch);
 
         $result = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -308,11 +549,69 @@ class SecurePagamentoController extends PagamentoController
                 'msg' => 'O PagTesouro retornou uma URL de pagamento inválida.',
                 'class' => 'danger',
             ]);
-
             return null;
         }
 
         return $dados;
+    }
+
+    private function consultarPagTesouro($idPagamento)
+    {
+        $pagtesouro = $this->pagTesouroConfig();
+        $url = 'https://pagtesouro.tesouro.gov.br/api/gru/pagamentos/' . rawurlencode($idPagamento);
+        $ch = curl_init($url);
+
+        curl_setopt($ch, CURLOPT_HTTPGET, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: application/json',
+            'Authorization: Bearer ' . $pagtesouro->token,
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        $this->aplicarTlsSeguro($ch);
+
+        $resultado = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ($resultado === false) {
+            $erro = curl_error($ch);
+            curl_close($ch);
+            throw new \RuntimeException('Erro de comunicação com o PagTesouro: ' . $erro);
+        }
+
+        curl_close($ch);
+
+        if ($httpCode < 200 || $httpCode >= 300) {
+            throw new \RuntimeException('PagTesouro retornou HTTP inesperado.');
+        }
+
+        $dados = json_decode($resultado);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_object($dados)) {
+            throw new \RuntimeException('Resposta inválida do PagTesouro.');
+        }
+
+        return $dados;
+    }
+
+    private function aplicarTlsSeguro($ch)
+    {
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+
+        $proxy = config('services.pagtesouro.proxy');
+        if (!empty($proxy)) {
+            curl_setopt($ch, CURLOPT_PROXY, $proxy);
+        }
+
+        $caBundle = config('services.pagtesouro.ca_bundle');
+        if (!empty($caBundle)) {
+            if (!is_readable($caBundle)) {
+                throw new \RuntimeException('CA bundle do PagTesouro não está acessível.');
+            }
+
+            curl_setopt($ch, CURLOPT_CAINFO, $caBundle);
+        }
     }
 
     private function isHttpsUrl($url)
