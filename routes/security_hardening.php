@@ -18,13 +18,21 @@ Route::middleware(['auth', 'role:atendente|administrador_geral|auxiliar_administ
     ->delete('/atendente/hospedagem/{id}/checkout', 'Security\SecureHospedeActionsController@checkout')
     ->name('hospede.checkout');
 
-// Sobrescreve os endpoints legados de criação de pagamento.
-// O valor restante recebido na URL é mantido apenas por compatibilidade
-// com as views atuais; o controller seguro ignora esse valor e recalcula.
+// Bloqueia os GETs legados que criavam pagamentos. O web.php antigo ainda
+// registra essas URLs como GET, então elas são sobrescritas aqui por último.
 Route::middleware(['auth', 'role:hospede'])
-    ->get('/processaRequisicao/{id}', 'Security\SecurePagamentoController@processaRequisicao')
-    ->name('pagamento.processaRequisicao');
+    ->get('/processaRequisicao/{id}', 'Security\BlockedLegacyGetController@pagamento');
 
 Route::middleware(['auth', 'role:hospede'])
-    ->get('/processaPagamentoRestante/{id}/valor/{restante}', 'Security\SecurePagamentoController@processaPagamentoRestante')
+    ->get('/processaPagamentoRestante/{id}/valor/{restante}', 'Security\BlockedLegacyGetController@pagamento');
+
+// Criação de pagamento somente por POST + CSRF.
+Route::middleware(['auth', 'role:hospede'])
+    ->post('/processaRequisicao/{id}', 'Security\SecurePagamentoController@processaRequisicao')
+    ->name('pagamento.processaRequisicao');
+
+// O parâmetro restante permanece temporariamente na URL por compatibilidade
+// com a view legada; o controller seguro ignora esse valor e recalcula no servidor.
+Route::middleware(['auth', 'role:hospede'])
+    ->post('/processaPagamentoRestante/{id}/valor/{restante}', 'Security\SecurePagamentoController@processaPagamentoRestante')
     ->name('pagamento.processaPagamentoRestante');
