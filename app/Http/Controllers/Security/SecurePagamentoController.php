@@ -219,6 +219,26 @@ class SecurePagamentoController extends PagamentoController
             curl_setopt($ch, CURLOPT_PROXY, $proxy);
         }
 
+        $caBundle = config('services.pagtesouro.ca_bundle');
+        if (!empty($caBundle)) {
+            if (!is_readable($caBundle)) {
+                curl_close($ch);
+
+                Log::error('CA bundle do PagTesouro não está acessível.', [
+                    'ca_bundle' => $caBundle,
+                ]);
+
+                \Session::flash('message', [
+                    'msg' => 'A configuração de certificado do PagTesouro está inválida.',
+                    'class' => 'danger',
+                ]);
+
+                return null;
+            }
+
+            curl_setopt($ch, CURLOPT_CAINFO, $caBundle);
+        }
+
         $result = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
@@ -279,7 +299,29 @@ class SecurePagamentoController extends PagamentoController
             return null;
         }
 
+        if (!$this->isHttpsUrl($dados->proximaUrl)) {
+            Log::warning('PagTesouro retornou URL de redirecionamento inválida.', [
+                'host' => parse_url((string) $dados->proximaUrl, PHP_URL_HOST),
+            ]);
+
+            \Session::flash('message', [
+                'msg' => 'O PagTesouro retornou uma URL de pagamento inválida.',
+                'class' => 'danger',
+            ]);
+
+            return null;
+        }
+
         return $dados;
+    }
+
+    private function isHttpsUrl($url)
+    {
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return false;
+        }
+
+        return strtolower((string) parse_url($url, PHP_URL_SCHEME)) === 'https';
     }
 
     private function payloadPagamentoInicial($pagtesouro, $hospedagem, $valorDiaria)
