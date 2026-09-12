@@ -27,6 +27,13 @@ Route::get('/admin/pagamento/create', 'Security\BlockedLegacyGetController@legad
 Route::post('/admin/pagamento/store', 'Security\BlockedLegacyGetController@legado');
 Route::post('/admin/pagamento/update', 'Security\BlockedLegacyGetController@legado');
 
+// Endpoints de teste/debug de e-mail legados.
+Route::get('/mailable', 'Security\BlockedLegacyGetController@legado');
+Route::get('/mailable/mail', 'Security\BlockedLegacyGetController@legado');
+Route::get('/mail', 'Security\BlockedLegacyGetController@legado');
+Route::get('/envio/confirmacao/hospedagem/{id}', 'Security\BlockedLegacyGetController@legado');
+Route::get('/envios', 'Security\BlockedLegacyGetController@legado');
+
 // Bloqueia os GETs legados que criavam pagamentos. O web.php antigo ainda
 // registra essas URLs como GET, então elas são sobrescritas aqui por último.
 Route::middleware(['auth', 'role:hospede'])
