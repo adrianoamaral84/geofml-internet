@@ -18,6 +18,15 @@ Route::middleware(['auth', 'role:atendente|administrador_geral|auxiliar_administ
     ->delete('/atendente/hospedagem/{id}/checkout', 'Security\SecureHospedeActionsController@checkout')
     ->name('hospede.checkout');
 
+// Endpoints de pagamento/debug legados que não fazem parte do fluxo do hóspede.
+Route::get('/pagamento', 'Security\BlockedLegacyGetController@legado');
+Route::get('/geraboleto', 'Security\BlockedLegacyGetController@legado');
+Route::get('/consultapagamento', 'Security\BlockedLegacyGetController@legado');
+Route::get('/pagamentoCarrinho/{id}/total/{total}', 'Security\BlockedLegacyGetController@legado');
+Route::get('/admin/pagamento/create', 'Security\BlockedLegacyGetController@legado');
+Route::post('/admin/pagamento/store', 'Security\BlockedLegacyGetController@legado');
+Route::post('/admin/pagamento/update', 'Security\BlockedLegacyGetController@legado');
+
 // Bloqueia os GETs legados que criavam pagamentos. O web.php antigo ainda
 // registra essas URLs como GET, então elas são sobrescritas aqui por último.
 Route::middleware(['auth', 'role:hospede'])
