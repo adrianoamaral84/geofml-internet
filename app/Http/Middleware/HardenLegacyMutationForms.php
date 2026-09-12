@@ -15,7 +15,11 @@ class HardenLegacyMutationForms
             return $response;
         }
 
-        if (!$request->routeIs('hospede.meuspedidos') && !$request->routeIs('hospede.meupedido')) {
+        if (
+            !$request->routeIs('hospede.meuspedidos') &&
+            !$request->routeIs('hospede.meupedido') &&
+            !$request->routeIs('precadastro')
+        ) {
             return $response;
         }
 
@@ -29,6 +33,16 @@ class HardenLegacyMutationForms
             $content = str_replace(
                 '<form action="" id="deletearea" method="get">',
                 '<form action="" id="deletearea" method="post">',
+                $content
+            );
+        }
+
+        if ($request->routeIs('precadastro')) {
+            // A senha já foi definida no primeiro acesso. Remove da tela legada
+            // o bloco duplicado de senha/confirmação sem alterar o restante do formulário.
+            $content = preg_replace(
+                '/\s*<div class="alert alert-info"[^>]*>\s*<strong>Requisitos da senha:<\/strong>.*?<input[^>]*name="resenha"[^>]*>.*?<\/div>\s*<\/div>/s',
+                '',
                 $content
             );
         }
