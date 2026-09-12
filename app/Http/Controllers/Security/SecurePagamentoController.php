@@ -52,7 +52,7 @@ class SecurePagamentoController extends PagamentoController
         }
 
         $pagtesouro = $this->pagTesouroConfig();
-        $payload = $this->prepareJson($hospedagem);
+        $payload = $this->payloadPagamentoInicial($pagtesouro, $hospedagem, $valorDiaria);
         $resultado = $this->enviarPagTesouro($pagtesouro, $payload);
 
         if (!$resultado) {
@@ -280,6 +280,26 @@ class SecurePagamentoController extends PagamentoController
         }
 
         return $dados;
+    }
+
+    private function payloadPagamentoInicial($pagtesouro, $hospedagem, $valorDiaria)
+    {
+        return [
+            'codigoServico' => $pagtesouro->codservico,
+            'referencia' => '',
+            'competencia' => '',
+            'vencimento' => now()->format('dmY'),
+            'cnpjCpf' => $hospedagem->user_cpf,
+            'nomeContribuinte' => $hospedagem->user->name,
+            'valorPrincipal' => number_format($valorDiaria, 2, '.', ''),
+            'valorDescontos' => '',
+            'valorOutrasDeducoes' => '',
+            'valorMulta' => '',
+            'valorJuros' => '',
+            'valorOutrosAcrescimos' => '',
+            'modoNavegacao' => '2',
+            'urlNotificacao' => 'https://valpagtesouro.tesouro.gov.br/api/simulador/ug/notificacao',
+        ];
     }
 
     private function payloadPagamentoRestante($pagtesouro, $hospedagem, $valorRestante)
