@@ -79,8 +79,9 @@ Route::get('/usuarios/{user}/documentos/{tipo}', 'UserDocumento\\UserDocumentoCo
     ->middleware('auth')
     ->name('usuarios.documentos.show');
 
-/* Compatibilidade temporária com a tela de pré-cadastro legada. */
-Route::get('/usuarios/ver/documento/{id}/{doc}/{tipo}/arquivo', 'UsuarioController@verDocumento')
+/* Compatibilidade temporária com a tela de pré-cadastro legada, agora usando
+ * o mesmo leitor seguro e controle de ownership da rota canônica. */
+Route::get('/usuarios/ver/documento/{id}/{doc}/{tipo}/arquivo', 'UserDocumento\\UserDocumentoController@showLegacy')
     ->middleware('auth')
     ->name('documentos.verdocumento');
 
