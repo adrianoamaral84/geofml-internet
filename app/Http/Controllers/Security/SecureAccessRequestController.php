@@ -40,7 +40,7 @@ class SecureAccessRequestController extends Controller
         }
 
         try {
-            $status = DB::transaction(function () use ($validated) {
+            DB::transaction(function () use ($validated) {
                 $usuario = new User();
                 $usuario->name = strtoupper($validated['nome']);
                 $usuario->email = $validated['email'];
@@ -56,25 +56,20 @@ class SecureAccessRequestController extends Controller
                 $usuario->save();
                 $usuario->syncRoles(['5']);
 
-                return Password::broker()->sendResetLink([
+                $status = Password::broker()->sendResetLink([
                     'email' => $usuario->email,
                 ]);
+
+                if ($status !== Password::RESET_LINK_SENT) {
+                    throw new \RuntimeException(
+                        'Password broker não enviou o link: ' . $status
+                    );
+                }
             });
         } catch (\Throwable $e) {
             Log::error('Falha ao criar solicitação de acesso segura.', [
                 'email' => $validated['email'],
                 'erro' => $e->getMessage(),
-            ]);
-
-            return back()->withInput()->withErrors([
-                'email' => 'Não foi possível enviar o link para definição da senha. Tente novamente.',
-            ]);
-        }
-
-        if ($status !== Password::RESET_LINK_SENT) {
-            Log::warning('Password broker não enviou link após solicitação de acesso.', [
-                'email' => $validated['email'],
-                'status' => $status,
             ]);
 
             return back()->withInput()->withErrors([
