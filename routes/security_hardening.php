@@ -60,6 +60,12 @@ Route::middleware('throttle:5,10')
     ->post('/pedido', 'Security\SecureAccessRequestController@store')
     ->name('pedido.acesso');
 
+// Pré-cadastro autenticado: atualiza somente dados cadastrais/documentos.
+// A senha já foi definida no primeiro acesso e não pode ser alterada aqui.
+Route::middleware(['auth', 'role:precadastro'])
+    ->post('/user/create/new', 'Security\SecurePreCadastroController@store')
+    ->name('usuario.create.new');
+
 // Bloqueia os GETs legados que criavam pagamentos. O web.php antigo ainda
 // registra essas URLs como GET, então elas são sobrescritas aqui por último.
 Route::middleware(['auth', 'role:hospede'])
