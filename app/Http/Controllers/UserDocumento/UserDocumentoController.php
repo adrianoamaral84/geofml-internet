@@ -4,6 +4,7 @@ namespace App\Http\Controllers\UserDocumento;
 
 use App\User;
 use App\UserDocumento;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 
@@ -58,6 +59,27 @@ class UserDocumentoController extends Controller
             'X-Content-Type-Options' => 'nosniff',
             'Cache-Control' => 'private, no-store, max-age=0',
         ]);
+    }
+
+    public function showLegacy($id, $doc, $tipo)
+    {
+        try {
+            $userId = Crypt::decrypt($id);
+        } catch (\Throwable $e) {
+            abort(404);
+        }
+
+        // O parâmetro $doc existia apenas para transportar MIME na rota antiga.
+        // Ele não é confiável e é deliberadamente ignorado.
+        $tipoDocumento = (string) $tipo === '1' ? 'frente' : ((string) $tipo === '2' ? 'verso' : null);
+
+        if ($tipoDocumento === null) {
+            abort(404);
+        }
+
+        $user = User::findOrFail($userId);
+
+        return $this->show($user, $tipoDocumento);
     }
 
     private function ehCaminhoPrivado($arquivo)
