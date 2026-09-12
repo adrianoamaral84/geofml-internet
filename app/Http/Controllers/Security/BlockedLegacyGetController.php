@@ -11,6 +11,11 @@ class BlockedLegacyGetController extends Controller
         abort(405, 'Esta operação de pagamento exige POST.');
     }
 
+    public function postOnly()
+    {
+        abort(405, 'Esta operação exige POST.');
+    }
+
     public function legado()
     {
         abort(404);
