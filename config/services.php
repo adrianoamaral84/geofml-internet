@@ -22,6 +22,7 @@ return [
     'config_id' => env('PAGTESOURO_CONFIG_ID', 2),
     'modo_teste' => env('PAGTESOURO_MODO_TESTE', false),
     'ambiente' => env('PAGTESOURO_AMBIENTE', 'producao'),
+    'proxy' => env('PAGTESOURO_PROXY'),
     ],
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
