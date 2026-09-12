@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Security;
 
 use App\Http\Controllers\Controller;
+use App\Notifications\PrimeiroAcesso;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -50,21 +51,13 @@ class SecureAccessRequestController extends Controller
                 $usuario->perfil_id = 5;
 
                 // Nunca utiliza CPF ou outro dado pessoal como senha temporária.
-                // O valor é desconhecido até pelo usuário; ele definirá a senha
-                // por meio do fluxo oficial de reset do Laravel.
+                // O usuário define a própria senha pelo token de primeiro acesso.
                 $usuario->password = Hash::make(Str::random(64));
                 $usuario->save();
                 $usuario->syncRoles(['5']);
 
-                $status = Password::broker()->sendResetLink([
-                    'email' => $usuario->email,
-                ]);
-
-                if ($status !== Password::RESET_LINK_SENT) {
-                    throw new \RuntimeException(
-                        'Password broker não enviou o link: ' . $status
-                    );
-                }
+                $token = Password::broker()->createToken($usuario);
+                $usuario->notify(new PrimeiroAcesso($token));
             });
         } catch (\Throwable $e) {
             Log::error('Falha ao criar solicitação de acesso segura.', [
@@ -73,12 +66,12 @@ class SecureAccessRequestController extends Controller
             ]);
 
             return back()->withInput()->withErrors([
-                'email' => 'Não foi possível enviar o link para definição da senha. Tente novamente.',
+                'email' => 'Não foi possível enviar o e-mail de primeiro acesso. Tente novamente.',
             ]);
         }
 
         \Session::flash('message', [
-            'msg' => 'Solicitação recebida. Enviamos um e-mail para você definir sua senha de acesso.',
+            'msg' => 'Solicitação recebida. Enviamos um e-mail de primeiro acesso para você definir sua senha.',
             'class' => 'success',
         ]);
 
