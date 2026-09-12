@@ -49,6 +49,12 @@ Route::get('/logout', 'Security\BlockedLegacyGetController@postOnly');
 Route::get('/pedido', 'Security\BlockedLegacyGetController@postOnly');
 Route::get('/user/create/new', 'Security\BlockedLegacyGetController@postOnly');
 
+// Solicitação pública de acesso: cria conta sem senha conhecida e envia o
+// fluxo oficial de definição de senha. Rate limit reduz abuso do endpoint.
+Route::middleware('throttle:5,10')
+    ->post('/pedido', 'Security\SecureAccessRequestController@store')
+    ->name('pedido.acesso');
+
 // Bloqueia os GETs legados que criavam pagamentos. O web.php antigo ainda
 // registra essas URLs como GET, então elas são sobrescritas aqui por último.
 Route::middleware(['auth', 'role:hospede'])
