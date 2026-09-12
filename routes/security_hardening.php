@@ -43,6 +43,12 @@ Route::post('/envio/negado', 'Security\BlockedLegacyGetController@legado');
 Route::get('/envio/espera/{id}', 'Security\BlockedLegacyGetController@legado');
 Route::get('/envio/documento/vencido/{id}', 'Security\BlockedLegacyGetController@legado');
 
+// Mutações legadas que eram acessíveis por GET.
+// Os respectivos POSTs legítimos continuam registrados no web.php/Auth::routes.
+Route::get('/logout', 'Security\BlockedLegacyGetController@postOnly');
+Route::get('/pedido', 'Security\BlockedLegacyGetController@postOnly');
+Route::get('/user/create/new', 'Security\BlockedLegacyGetController@postOnly');
+
 // Bloqueia os GETs legados que criavam pagamentos. O web.php antigo ainda
 // registra essas URLs como GET, então elas são sobrescritas aqui por último.
 Route::middleware(['auth', 'role:hospede'])
