@@ -85,20 +85,20 @@ Route::get('/usuarios/ver/documento/{id}/{doc}/{tipo}/arquivo', 'UserDocumento\\
     ->middleware('auth')
     ->name('documentos.verdocumento');
 
-/* PagTesouro: status é sempre necessário. O simulador só existe quando
- * o modo de teste estiver explicitamente habilitado. */
+/* PagTesouro: todo o fluxo operacional passa pelo controller seguro.
+ * O simulador só existe quando o modo de teste estiver explicitamente habilitado. */
 Route::middleware(['auth', 'role:hospede'])->group(function () {
-    Route::get('/pagamento/inicial/{id}/status', 'Pagamento\\PagamentoController@consultarStatusPagamentoInicial')
+    Route::get('/pagamento/inicial/{id}/status', 'Security\\SecurePagamentoController@consultarStatusPagamentoInicial')
         ->name('pagamento.inicial.status');
 
     if (config('services.pagtesouro.modo_teste')) {
-        Route::get('/pagamento/simulador/{id}', 'Pagamento\\PagamentoController@simulador')
+        Route::get('/pagamento/simulador/{id}', 'Security\\SecurePagamentoController@simulador')
             ->name('pagamento.simulador');
 
-        Route::post('/pagamento/simulador/{id}/aprovar', 'Pagamento\\PagamentoController@aprovarSimulacao')
+        Route::post('/pagamento/simulador/{id}/aprovar', 'Security\\SecurePagamentoController@aprovarSimulacao')
             ->name('pagamento.simulador.aprovar');
 
-        Route::post('/pagamento/simulador/{id}/cancelar', 'Pagamento\\PagamentoController@cancelarSimulacao')
+        Route::post('/pagamento/simulador/{id}/cancelar', 'Security\\SecurePagamentoController@cancelarSimulacao')
             ->name('pagamento.simulador.cancelar');
     }
 });
