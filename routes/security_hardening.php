@@ -49,6 +49,11 @@ Route::get('/logout', 'Security\BlockedLegacyGetController@postOnly');
 Route::get('/pedido', 'Security\BlockedLegacyGetController@postOnly');
 Route::get('/user/create/new', 'Security\BlockedLegacyGetController@postOnly');
 
+// Link público antigo de finalização de cadastro ficou obsoleto após o fluxo
+// seguro de primeiro acesso. O usuário define a senha, é autenticado pelo
+// Laravel e segue para o pré-cadastro pelo /home.
+Route::get('/{id}/finalizarcadastro', 'Security\BlockedLegacyGetController@legado');
+
 // Solicitação pública de acesso: cria conta sem senha conhecida e envia o
 // fluxo oficial de definição de senha. Rate limit reduz abuso do endpoint.
 Route::middleware('throttle:5,10')
