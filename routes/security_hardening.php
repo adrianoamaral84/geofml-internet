@@ -34,6 +34,15 @@ Route::get('/mail', 'Security\BlockedLegacyGetController@legado');
 Route::get('/envio/confirmacao/hospedagem/{id}', 'Security\BlockedLegacyGetController@legado');
 Route::get('/envios', 'Security\BlockedLegacyGetController@legado');
 
+// Fluxos administrativos de usuário/e-mail pertencem ao GeoFML Admin, não ao Internet.
+Route::get('/envio/login/{id}', 'Security\BlockedLegacyGetController@legado');
+Route::get('/envio/liberado/{id}', 'Security\BlockedLegacyGetController@legado');
+Route::get('/envio/libera/{id}/acesso', 'Security\BlockedLegacyGetController@legado');
+Route::get('/envio/negado/{id}', 'Security\BlockedLegacyGetController@legado');
+Route::post('/envio/negado', 'Security\BlockedLegacyGetController@legado');
+Route::get('/envio/espera/{id}', 'Security\BlockedLegacyGetController@legado');
+Route::get('/envio/documento/vencido/{id}', 'Security\BlockedLegacyGetController@legado');
+
 // Bloqueia os GETs legados que criavam pagamentos. O web.php antigo ainda
 // registra essas URLs como GET, então elas são sobrescritas aqui por último.
 Route::middleware(['auth', 'role:hospede'])
