@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
 class EnforceHospedeOwnership
@@ -17,22 +16,32 @@ class EnforceHospedeOwnership
         }
 
         if ($request->is('hospede/uploadrecibo') && $request->isMethod('post')) {
-            $this->assertHospedagemOwnership($request->input('hospedagem_id'), $user->id, false);
+            $this->assertHospedagemOwnership($request->input('hospedagem_id'), $user->id);
         }
 
         if ($request->is('processaRequisicao/*')) {
-            $this->assertHospedagemOwnership($this->encryptedSegment($request, 1), $user->id, true);
+            $this->assertHospede($user);
+            $this->assertHospedagemOwnership($this->encryptedSegment($request, 1), $user->id);
         }
 
         if ($request->is('processaPagamentoRestante/*/valor/*')) {
-            $this->assertHospedagemOwnership($this->encryptedSegment($request, 1), $user->id, true);
+            $this->assertHospede($user);
+            $this->assertHospedagemOwnership($this->encryptedSegment($request, 1), $user->id);
         }
 
         if ($request->is('pagamento/inicial/*/status')) {
-            $this->assertHospedagemOwnership($this->encryptedSegment($request, 2), $user->id, true);
+            $this->assertHospede($user);
+            $this->assertHospedagemOwnership($this->encryptedSegment($request, 2), $user->id);
         }
 
         return $next($request);
+    }
+
+    private function assertHospede($user)
+    {
+        if (!$user->hasRole('hospede')) {
+            abort(403, 'Esta operação é exclusiva do hóspede.');
+        }
     }
 
     private function encryptedSegment($request, $index)
@@ -50,19 +59,13 @@ class EnforceHospedeOwnership
         }
     }
 
-    private function assertHospedagemOwnership($hospedagemId, $userId, $encrypted = false)
+    private function assertHospedagemOwnership($hospedagemId, $userId)
     {
-        if ($encrypted) {
-            $id = $hospedagemId;
-        } else {
-            if (!is_numeric($hospedagemId)) {
-                abort(404);
-            }
-
-            $id = (int) $hospedagemId;
+        if (!is_numeric($hospedagemId)) {
+            abort(404);
         }
 
-        $pertenceAoUsuario = \App\Hospede::where('id', $id)
+        $pertenceAoUsuario = \App\Hospede::where('id', (int) $hospedagemId)
             ->where('user_id', $userId)
             ->exists();
 
