@@ -108,13 +108,16 @@ class SecureHospedeController extends Controller
         $extensao = strtolower($arquivo->extension());
 
         DB::transaction(function () use ($hospedagem, $conteudoBase64, $extensao) {
-            \App\Comprovante::updateOrCreate(
-                ['hospedagem_id' => $hospedagem->id],
-                [
-                    'arquivo' => $conteudoBase64,
-                    'tipo_doc' => $extensao,
-                ]
-            );
+            $comprovante = \App\Comprovante::where('hospedagem_id', $hospedagem->id)->first();
+
+            if (!$comprovante) {
+                $comprovante = new \App\Comprovante();
+                $comprovante->hospedagem_id = $hospedagem->id;
+            }
+
+            $comprovante->arquivo = $conteudoBase64;
+            $comprovante->tipo_doc = $extensao;
+            $comprovante->save();
 
             $hospedagem->status = 4;
             $hospedagem->save();
