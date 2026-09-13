@@ -59,7 +59,7 @@ Route::middleware('auth')->group(function () {
 
 /* Fluxo operacional do hóspede. */
 Route::middleware(['auth', 'role:hospede'])->prefix('hospede')->group(function () {
-    Route::get('/', 'Hospede\\HospedeController@index')->name('hospede.index');
+    Route::get('/', 'Security\\SecureHospedeController@index')->name('hospede.index');
 
     Route::get('/pedido', 'Pedidos\\PedidosController@chamaFormularioPedido')->name('hospede.solicitarinscricao');
     Route::post('/pedido/confirmar', 'Pedidos\\PedidosController@confimrarPedido')->name('hospede.confirmar');
