@@ -36,7 +36,7 @@ class SecureHospedeController extends Controller
                     'class' => 'danger',
                 ]);
 
-                return redirect()->route('home');
+                return redirect()->route('home.home');
             }
         }
 
