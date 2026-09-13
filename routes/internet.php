@@ -65,7 +65,7 @@ Route::middleware(['auth', 'role:hospede'])->prefix('hospede')->group(function (
     Route::post('/pedido/confirmar', 'Security\\SecurePedidoController@confirmar')->name('hospede.confirmar');
     Route::post('/pedido/store', 'Security\\SecurePedidoStoreController@store')->name('hospede.store');
 
-    Route::get('/pedido/edita/{id}', 'EditarPedido\\EditarPedidoController@index')->name('hospede.solicitarinscricao.edit');
+    Route::get('/pedido/edita/{id}', 'Security\\SecureEditarPedidoController@index')->name('hospede.solicitarinscricao.edit');
     Route::post('/pedido/edita/confirmar', 'EditarPedido\\EditarPedidoController@confirmaEdicao')->name('hospede.edita.confirmar');
     Route::post('/pedido/edita/store', 'EditarPedido\\EditarPedidoController@gravaEdicao')->name('hospede.storeEdit.edita');
 
