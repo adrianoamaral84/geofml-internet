@@ -91,6 +91,13 @@ Route::middleware(['auth', 'role:hospede'])->group(function () {
     Route::get('/pagamento/inicial/{id}/status', 'Security\\SecurePagamentoController@consultarStatusPagamentoInicial')
         ->name('pagamento.inicial.status');
 
+    /* Compatibilidade temporária com a view legada meu_pedido.blade.php.
+     * A view ainda referencia este nome dentro de um comentário HTML, que o
+     * Blade continua avaliando. A rota permanece protegida e usa o mesmo
+     * controller seguro da consulta de status atual. */
+    Route::get('/pagamento/consulta/{id}', 'Security\\SecurePagamentoController@consultarStatusPagamentoInicial')
+        ->name('pagamento.consulta');
+
     if (config('services.pagtesouro.modo_teste')) {
         Route::get('/pagamento/simulador/{id}', 'Security\\SecurePagamentoController@simulador')
             ->name('pagamento.simulador');
