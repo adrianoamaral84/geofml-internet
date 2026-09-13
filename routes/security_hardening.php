@@ -42,3 +42,41 @@ Route::middleware(['auth', 'role:hospede'])
 Route::middleware(['auth', 'role:hospede'])
     ->post('/processaPagamentoRestante/{id}/valor/{restante}', 'Security\\SecurePagamentoController@processaPagamentoRestante')
     ->name('pagamento.processaPagamentoRestante');
+
+/*
+|--------------------------------------------------------------------------
+| Recuperação temporária do fluxo legado de edição
+|--------------------------------------------------------------------------
+|
+| O gravaEdicao() legado ainda usa redirect()->back() em falhas de validação.
+| Como a tela anterior é a confirmação POST-only, o navegador seguia o 302
+| como GET para /hospede/pedido/edita/confirmar e recebia 404.
+|
+| Enquanto a gravação final não é movida para o controller seguro, este GET
+| recupera o id que o próprio Laravel colocou em _old_input, valida ownership,
+| preserva os flashes de erro e retorna para a tela GET de edição.
+|
+*/
+Route::middleware(['auth', 'role:hospede'])
+    ->get('/hospede/pedido/edita/confirmar', function () {
+        $pedidoId = old('id');
+
+        if (!$pedidoId || !ctype_digit((string) $pedidoId)) {
+            return redirect()->route('hospede.meuspedidos');
+        }
+
+        $pedido = \App\Hospede::where('id', (int) $pedidoId)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (!$pedido) {
+            return redirect()->route('hospede.meuspedidos');
+        }
+
+        session()->reflash();
+
+        return redirect()->route(
+            'hospede.solicitarinscricao.edit',
+            \Illuminate\Support\Facades\Crypt::encrypt($pedido->id)
+        );
+    });
