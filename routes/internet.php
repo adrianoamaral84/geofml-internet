@@ -69,9 +69,9 @@ Route::middleware(['auth', 'role:hospede'])->prefix('hospede')->group(function (
     Route::post('/pedido/edita/confirmar', 'EditarPedido\\EditarPedidoController@confirmaEdicao')->name('hospede.edita.confirmar');
     Route::post('/pedido/edita/store', 'EditarPedido\\EditarPedidoController@gravaEdicao')->name('hospede.storeEdit.edita');
 
-    Route::get('/meuspedidos', 'Hospede\\HospedeController@meuspedidos')->name('hospede.meuspedidos');
-    Route::get('/meupedido/{id}', 'Hospede\\HospedeController@meuspedido')->name('hospede.meupedido');
-    Route::post('/uploadrecibo', 'Hospede\\HospedeController@uploadComprovantePagamento')->name('hospede.uploadrecibo');
+    Route::get('/meuspedidos', 'Security\\SecureHospedeController@meuspedidos')->name('hospede.meuspedidos');
+    Route::get('/meupedido/{id}', 'Security\\SecureHospedeController@meupedido')->name('hospede.meupedido');
+    Route::post('/uploadrecibo', 'Security\\SecureHospedeController@uploadComprovantePagamento')->name('hospede.uploadrecibo');
 });
 
 /* Consulta/visualização de documentos do próprio usuário. */
