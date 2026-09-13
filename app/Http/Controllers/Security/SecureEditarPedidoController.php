@@ -46,11 +46,6 @@ class SecureEditarPedidoController extends Controller
             return redirect()->route('hospede.meuspedidos');
         }
 
-        // Guarda somente o id de um pedido já validado por ownership e status.
-        // Esse contexto permite recuperar erros do fluxo POST legado sem
-        // redirecionar o navegador para uma rota que aceita apenas POST.
-        session()->put('edicao_pedido_id', (int) $hospedagem->id);
-
         if (
             (int) $usuarioAutenticado->indeterminado !== 1 &&
             !empty($usuarioAutenticado->validade)
