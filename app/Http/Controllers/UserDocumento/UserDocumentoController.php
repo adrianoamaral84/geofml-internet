@@ -4,6 +4,7 @@ namespace App\Http\Controllers\UserDocumento;
 
 use App\User;
 use App\UserDocumento;
+use App\Comprovante;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
@@ -64,9 +65,33 @@ class UserDocumentoController extends Controller
     public function showLegacy($id, $doc, $tipo)
     {
         try {
-            $userId = Crypt::decrypt($id);
+            $registroId = Crypt::decrypt($id);
         } catch (\Throwable $e) {
             abort(404);
+        }
+
+        // tipo=3 corresponde ao comprovante de pagamento legado.
+        // Nesse caso, o primeiro parâmetro é o ID do comprovante, não o ID do usuário.
+        if ((string) $tipo === '3') {
+            $comprovante = Comprovante::with('hospedagem')->findOrFail($registroId);
+
+            if (!$comprovante->hospedagem ||
+                (int) $comprovante->hospedagem->user_id !== (int) auth()->id()) {
+                abort(403, 'Você não tem autorização para acessar este comprovante.');
+            }
+
+            $conteudo = base64_decode((string) $comprovante->arquivo, true);
+
+            if ($conteudo === false || $conteudo === '') {
+                abort(404);
+            }
+
+            return response($conteudo, 200, [
+                'Content-Type' => $this->mimeSeguro($comprovante->tipo_doc),
+                'Content-Disposition' => 'inline; filename="comprovante-pagamento"',
+                'X-Content-Type-Options' => 'nosniff',
+                'Cache-Control' => 'private, no-store, max-age=0',
+            ]);
         }
 
         // O parâmetro $doc existia apenas para transportar MIME na rota antiga.
@@ -77,7 +102,7 @@ class UserDocumentoController extends Controller
             abort(404);
         }
 
-        $user = User::findOrFail($userId);
+        $user = User::findOrFail($registroId);
 
         return $this->show($user, $tipoDocumento);
     }
