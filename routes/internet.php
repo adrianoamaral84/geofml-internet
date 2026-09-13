@@ -109,3 +109,39 @@ Route::middleware(['auth', 'role:hospede'])->group(function () {
             ->name('pagamento.simulador.cancelar');
     }
 });
+
+/*
+|--------------------------------------------------------------------------
+| Sentinelas de compatibilidade da view legada de pedido
+|--------------------------------------------------------------------------
+|
+| A view meuspedidos/meu_pedido.blade.php ainda contém referências Blade
+| a ações administrativas que não pertencem ao Portal Internet. O Blade
+| resolve route() mesmo quando o trecho está oculto por perfil ou comentário
+| HTML. Estes nomes existem somente para permitir a renderização da view.
+| Qualquer acesso efetivo é recusado com 404 e nenhuma ação é executada.
+|
+*/
+Route::middleware('auth')->group(function () {
+    $rotaLegadaBloqueada = function () {
+        abort(404);
+    };
+
+    Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/_legacy/internet/hospedagem/liberar/{id}', $rotaLegadaBloqueada)
+        ->name('hospedagem.liberar');
+
+    Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/_legacy/internet/hospedagem/negar/{id}', $rotaLegadaBloqueada)
+        ->name('hospedagem.negar');
+
+    Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/_legacy/internet/hospede/checkin/{id}', $rotaLegadaBloqueada)
+        ->name('hospede.checkin');
+
+    Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/_legacy/internet/hospede/checkout/{id}/{hospede}', $rotaLegadaBloqueada)
+        ->name('hospede.checkout');
+
+    Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/_legacy/internet/hospedagem/{id}/produto', $rotaLegadaBloqueada)
+        ->name('adicionar.produto.hospedagem');
+
+    Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/_legacy/internet/hospedagem/{id}/fila-espera', $rotaLegadaBloqueada)
+        ->name('envia.mail.espera');
+});
