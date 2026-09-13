@@ -73,11 +73,8 @@ Route::middleware(['auth', 'role:hospede'])->prefix('hospede')->group(function (
     Route::post('/pedido/edita/confirmar', 'Security\\SecureEditarPedidoConfirmController@confirmar')
         ->middleware(\App\Http\Middleware\PreventOverlappingHospedePeriod::class)
         ->name('hospede.edita.confirmar');
-    Route::post('/pedido/edita/store', 'EditarPedido\\EditarPedidoController@gravaEdicao')
-        ->middleware([
-            \App\Http\Middleware\PreventOverlappingHospedePeriod::class,
-            \App\Http\Middleware\FixLegacyEditStoreRedirect::class,
-        ])
+    Route::post('/pedido/edita/store', 'Security\\SecureEditarPedidoStoreController@store')
+        ->middleware(\App\Http\Middleware\PreventOverlappingHospedePeriod::class)
         ->name('hospede.storeEdit.edita');
 
     Route::get('/meuspedidos', 'Security\\SecureHospedeController@meuspedidos')->name('hospede.meuspedidos');
