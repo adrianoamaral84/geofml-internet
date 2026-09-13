@@ -67,7 +67,9 @@ Route::middleware(['auth', 'role:hospede'])->prefix('hospede')->group(function (
 
     Route::get('/pedido/edita/{id}', 'Security\\SecureEditarPedidoController@index')->name('hospede.solicitarinscricao.edit');
     Route::post('/pedido/edita/confirmar', 'Security\\SecureEditarPedidoConfirmController@confirmar')->name('hospede.edita.confirmar');
-    Route::post('/pedido/edita/store', 'EditarPedido\\EditarPedidoController@gravaEdicao')->name('hospede.storeEdit.edita');
+    Route::post('/pedido/edita/store', 'EditarPedido\\EditarPedidoController@gravaEdicao')
+        ->middleware(\App\Http\Middleware\FixLegacyEditStoreRedirect::class)
+        ->name('hospede.storeEdit.edita');
 
     Route::get('/meuspedidos', 'Security\\SecureHospedeController@meuspedidos')->name('hospede.meuspedidos');
     Route::get('/meupedido/{id}', 'Security\\SecureHospedeController@meupedido')->name('hospede.meupedido');
