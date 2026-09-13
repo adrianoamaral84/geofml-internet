@@ -61,7 +61,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:hospede'])->prefix('hospede')->group(function () {
     Route::get('/', 'Security\\SecureHospedeController@index')->name('hospede.index');
 
-    Route::get('/pedido', 'Pedidos\\PedidosController@chamaFormularioPedido')->name('hospede.solicitarinscricao');
+    Route::get('/pedido', 'Security\\SecurePedidoController@create')->name('hospede.solicitarinscricao');
     Route::post('/pedido/confirmar', 'Pedidos\\PedidosController@confimrarPedido')->name('hospede.confirmar');
     Route::post('/pedido/store', 'Pedidos\\PedidosController@store')->name('hospede.store');
 
