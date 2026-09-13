@@ -5,6 +5,7 @@ namespace App\Http\Controllers\UserDocumento;
 use App\User;
 use App\UserDocumento;
 use App\Comprovante;
+use App\Hospede;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
@@ -73,10 +74,13 @@ class UserDocumentoController extends Controller
         // tipo=3 corresponde ao comprovante de pagamento legado.
         // Nesse caso, o primeiro parâmetro é o ID do comprovante, não o ID do usuário.
         if ((string) $tipo === '3') {
-            $comprovante = Comprovante::with('hospedagem')->findOrFail($registroId);
+            $comprovante = Comprovante::findOrFail($registroId);
 
-            if (!$comprovante->hospedagem ||
-                (int) $comprovante->hospedagem->user_id !== (int) auth()->id()) {
+            $hospedagem = Hospede::where('id', $comprovante->hospedagem_id)
+                ->where('user_id', auth()->id())
+                ->first();
+
+            if (!$hospedagem) {
                 abort(403, 'Você não tem autorização para acessar este comprovante.');
             }
 
