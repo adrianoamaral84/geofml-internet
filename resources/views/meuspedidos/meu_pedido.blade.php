@@ -104,8 +104,28 @@
   }
 } 
 
+#modalComprovante .modal-dialog {
+  max-width: 95vw;
+  width: 95vw;
+  margin: 2vh auto;
+}
 
- 
+#modalComprovante .modal-content {
+  height: 92vh;
+}
+
+#modalComprovante .modal-body {
+  height: calc(92vh - 65px);
+  padding: 0;
+  overflow: hidden;
+}
+
+#modalComprovante iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
 
 </style>
 
@@ -685,15 +705,14 @@
                         @if($hospedagem->status == 4)
                          <div class="form-group col-sm-12 col-md-12 col-lg-6">
 
-
-                            <a href="{{ route('documentos.verdocumento', ['id' => Crypt::encrypt($comprovante->id), 'doc' => Crypt::encrypt($comprovante->tipo_doc), 'tipo' => '3' ]) }}" target="_blank" class="btn btn-secondary btn-xl rounded-s" style="margin-top: 20px;">
+                            <button type="button"
+                                    class="btn btn-secondary btn-xl rounded-s"
+                                    style="margin-top: 20px;"
+                                    data-toggle="modal"
+                                    data-target="#modalComprovante">
                                     <i class="fas fa-address-card"></i>
                                     Ver Comprovante de Pagamento
-                            </a> 
-
-
-
-                            
+                            </button>
 
                         </div>
                        
@@ -899,6 +918,29 @@
   <!-- Modal Caption (Image Text) -->
   <div id="caption"></div>
 </div>
+
+@if($hospedagem->status == 4 && $comprovante)
+<div class="modal fade" id="modalComprovante" tabindex="-1" role="dialog" aria-labelledby="modalComprovanteTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalComprovanteTitulo">
+                    <i class="fas fa-file-alt"></i> Comprovante de Pagamento
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <iframe
+                    src="{{ route('documentos.verdocumento', ['id' => Crypt::encrypt($comprovante->id), 'doc' => Crypt::encrypt($comprovante->tipo_doc), 'tipo' => '3']) }}"
+                    title="Comprovante de Pagamento">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
             
                                 <div class="modal fade" id="AprovaModal">
                                     <div class="modal-dialog" role="document">
@@ -1131,19 +1173,23 @@ $(document).ready(function(){
     var img = document.getElementById("myImg");
     var modalImg = document.getElementById("img01");
     var captionText = document.getElementById("caption");
-    img.onclick = function(){
-    modal.style.display = "block";
-    modalImg.src = this.src;
-    captionText.innerHTML = this.alt;
+    if (img && modal && modalImg && captionText) {
+        img.onclick = function(){
+            modal.style.display = "block";
+            modalImg.src = this.src;
+            captionText.innerHTML = this.alt;
+        }
     }
 
 // Get the <span> element that closes the modal
 var span = document.getElementsByClassName("close")[0];
 
 // When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-} 
+if (span && modal) {
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+}
 </script>
 <script>
 let janelaPagamentoInicial = null;
