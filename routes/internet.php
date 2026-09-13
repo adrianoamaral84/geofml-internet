@@ -125,9 +125,9 @@ Route::middleware(['auth', 'role:hospede'])->group(function () {
 |
 | A view meuspedidos/meu_pedido.blade.php ainda contém referências Blade
 | a ações administrativas que não pertencem ao Portal Internet. O Blade
-| resolve route() mesmo quando o trecho está oculto por perfil ou comentário
-| HTML. Estes nomes existem somente para permitir a renderização da view.
-| Qualquer acesso efetivo é recusado com 404 e nenhuma ação é executada.
+| resolve route() em JavaScript durante a renderização. Estes nomes existem
+| somente para permitir a renderização da view. Qualquer acesso efetivo é
+| recusado com 404 e nenhuma ação é executada.
 |
 */
 Route::middleware('auth')->group(function () {
@@ -146,10 +146,4 @@ Route::middleware('auth')->group(function () {
 
     Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/_legacy/internet/hospede/checkout/{id}/{hospede}', $rotaLegadaBloqueada)
         ->name('hospede.checkout');
-
-    Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/_legacy/internet/hospedagem/{id}/produto', $rotaLegadaBloqueada)
-        ->name('adicionar.produto.hospedagem');
-
-    Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/_legacy/internet/hospedagem/{id}/fila-espera', $rotaLegadaBloqueada)
-        ->name('envia.mail.espera');
 });
