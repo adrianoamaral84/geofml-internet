@@ -248,19 +248,18 @@ class SecureHospedeController extends Controller
 
         $CheckInAntecipado = false;
         $CheckOutAtrasado = false;
-        $valorPagarRestante = 0;
+        $valorPagarRestante = (float) ($hospedagem->valor_restante ?? 0);
+        $qntDiariasAtualizada = (int) ($hospedagem->qntdiarias ?? 0);
+        $valorAtualizado = (float) ($hospedagem->valor ?? 0);
 
         if ($hospedagem->checkin_at !== null && (int) $hospedagem->checkin === 1) {
             $calculo = (new CalculoHospedagemService())->calcular($hospedagem);
 
             $CheckInAntecipado = $calculo['checkin_antecipado'];
             $CheckOutAtrasado = $calculo['checkout_atrasado'];
-            $valorPagarRestante = $calculo['valor_restante'];
-
-            $hospedagem->valor_restante = $calculo['valor_restante'];
-            $hospedagem->qntdiarias = $calculo['dias'];
-            $hospedagem->valor = $calculo['valor_total'];
-            $hospedagem->save();
+            $valorPagarRestante = (float) $calculo['valor_restante'];
+            $qntDiariasAtualizada = (int) $calculo['dias'];
+            $valorAtualizado = (float) $calculo['valor_total'];
         }
 
         $cancelar = 1;
@@ -275,7 +274,9 @@ class SecureHospedeController extends Controller
             'arquivo',
             'cancelar',
             'hoje',
-            'valorPagarRestante'
+            'valorPagarRestante',
+            'qntDiariasAtualizada',
+            'valorAtualizado'
         ));
     }
 
