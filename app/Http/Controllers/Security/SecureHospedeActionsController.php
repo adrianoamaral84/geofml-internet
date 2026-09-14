@@ -38,11 +38,11 @@ class SecureHospedeActionsController extends Controller
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        if (!in_array((int) $hospedagem->status, [2, 3, 5, 7], true)) {
+        if (!in_array((int) $hospedagem->status, [2, 3, 4, 5, 7], true)) {
             abort(403, 'Esta reserva não pode ser cancelada no estado atual.');
         }
 
-        if ($hospedagem->checkin !== null) {
+        if ((int) $hospedagem->checkin === 1) {
             abort(403, 'Não é possível cancelar uma reserva após o check-in.');
         }
 
