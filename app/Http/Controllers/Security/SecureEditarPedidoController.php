@@ -58,7 +58,7 @@ class SecureEditarPedidoController extends Controller
                     'class' => 'danger',
                 ]);
 
-                return redirect()->route('home');
+                return redirect()->route('home.home');
             }
 
             if ($validade->lt($today)) {
@@ -67,7 +67,7 @@ class SecureEditarPedidoController extends Controller
                     'class' => 'danger',
                 ]);
 
-                return redirect()->route('home');
+                return redirect()->route('home.home');
             }
         }
 
