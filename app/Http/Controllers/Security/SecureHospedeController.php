@@ -265,7 +265,7 @@ class SecureHospedeController extends Controller
 
         $cancelar = 1;
 
-        return view('meuspedidos.meu_pedido', compact(
+        return view('meuspedidos.meu_pedido_hospede', compact(
             'CheckInAntecipado',
             'CheckOutAtrasado',
             'hospedagem',
