@@ -157,7 +157,7 @@
                             </form>
                         @endif
 
-                        @if(in_array((int) $hospedagem->status, [2, 3, 5, 7], true) && (int) $hospedagem->checkin !== 1)
+                        @if(in_array((int) $hospedagem->status, [2, 3, 4, 5, 7], true) && (int) $hospedagem->checkin !== 1)
                             <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modalCancelar">
                                 <i class="fas fa-bed"></i> Cancelar Reserva
                             </button>
@@ -238,7 +238,7 @@
 </div>
 @endif
 
-@if(in_array((int) $hospedagem->status, [2, 3, 5, 7], true) && (int) $hospedagem->checkin !== 1)
+@if(in_array((int) $hospedagem->status, [2, 3, 4, 5, 7], true) && (int) $hospedagem->checkin !== 1)
 <div class="modal fade" id="modalCancelar" tabindex="-1" role="dialog" aria-labelledby="modalCancelarTitulo" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
