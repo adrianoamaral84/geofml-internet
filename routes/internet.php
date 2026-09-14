@@ -99,13 +99,6 @@ Route::middleware(['auth', 'role:hospede'])->group(function () {
     Route::get('/pagamento/inicial/{id}/status', 'Security\\SecurePagamentoController@consultarStatusPagamentoInicial')
         ->name('pagamento.inicial.status');
 
-    /* Compatibilidade temporária com a view legada meu_pedido.blade.php.
-     * A view ainda referencia este nome dentro de um comentário HTML, que o
-     * Blade continua avaliando. A rota permanece protegida e usa o mesmo
-     * controller seguro da consulta de status atual. */
-    Route::get('/pagamento/consulta/{id}', 'Security\\SecurePagamentoController@consultarStatusPagamentoInicial')
-        ->name('pagamento.consulta');
-
     if (config('services.pagtesouro.modo_teste')) {
         Route::get('/pagamento/simulador/{id}', 'Security\\SecurePagamentoController@simulador')
             ->name('pagamento.simulador');
@@ -116,34 +109,4 @@ Route::middleware(['auth', 'role:hospede'])->group(function () {
         Route::post('/pagamento/simulador/{id}/cancelar', 'Security\\SecurePagamentoController@cancelarSimulacao')
             ->name('pagamento.simulador.cancelar');
     }
-});
-
-/*
-|--------------------------------------------------------------------------
-| Sentinelas de compatibilidade da view legada de pedido
-|--------------------------------------------------------------------------
-|
-| A view meuspedidos/meu_pedido.blade.php ainda contém referências Blade
-| a ações administrativas que não pertencem ao Portal Internet. O Blade
-| resolve route() em JavaScript durante a renderização. Estes nomes existem
-| somente para permitir a renderização da view. Qualquer acesso efetivo é
-| recusado com 404 e nenhuma ação é executada.
-|
-*/
-Route::middleware('auth')->group(function () {
-    $rotaLegadaBloqueada = function () {
-        abort(404);
-    };
-
-    Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/_legacy/internet/hospedagem/liberar/{id}', $rotaLegadaBloqueada)
-        ->name('hospedagem.liberar');
-
-    Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/_legacy/internet/hospedagem/negar/{id}', $rotaLegadaBloqueada)
-        ->name('hospedagem.negar');
-
-    Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/_legacy/internet/hospede/checkin/{id}', $rotaLegadaBloqueada)
-        ->name('hospede.checkin');
-
-    Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/_legacy/internet/hospede/checkout/{id}/{hospede}', $rotaLegadaBloqueada)
-        ->name('hospede.checkout');
 });
