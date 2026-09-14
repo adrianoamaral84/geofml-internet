@@ -39,13 +39,6 @@
         <div class="col-12">
             <div class="card card-block sameheight-item">
 
-                @if(session('message'))
-                    @php($flash = session('message'))
-                    <div class="alert alert-{{ $flash['class'] ?? 'info' }}">
-                        {{ $flash['msg'] ?? '' }}
-                    </div>
-                @endif
-
                 @if($hospedagem->status == 5)
                     <div class="alert alert-danger text-center" role="alert">
                         Faça o upload do comprovante de pagamento para confirmar a reserva.
@@ -152,10 +145,6 @@
 
                 <div class="row">
                     <div class="form-group col-12">
-                        <a href="{{ route('hospede.meuspedidos') }}" class="btn btn-secondary">
-                            <i class="fas fa-angle-left"></i> Voltar
-                        </a>
-
                         @if($hospedagem->status == 3 || $hospedagem->status == 5)
                             <form id="formPagamentoInicial"
                                   action="{{ route('pagamento.processaRequisicao', ['id' => Crypt::encrypt($hospedagem->id)]) }}"
@@ -198,9 +187,11 @@
                                 <input type="file" class="custom-file-input" name="documento" id="documento" accept=".jpg,.jpeg,.png,.pdf" required>
                                 <label class="custom-file-label" for="documento">Escolha o arquivo</label>
                             </div>
-                            <small class="form-text text-danger">
-                                JPG, PNG ou PDF de até 4 MB.
-                            </small>
+                            <p>
+                                <font style="color: red; font-size: 16px;">
+                                    <b>Comprovante de Pagamento no formato .JPG, .PNG, .PDF até 4MB ou PRINT do arquivo PDF</b>
+                                </font>
+                            </p>
                             @error('documento')
                                 <span class="text-danger"><strong>{{ $message }}</strong></span>
                             @enderror
@@ -211,6 +202,16 @@
                         </button>
                     </form>
                 @endif
+
+                <hr>
+
+                <div class="row">
+                    <div class="form-group col-12 mb-0">
+                        <a href="{{ route('hospede.meuspedidos') }}" class="btn btn-secondary">
+                            <i class="fas fa-angle-left"></i> Voltar
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
