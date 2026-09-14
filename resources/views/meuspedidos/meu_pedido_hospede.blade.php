@@ -124,11 +124,11 @@
                     </div>
                     <div class="form-group col-sm-12 col-md-4">
                         <label class="control-label">Quantidade de Diárias</label>
-                        <input type="text" class="form-control boxed" value="{{ $hospedagem->qntdiarias }}" readonly>
+                        <input type="text" class="form-control boxed" value="{{ $qntDiariasAtualizada }}" readonly>
                     </div>
                     <div class="form-group col-sm-12 col-md-4">
                         <label class="control-label">Valor Total</label>
-                        <input type="text" class="form-control boxed" value="R$ {{ number_format((float) $hospedagem->valor, 2, ',', '.') }}" readonly>
+                        <input type="text" class="form-control boxed" value="R$ {{ number_format((float) $valorAtualizado, 2, ',', '.') }}" readonly>
                     </div>
                 </div>
 
