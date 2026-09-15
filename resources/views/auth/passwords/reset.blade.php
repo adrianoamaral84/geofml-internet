@@ -25,11 +25,15 @@
         @enderror
     </div>
 
-   
+    <div class="alert alert-info" role="alert" style="font-size: 13px;">
+        <strong>Requisitos da senha:</strong><br>
+        Mínimo de 8 caracteres, contendo pelo menos 1 letra maiúscula, 1 letra minúscula, 1 número e 1 símbolo.
+    </div>
 
     <div class="form-group">
-        <label for="password">{{ __('Senha') }}</label>
-            <input id="password" type="password" class="form-control underlined @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
+        <label for="password">{{ __('Nova Senha') }}</label>
+            <input id="password" type="password" class="form-control underlined @error('password') is-invalid @enderror" name="password" required minlength="8" maxlength="64" autocomplete="new-password" aria-describedby="passwordHelp">
+            <small id="passwordHelp" class="form-text text-muted">Exemplo de formato válido: uma combinação com letras maiúsculas e minúsculas, número e símbolo.</small>
 
             @error('password')
                 <span class="invalid-feedback" role="alert">
@@ -39,10 +43,10 @@
     </div>
 
     <div class="form-group ">
-        <label for="password-confirm">{{ __('Confirme a Senha') }}</label>
+        <label for="password-confirm">{{ __('Confirme a Nova Senha') }}</label>
 
         
-            <input id="password-confirm" type="password" class="form-control underlined" name="password_confirmation" required autocomplete="new-password">
+            <input id="password-confirm" type="password" class="form-control underlined" name="password_confirmation" required minlength="8" maxlength="64" autocomplete="new-password">
        
     </div>
 
