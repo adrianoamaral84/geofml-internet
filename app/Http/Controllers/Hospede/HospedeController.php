@@ -5351,4 +5351,45 @@ public function meuspedido($id)
 
 
 
+
+    public function remanejamento($token)
+    {
+        $hospedagens = \App\Hospede::where('user_id', Auth::id())
+            ->where('remanejamento_token', $token)
+            ->orderBy('id')
+            ->get();
+
+        if ($hospedagens->isEmpty()) {
+            abort(404);
+        }
+
+        return view('hospedagem.remanejamento', compact('hospedagens', 'token'));
+    }
+
+    public function aceitarRemanejamento($token)
+    {
+        $hospedagens = \App\Hospede::where('user_id', Auth::id())
+            ->where('remanejamento_token', $token)
+            ->get();
+
+        if ($hospedagens->isEmpty()) {
+            abort(404);
+        }
+
+        DB::transaction(function () use ($hospedagens) {
+            foreach ($hospedagens as $hospedagem) {
+                $hospedagem->remanejamento_status = 'aceito';
+                $hospedagem->remanejamento_aceito_at = Carbon::now();
+                $hospedagem->save();
+            }
+        });
+
+        \Session::flash('message', [
+            'msg' => 'Remanejamento aceito com sucesso.',
+            'class' => 'success',
+        ]);
+
+        return redirect()->route('hospede.meuspedidos');
+    }
+
 }
