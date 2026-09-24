@@ -74,7 +74,7 @@
                                      <option value="">Selecione</option>
                                      @foreach($unidadess as $unidad)
 
-                                         <option value="{{$unidad['id']}}"> {{$unidad['value']}} </option>
+                                         <option value="{{$unidad['id']}}" data-capacidade="{{$unidad['capacidade']}}"> {{$unidad['value']}} </option>
                                         
 
                                     @endforeach
@@ -131,7 +131,11 @@
 
         </div>
 
-     
+        <div id="capacidade-alerta" class="alert alert-danger" role="alert" style="display: none;">
+            O número de hóspedes excede a capacidade desta unidade. Solicite uma unidade adicional ou altere sua seleção para melhor acomodá-los.
+        </div>
+
+        <div id="capacidade-info" class="alert alert-info" role="alert" style="display: none;"></div>
 
         <div class="row has-error">
             
@@ -184,7 +188,7 @@
                                     <hr>
                                     <div class="form-group row">
                                         <div class="col-sm-12 col-md-12 col-lg-12">
-                                            <button type="submit" class="btn btn-primary rounded-s"> Próximo <i class="fas fa-angle-right btn-sm"></i></button>
+                                            <button type="submit" id="btn-proximo" class="btn btn-primary rounded-s"> Próximo <i class="fas fa-angle-right btn-sm"></i></button>
                                         </div>
                                     </div>
                                 </form>
@@ -255,6 +259,45 @@
 <script>
 $(document).ready(function(){
 $('#petmsg').hide();
+
+function validarCapacidadeUH() {
+    var opcaoSelecionada = $('#tipo option:selected');
+    var capacidade = parseInt(opcaoSelecionada.data('capacidade'), 10) || 0;
+    var adultos = parseInt($('#adultos').val(), 10) || 0;
+    var criancas = parseInt($('#criancas').val(), 10) || 0;
+    var totalHospedes = adultos + criancas;
+    var excedeu = capacidade > 0 && totalHospedes > capacidade;
+    var semCapacidade = $('#tipo').val() && capacidade <= 0;
+
+    if (capacidade > 0) {
+        $('#capacidade-info')
+            .text('Capacidade máxima desta unidade: ' + capacidade + ' pessoas.')
+            .show();
+    } else {
+        $('#capacidade-info').hide();
+    }
+
+    if (excedeu) {
+        $('#capacidade-alerta')
+            .text(
+                'O número de hóspedes (' + totalHospedes +
+                ') excede a capacidade desta unidade (' + capacidade +
+                '). Solicite uma unidade adicional ou altere sua seleção para melhor acomodá-los.'
+            )
+            .show();
+    } else if (semCapacidade) {
+        $('#capacidade-alerta')
+            .text('Não foi possível identificar a capacidade da unidade selecionada. Selecione outra unidade ou entre em contato com o administrador.')
+            .show();
+    } else {
+        $('#capacidade-alerta').hide();
+    }
+
+    $('#btn-proximo').prop('disabled', excedeu || semCapacidade);
+}
+
+$('#tipo, #adultos, #criancas').on('change input', validarCapacidadeUH);
+validarCapacidadeUH();
 $('#pet').on('change', ()=>{
     var pet = $('select[name="pet"] option:selected').val();
     if(pet == 1){
