@@ -476,7 +476,7 @@
                         
 
                             <label class="control-label">{{ __('Valor Diária') }}</label>
-                            <input type="text" class="form-control boxed @error('valordiaria') is-invalid @enderror" value="{{ number_format( $hospedagem->valortarifa, 2, ',', '.' )}}" name="valordiaria" id="valordiaria" required autofocus readonly onpaste="return false;">
+                            <input type="text" class="form-control boxed @error('valordiaria') is-invalid @enderror" value="{{ number_format(($hospedagem->qntdiarias > 0 ? ($hospedagem->valor / $hospedagem->qntdiarias) : $hospedagem->valortarifa), 2, ',', '.') }}" name="valordiaria" id="valordiaria" required autofocus readonly onpaste="return false;">
                             @error('valor')
                                 <span class="has-error" role="alert">
                                     <strong>{{ $message }}</strong>
