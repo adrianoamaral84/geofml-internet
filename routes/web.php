@@ -187,6 +187,9 @@ Route::prefix('hospede')->group(function(){
 	
 
 	//Route::post('/confirmar', 'Hospede\HospedeController@ConfirmarDadosAntigo')->name('hospede.confirmar');
+	Route::get('/remanejamento/{token}', 'Hospede\\HospedeController@remanejamento')->name('hospede.remanejamento');
+	Route::post('/remanejamento/{token}/aceitar', 'Hospede\\HospedeController@aceitarRemanejamento')->name('hospede.remanejamento.aceitar');
+
 	Route::get('/meuspedidos', 'Hospede\HospedeController@meuspedidos')->name('hospede.meuspedidos');
 	Route::get('/meupedido/{id}', 'Hospede\HospedeController@meuspedido')->name('hospede.meupedido');
 	Route::get('/delete/meupedido/{id}', 'Hospede\HospedeController@deleteInscricao')->name('hospede.delete.pedido');

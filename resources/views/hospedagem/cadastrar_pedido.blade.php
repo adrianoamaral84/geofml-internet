@@ -74,7 +74,11 @@
                                      <option value="">Selecione</option>
                                      @foreach($unidadess as $unidad)
 
+<<<<<<< HEAD
                                          <option value="{{$unidad['id']}}" data-capacidade="{{$unidad['capacidade']}}"> {{$unidad['value']}} </option>
+=======
+                                         <option value="{{$unidad['id']}}" data-capacidade="{{$unidad['capacidade']}}" {{ old('tipo') == $unidad['id'] ? 'selected' : '' }}> {{$unidad['value']}} </option>
+>>>>>>> remotes/origin/feature/capacidade-remanejamento
                                         
 
                                     @endforeach
@@ -91,8 +95,9 @@
                             @enderror
             </div>
 
-             
-
+            <div class="col-12">
+                <div id="alerta-capacidade" class="alert alert-warning" style="display:none;" role="alert"></div>
+            </div>
 
         </div>
 
@@ -314,6 +319,60 @@ $('#pet').on('change', ()=>{
 
 
 
+
+<script>
+$(document).ready(function(){
+    function validarCapacidade() {
+        var capacidade = parseInt($('#tipo option:selected').data('capacidade') || 0, 10);
+        var adultos = parseInt($('#adultos').val() || 0, 10);
+        var criancas = parseInt($('#criancas').val() || 0, 10);
+        var total = adultos + criancas;
+        var $alerta = $('#alerta-capacidade');
+        var $botao = $('#btn-proximo');
+
+        if (!$('#tipo').val()) {
+            $alerta.hide().text('');
+            $botao.prop('disabled', false);
+            return;
+        }
+
+        if (capacidade <= 0) {
+            $alerta
+                .text('Não há unidade habitacional disponível para o tipo selecionado.')
+                .show();
+            $botao.prop('disabled', true);
+            return;
+        }
+
+        if (total > capacidade) {
+            $alerta
+                .text(
+                    'O número de hóspedes (' + total + ') excede a capacidade desta unidade (' +
+                    capacidade +
+                    '). Solicite uma unidade adicional ou altere sua seleção para melhor acomodá-lo.'
+                )
+                .show();
+            $botao.prop('disabled', true);
+            return;
+        }
+
+        if (total > 0) {
+            $alerta
+                .removeClass('alert-warning')
+                .addClass('alert-info')
+                .text('Capacidade máxima do tipo selecionado: ' + capacidade + ' hóspede(s).')
+                .show();
+        } else {
+            $alerta.hide().text('');
+        }
+
+        $botao.prop('disabled', false);
+    }
+
+    $('#tipo, #adultos, #criancas').on('change input', validarCapacidade);
+    validarCapacidade();
+});
+</script>
 
 @endpush
 @endsection

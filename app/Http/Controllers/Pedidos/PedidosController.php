@@ -19,6 +19,33 @@ use Illuminate\Support\Facades\Mail;
 
 class PedidosController extends Controller
 {
+    /**
+     * Valida a ocupação máxima possível para o tipo solicitado.
+     *
+     * A UH física é definida posteriormente no painel administrativo. Por isso,
+     * nesta etapa usamos a maior capacidade entre as UHs disponíveis do tipo.
+     */
+    private function validarCapacidadeSolicitacao($tipoId, $adultos, $criancas)
+    {
+        $totalHospedes = (int) $adultos + (int) $criancas;
+
+        $capacidadeMaxima = (int) \App\UnidadeHabitacional::where('disponivel', 1)
+            ->where('tipo_und_hab_id', (int) $tipoId)
+            ->max('capacidade_ocupacao');
+
+        if ($capacidadeMaxima <= 0) {
+            return 'Não há unidade habitacional disponível para o tipo selecionado.';
+        }
+
+        if ($totalHospedes > $capacidadeMaxima) {
+            return 'O número de hóspedes (' . $totalHospedes
+                . ') excede a capacidade máxima disponível para este tipo de unidade ('
+                . $capacidadeMaxima
+                . '). Solicite uma unidade adicional ou altere sua seleção para melhor acomodá-lo.';
+        }
+
+        return null;
+    }
 
 
 
@@ -34,7 +61,7 @@ Faz os calculos de meses conforme regras estabelecidas
 */
 public function chamaFormularioPedido(){
 
-    
+
 
 /*
 Carbon::setTestNow(
@@ -115,18 +142,18 @@ $gruposTarifa = \App\GrupoTarifa::with('tipoundhabitacao')
 |
 */
 
-$capacidadesPorTipo = \App\UnidadeHabitacional::select(
-        'tipo_und_hab_id',
-        DB::raw('MAX(CAST(capacidade_ocupacao AS UNSIGNED)) AS capacidade_maxima')
-    )
-    ->whereNotNull('tipo_und_hab_id')
+$tiposPermitidos = $gruposTarifa
+    ->pluck('tipoundhabitacao')
+    ->filter()
+    ->unique('id');
+
+$capacidadesPorTipo = \App\UnidadeHabitacional::where('disponivel', 1)
+    ->whereIn('tipo_und_hab_id', $tiposPermitidos->pluck('id'))
+    ->selectRaw('tipo_und_hab_id, MAX(capacidade_ocupacao) as capacidade_maxima')
     ->groupBy('tipo_und_hab_id')
     ->pluck('capacidade_maxima', 'tipo_und_hab_id');
 
-$unidadess = $gruposTarifa
-    ->pluck('tipoundhabitacao')
-    ->filter()
-    ->unique('id')
+$unidadess = $tiposPermitidos
     ->sortBy(function ($unidade) {
         return mb_strtolower($unidade->descricao);
     })
@@ -134,7 +161,7 @@ $unidadess = $gruposTarifa
         return [
             'id' => $unidade->id,
             'value' => $unidade->descricao,
-            'capacidade' => (int) $capacidadesPorTipo->get($unidade->id, 0),
+            'capacidade' => (int) ($capacidadesPorTipo[$unidade->id] ?? 0),
         ];
     })
     ->values()
@@ -416,7 +443,7 @@ public function confimrarPedido(Request $request){
 
     $usuario = Auth::user();
     $today = Carbon::today();
-    
+
     /*
     |--------------------------------------------------------------------------
     | Validação dos campos
@@ -508,6 +535,21 @@ public function confimrarPedido(Request $request){
             ->back()
             ->withErrors($validator)
             ->withInput();
+    }
+
+    $erroCapacidade = $this->validarCapacidadeSolicitacao(
+        (int) $request->tipo,
+        (int) $request->adultos,
+        (int) $request->criancas
+    );
+
+    if ($erroCapacidade) {
+        return redirect()
+            ->back()
+            ->withInput()
+            ->withErrors([
+                'adultos' => $erroCapacidade,
+            ]);
     }
 
     /*
@@ -1486,7 +1528,7 @@ public function confimrarPedido(Request $request){
 
 public function store(Request $request)
 {
-    
+
     date_default_timezone_set('America/Sao_Paulo');
     $usuario = Auth::user();
     $today = Carbon::today();
@@ -1587,6 +1629,21 @@ public function store(Request $request)
             ->back()
             ->withErrors($validator)
             ->withInput();
+    }
+
+    $erroCapacidade = $this->validarCapacidadeSolicitacao(
+        (int) $request->tipo,
+        (int) $request->adultos,
+        (int) $request->criancas
+    );
+
+    if ($erroCapacidade) {
+        return redirect()
+            ->back()
+            ->withInput()
+            ->withErrors([
+                'adultos' => $erroCapacidade,
+            ]);
     }
 
     /*
