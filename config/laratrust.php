@@ -254,11 +254,12 @@ return [
         | Laratrust Panel Register
         |--------------------------------------------------------------------------
         |
-        | This manages if routes used for the admin panel should be registered.
-        | Turn this value to false if you don't want to use Laratrust admin panel
+        | O painel administrativo de roles/permissoes nao pertence ao GeoFML Internet.
+        | Fica desabilitado por padrao e so pode ser habilitado explicitamente
+        | em ambiente controlado.
         |
         */
-        'register' => true,
+        'register' => env('LARATRUST_PANEL_REGISTER', false),
 
         /*
         |--------------------------------------------------------------------------
@@ -311,13 +312,8 @@ return [
         |
         */
         'roles_restrictions' => [
-            // The user won't be able to remove roles already assigned to users.
             'not_removable' => [],
-
-            // The user won't be able to edit the role and the permissions assigned.
             'not_editable' => [],
-
-            // The user won't be able to delete the role.
             'not_deletable' => [],
         ],
     ]

@@ -36,23 +36,25 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
-     * Define the routes for the application.
+     * Define the routes for the Internet portal.
+     *
+     * This application does not expose an operational API, so the default
+     * routes/api.php scaffold is intentionally not registered.
      *
      * @return void
      */
     public function map()
     {
-        $this->mapApiRoutes();
-
         $this->mapWebRoutes();
-
-        //
     }
 
     /**
-     * Define the "web" routes for the application.
+     * Define the web routes used by the Internet portal.
      *
-     * These routes all receive session state, CSRF protection, etc.
+     * The historical routes/web.php contains administrative and attendant
+     * routes copied from the intranet/admin application, including references
+     * to controllers that do not exist in this project. It remains in the
+     * repository only as legacy reference and is no longer registered.
      *
      * @return void
      */
@@ -60,21 +62,12 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::middleware('web')
             ->namespace($this->namespace)
-            ->group(base_path('routes/web.php'));
-    }
+            ->group(base_path('routes/internet.php'));
 
-    /**
-     * Define the "api" routes for the application.
-     *
-     * These routes are typically stateless.
-     *
-     * @return void
-     */
-    protected function mapApiRoutes()
-    {
-        Route::prefix('api')
-            ->middleware('api')
+        // Hardening is loaded last so the protected replacements keep
+        // precedence over compatibility/legacy paths.
+        Route::middleware('web')
             ->namespace($this->namespace)
-            ->group(base_path('routes/api.php'));
+            ->group(base_path('routes/security_hardening.php'));
     }
 }

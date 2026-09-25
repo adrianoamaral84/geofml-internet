@@ -86,7 +86,7 @@
 
                                <div class="modal fade" id="DeleteModal">
                                     <div class="modal-dialog" role="document">
-                                        <form action="" id="deleteForm" method="get">
+                                        <form action="" id="deleteForm" method="post">
                                             <div class="modal-content">
                                                 <div class="modal-header">
                                                     <h4 class="modal-title"><i class="fa fa-warning"></i> Atenção</h4>
@@ -109,7 +109,7 @@
                                 </div>
                                 <div class="modal fade" id="ActivateModal">
                                     <div class="modal-dialog" role="document">
-                                        <form action="" id="activateForm" method="get">
+                                        <form action="" id="activateForm" method="post">
                                             <div class="modal-content">
                                                 <div class="modal-header">
                                                     <h4 class="modal-title"><i class="fa fa-warning"></i> Atenção</h4>

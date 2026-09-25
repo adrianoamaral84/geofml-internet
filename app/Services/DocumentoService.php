@@ -5,6 +5,8 @@ namespace App\Services;
 use App\User;
 use App\UserDocumento;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class DocumentoService
 {
@@ -19,86 +21,129 @@ class DocumentoService
     }
 
     private function salvar(User $user, UploadedFile $arquivo, string $tipo)
-{
-    $conteudo = $arquivo->openFile()->fread($arquivo->getSize());
-    $conteudoBase64 = base64_encode($conteudo);
+    {
+        $conteudo = file_get_contents($arquivo->getRealPath());
 
-    return UserDocumento::updateOrCreate(
-        [
-            'user_id' => $user->id,
-            'tipo' => $tipo,
-        ],
-        [
-            'arquivo' => $conteudoBase64,
-            'mime' => $arquivo->extension(),
-            'tamanho' => strlen($conteudoBase64),
-            'hash' => hash('sha256', $conteudoBase64),
-        ]
-    );
-}
-    public function obterFrente(User $user)
-{
-    $documento = UserDocumento::where('user_id', $user->id)
-        ->where('tipo', 'frente')
-        ->first();
+        if ($conteudo === false) {
+            throw new \RuntimeException('Não foi possível ler o documento enviado.');
+        }
 
-    if ($documento) {
+        $extensao = strtolower($arquivo->getClientOriginalExtension() ?: $arquivo->extension() ?: 'bin');
+        $nome = $tipo . '-' . Str::random(40) . '.' . $extensao;
+        $diretorio = 'documentos/' . $user->id;
+        $caminho = $diretorio . '/' . $nome;
+
+        if (!Storage::disk('local')->put($caminho, $conteudo)) {
+            throw new \RuntimeException('Não foi possível armazenar o documento enviado.');
+        }
+
+        $existente = UserDocumento::where('user_id', $user->id)
+            ->where('tipo', $tipo)
+            ->first();
+
+        $caminhoAnterior = $existente ? $existente->arquivo : null;
+
+        try {
+            $documento = UserDocumento::updateOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'tipo' => $tipo,
+                ],
+                [
+                    'arquivo' => $caminho,
+                    'mime' => $arquivo->getMimeType() ?: 'application/octet-stream',
+                    'tamanho' => strlen($conteudo),
+                    'hash' => hash('sha256', $conteudo),
+                ]
+            );
+        } catch (\Throwable $e) {
+            Storage::disk('local')->delete($caminho);
+            throw $e;
+        }
+
+        // Remove somente arquivos do padrão novo. Conteúdo legado em base64
+        // permanece intocado até ser substituído/migrado com segurança.
+        if (
+            !empty($caminhoAnterior)
+            && $caminhoAnterior !== $caminho
+            && strpos($caminhoAnterior, 'documentos/') === 0
+        ) {
+            Storage::disk('local')->delete($caminhoAnterior);
+        }
+
         return $documento;
     }
 
-    // Compatibilidade com banco antigo
-    if (!empty($user->documento)) {
+    public function obterFrente(User $user)
+    {
+        $documento = UserDocumento::where('user_id', $user->id)
+            ->where('tipo', 'frente')
+            ->first();
 
-        return (object)[
-            'arquivo' => $user->documento,
-            'mime' => $user->tipo_doc
-        ];
+        if ($documento) {
+            return $documento;
+        }
+
+        // Compatibilidade com banco antigo.
+        if (!empty($user->documento)) {
+            return (object) [
+                'arquivo' => $user->documento,
+                'mime' => $user->tipo_doc,
+            ];
+        }
+
+        return null;
     }
-
-    return null;
-}
-    
 
     public function obterVerso(User $user)
-{
-    $documento = UserDocumento::where('user_id', $user->id)
-        ->where('tipo', 'verso')
-        ->first();
+    {
+        $documento = UserDocumento::where('user_id', $user->id)
+            ->where('tipo', 'verso')
+            ->first();
 
-    if ($documento) {
-        return $documento;
+        if ($documento) {
+            return $documento;
+        }
+
+        if (!empty($user->documento_verso)) {
+            return (object) [
+                'arquivo' => $user->documento_verso,
+                'mime' => $user->tipo_doc_verso,
+            ];
+        }
+
+        return null;
     }
 
-    if (!empty($user->documento_verso)) {
-
-        return (object)[
-            'arquivo' => $user->documento_verso,
-            'mime' => $user->tipo_doc_verso
-        ];
+    public function existeDocumento(User $user)
+    {
+        return UserDocumento::where('user_id', $user->id)->exists();
     }
 
-    return null;
-}
+    public function excluir(User $user)
+    {
+        $documentos = UserDocumento::where('user_id', $user->id)->get();
 
-public function existeDocumento(User $user)
-{
-    return UserDocumento::where('user_id',$user->id)->exists();
-}
-public function excluir(User $user)
-{
-    UserDocumento::where('user_id',$user->id)->delete();
-}
+        foreach ($documentos as $documento) {
+            if (!empty($documento->arquivo) && strpos($documento->arquivo, 'documentos/') === 0) {
+                Storage::disk('local')->delete($documento->arquivo);
+            }
+        }
 
-public function mimeFrente(User $user)
-{
-    $doc = $this->obterFrente($user);
+        UserDocumento::where('user_id', $user->id)->delete();
+    }
 
-    return $doc ? $doc->mime : null;
-}
-public function mimeVerso(User $user)
-{
-    $doc = $this->obterVerso($user);
+    public function mimeFrente(User $user)
+    {
+        $doc = $this->obterFrente($user);
 
-    return $doc ? $doc->mime : null;
-}
+        return $doc ? $doc->mime : null;
+    }
+
+    public function mimeVerso(User $user)
+    {
+        $doc = $this->obterVerso($user);
+
+        return $doc ? $doc->mime : null;
+    }
 }

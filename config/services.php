@@ -20,8 +20,11 @@ return [
     ],
     'pagtesouro' => [
     'config_id' => env('PAGTESOURO_CONFIG_ID', 2),
+    'token' => env('PAGTESOURO_TOKEN'),
     'modo_teste' => env('PAGTESOURO_MODO_TESTE', false),
     'ambiente' => env('PAGTESOURO_AMBIENTE', 'producao'),
+    'proxy' => env('PAGTESOURO_PROXY'),
+    'ca_bundle' => env('PAGTESOURO_CA_BUNDLE'),
     ],
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
