@@ -24,6 +24,11 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
+     public function username()
+    {
+        return 'cpf';
+    }
+
     protected function credentials(Request $request)
     {
         if (isset($request['cpf'])) {
