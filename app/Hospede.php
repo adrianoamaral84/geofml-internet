@@ -33,12 +33,17 @@ class Hospede extends Model
     }
     
     public function valorTarifaComDesconto()
-{
-    if (!$this->user) {
-        return $this->valortarifa;
+    {
+        /*
+         * A tarifa unitária já é gravada em hospedagem.valortarifa
+         * com o desconto Mecenas aplicado no momento da criação
+         * ou edição do pedido.
+         *
+         * Portanto, durante os recálculos de check-in/check-out,
+         * devemos usar o valor persistido diretamente para evitar
+         * aplicar novamente os 30% de desconto.
+         */
+        return (float) $this->valortarifa;
     }
-
-    return $this->user->aplicarDesconto($this->valortarifa);
-}
 
 }
