@@ -5,79 +5,106 @@ namespace App\Services;
 use App\Hospede;
 use App\Horario;
 use Carbon\Carbon;
-use DateTime;
-use DateInterval;
+use RuntimeException;
 
 class CalculoHospedagemService
 {
     public function calcular(Hospede $hospedagem)
     {
-        date_default_timezone_set('America/Sao_Paulo');
+        $timezone = 'America/Sao_Paulo';
 
         $horarios = Horario::first();
 
-        $valorTarifa = $hospedagem->valorTarifaComDesconto();
-
-        $checkinAt = $hospedagem->checkin_at
-            ? Carbon::parse($hospedagem->checkin_at)
-            : Carbon::parse($hospedagem->data_inicio);
-
-        $agora = Carbon::now();
-
-        $dias = $checkinAt->diffInDays($agora);
-
-        if ($dias == 0) {
-            $dias = 1;
+        if (!$horarios) {
+            throw new RuntimeException(
+                'Os horarios de entrada, saida e tolerancia nao estao configurados.'
+            );
         }
+
+        $valorTarifa = (float) $hospedagem->valorTarifaComDesconto();
+        $tolerancia = (int) $horarios->tolerancia;
+
+        $dataInicio = Carbon::parse(
+            $hospedagem->data_inicio,
+            $timezone
+        )->startOfDay();
+
+        $dataTermino = Carbon::parse(
+            $hospedagem->data_termino,
+            $timezone
+        )->startOfDay();
+
+        $diariasContratadas = $dataInicio->diffInDays($dataTermino);
+
+        if ($diariasContratadas < 1) {
+            $diariasContratadas = 1;
+        }
+
+        $extraEntrada = 0;
+        $extraSaida = 0;
 
         $checkinAntecipado = false;
         $checkoutAtrasado = false;
 
-        $horaCheckin = $checkinAt->format('H:i:s');
-        $horaAgora = $agora->format('H:i:s');
+        if ($hospedagem->checkin_at) {
+            $checkinAt = Carbon::parse(
+                $hospedagem->checkin_at,
+                $timezone
+            );
 
-        $entrada = Carbon::parse($horarios->entrada);
-        $saida = Carbon::parse($horarios->saida);
+            $limiteEntrada = $dataInicio
+                ->copy()
+                ->setTimeFromTimeString($horarios->entrada)
+                ->subHours($tolerancia);
 
-        $entradaComTolerancia = $entrada->copy()->subHours($horarios->tolerancia);
-        $saidaComTolerancia = $saida->copy()->addHours($horarios->tolerancia);
+            if ($checkinAt->copy()->startOfDay()->lt($dataInicio)) {
+                $extraEntrada = $checkinAt
+                    ->copy()
+                    ->startOfDay()
+                    ->diffInDays($dataInicio);
 
-       $dataInicio = Carbon::parse($hospedagem->data_inicio);
-$dataCheckin = Carbon::parse($hospedagem->checkin_at);
+                $checkinAntecipado = true;
+            } elseif (
+                $checkinAt->isSameDay($dataInicio) &&
+                $checkinAt->lt($limiteEntrada)
+            ) {
+                $extraEntrada = 1;
+                $checkinAntecipado = true;
+            }
+        }
 
-// Só é check-in antecipado se entrou NO MESMO DIA da reserva
-// antes do horário permitido.
-if (
-    $dataCheckin->toDateString() == $dataInicio->toDateString() &&
-    $dataCheckin->format('H:i:s') < $entradaComTolerancia->format('H:i:s')
-) {
-    $checkinAntecipado = true;
-    $dias++;
-}
+        $momentoFinal = $hospedagem->checkout_at
+            ? Carbon::parse($hospedagem->checkout_at, $timezone)
+            : Carbon::now($timezone);
 
-       $dataTermino = Carbon::parse($hospedagem->data_termino);
+        $limiteCheckoutReserva = $dataTermino
+            ->copy()
+            ->setTimeFromTimeString($horarios->saida)
+            ->addHours($tolerancia);
 
-       // Só é check-out atrasado se saiu NO MESMO DIA da reserva
-/*
-if (
-    $agora->gte($dataTermino->copy()->startOfDay()) &&
-    $agora->format('H:i:s') > $saidaComTolerancia->format('H:i:s')
-) {
-    $checkoutAtrasado = true;
-    $dias++;
-}
-*/
+        if ($momentoFinal->gt($limiteCheckoutReserva)) {
+            $checkoutAtrasado = true;
 
+            $extraSaida = $dataTermino->diffInDays(
+                $momentoFinal->copy()->startOfDay()
+            );
 
-// Cobra smepre que o checkout for feito depois do horário permitido, mesmo que seja no dia seguinte.
-if ($agora->format('H:i:s') > $saidaComTolerancia->format('H:i:s')) {
-    $checkoutAtrasado = true;
-    $dias++;
-}
+            $limiteCheckoutDoDia = $momentoFinal
+                ->copy()
+                ->startOfDay()
+                ->setTimeFromTimeString($horarios->saida)
+                ->addHours($tolerancia);
+
+            if ($momentoFinal->gt($limiteCheckoutDoDia)) {
+                $extraSaida++;
+            }
+        }
+
+        $dias = $diariasContratadas + $extraEntrada + $extraSaida;
 
         $valorTotal = round($valorTarifa * $dias, 2);
 
-        $valorPago = $hospedagem->valor_pago ?? 0;
+        $valorPago = (float) ($hospedagem->valor_pago ?? 0);
 
         $valorRestante = round($valorTotal - $valorPago, 2);
 
@@ -87,6 +114,9 @@ if ($agora->format('H:i:s') > $saidaComTolerancia->format('H:i:s')) {
 
         return [
             'dias' => $dias,
+            'diarias_contratadas' => $diariasContratadas,
+            'diarias_extra_entrada' => $extraEntrada,
+            'diarias_extra_saida' => $extraSaida,
             'valor_tarifa' => $valorTarifa,
             'valor_total' => $valorTotal,
             'valor_pago' => $valorPago,
