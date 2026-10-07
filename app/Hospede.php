@@ -35,11 +35,12 @@ class Hospede extends Model
     
     public function valorTarifaComDesconto()
     {
-        if (!$this->user) {
-            return $this->valortarifa;
-        }
-
-        return $this->user->aplicarDesconto($this->valortarifa);
+        /*
+         * A tarifa salva em hospedagem.valortarifa ja deve refletir o valor
+         * unitario usado no pedido. Reaplicar Mecenas aqui causa desconto
+         * duplicado nos recalculos de hospedagem.
+         */
+        return round((float) $this->valortarifa, 2);
     }
 
     public function valorPrimeiraDiariaComDesconto()
@@ -119,11 +120,7 @@ class Hospede extends Model
             return round($valorTotal / $diarias, 2);
         }
 
-        if (!$this->user) {
-            return round((float) $this->valortarifa, 2);
-        }
-
-        return $this->user->aplicarDesconto($this->valortarifa);
+        return round((float) $this->valortarifa, 2);
     }
 
 }
