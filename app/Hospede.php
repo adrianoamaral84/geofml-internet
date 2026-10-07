@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Hospede extends Model
@@ -33,12 +34,96 @@ class Hospede extends Model
     }
     
     public function valorTarifaComDesconto()
-{
-    if (!$this->user) {
-        return $this->valortarifa;
+    {
+        if (!$this->user) {
+            return $this->valortarifa;
+        }
+
+        return $this->user->aplicarDesconto($this->valortarifa);
     }
 
-    return $this->user->aplicarDesconto($this->valortarifa);
-}
+    public function valorPrimeiraDiariaComDesconto()
+    {
+        $tarifa = $this->tarifaPrimeiraDiariaSemDesconto();
+
+        if ($tarifa !== null) {
+            return $this->user
+                ? $this->user->aplicarDesconto($tarifa)
+                : round((float) $tarifa, 2);
+        }
+
+        return $this->valorTarifaSalvaComDesconto();
+    }
+
+    private function tarifaPrimeiraDiariaSemDesconto()
+    {
+        if (!$this->data_inicio || !$this->tipo_und_id || !$this->user) {
+            return null;
+        }
+
+        $posto = $this->user->posto;
+
+        if (!$posto) {
+            return null;
+        }
+
+        $gruposTarifa = $posto->grupotarifa()->get();
+
+        if ($gruposTarifa->isEmpty()) {
+            return null;
+        }
+
+        $tarifa = null;
+
+        foreach ($gruposTarifa as $grupoTarifa) {
+            $tarifa = Tarifas::where('tipoundhab_id', $this->tipo_und_id)
+                ->where('grupo_destinacao_id', $grupoTarifa->id)
+                ->first();
+
+            if ($tarifa) {
+                break;
+            }
+        }
+
+        if (!$tarifa) {
+            return null;
+        }
+
+        $dataEntrada = Carbon::parse($this->data_inicio)->format('Y-m-d');
+
+        $temporada = Temporada::whereDate('data_inicio', '<=', $dataEntrada)
+            ->whereDate('data_termino', '>=', $dataEntrada)
+            ->first();
+
+        if (!$temporada) {
+            return null;
+        }
+
+        if ((int) $temporada->tipo_temporada_id === 2) {
+            return round((float) $tarifa->valor_baixa, 2);
+        }
+
+        if ((int) $temporada->tipo_temporada_id === 1) {
+            return round((float) $tarifa->valor, 2);
+        }
+
+        return null;
+    }
+
+    private function valorTarifaSalvaComDesconto()
+    {
+        $diarias = (int) ($this->qntdiarias ?? 0);
+        $valorTotal = (float) ($this->valor ?? 0);
+
+        if ($diarias > 0 && $valorTotal > 0) {
+            return round($valorTotal / $diarias, 2);
+        }
+
+        if (!$this->user) {
+            return round((float) $this->valortarifa, 2);
+        }
+
+        return $this->user->aplicarDesconto($this->valortarifa);
+    }
 
 }
