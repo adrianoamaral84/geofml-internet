@@ -910,6 +910,8 @@ if (config('services.pagtesouro.modo_teste')) {
 
 
 
+
+
             
         $situacoesConfirmadas = [
             'CONCLUIDO',
