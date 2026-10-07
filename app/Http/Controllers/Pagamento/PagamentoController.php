@@ -443,7 +443,7 @@ public function processaRequisicao($id)
 
 
            $valorDiaria = round(
-            (float) $hospedagem->valorTarifaComDesconto(),
+            (float) $hospedagem->valorPrimeiraDiariaComDesconto(),
             2
             );
 
@@ -783,7 +783,7 @@ $pagamento->save();
             "vencimento" => $vencimento,
             "cnpjCpf" => $hospedagem->user_cpf, // 
             "nomeContribuinte" =>  $hospedagem->user->name, //  
-            "valorPrincipal" =>  $hospedagem->valorTarifaComDesconto(),
+            "valorPrincipal" =>  $hospedagem->valorPrimeiraDiariaComDesconto(),
             "valorDescontos" => "",
             "valorOutrasDeducoes" => "",
             "valorMulta" => "",
@@ -896,8 +896,6 @@ if (config('services.pagtesouro.modo_teste')) {
             : 'Pagamento de teste aguardando aprovação.',
     ]);
 }
-
-
 
 
 
@@ -1061,7 +1059,7 @@ if (config('services.pagtesouro.modo_teste')) {
                 $valorDiaria = round(
                     (float) (
                         $pagamentoBanco->valor
-                        ?? $hospedagemBanco->valorTarifaComDesconto()
+                        ?? $hospedagemBanco->valorPrimeiraDiariaComDesconto()
                     ),
                     2
                 );
