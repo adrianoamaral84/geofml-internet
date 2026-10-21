@@ -316,5 +316,6 @@
 </script>
 -->
 
+@include('hospedagem.partials.protecao_duplo_envio')
 @endpush
 @endsection
