@@ -82,9 +82,9 @@
                                      <option value="">Selecione</option>
                                 
 
-                                @foreach($unidades as $unidade)
+                                @foreach($unidadess as $unidade)
 
-                                         <option value="{!! $unidade->id !!}" @if($hospedagem->tipo_und_id == $unidade->id) selected @endif> {!! $unidade->descricao !!} </option>
+                                         <option value="{{ $unidade['id'] }}" data-capacidade="{{ $unidade['capacidade'] }}" @if(old('tipo', $hospedagem->tipo_und_id) == $unidade['id']) selected @endif>{{ $unidade['value'] }}</option>
 
                                 @endforeach
 
@@ -104,9 +104,9 @@
            
         </div>
 
-       
-      
-       
+        <div id="capacidade-info" class="alert alert-info" role="alert" style="display:none;"></div>
+        <div id="capacidade-alerta" class="alert alert-danger" role="alert" style="display:none;"></div>
+
         <div class="row form-group has-error">
 
                <div class="form-group col-sm-12 col-md-12 col-lg-6">
@@ -199,7 +199,7 @@
                                     <hr>
                                     <div class="form-group row">
                                         <div class="col-sm-12 col-md-12 col-lg-12">
-                                            <button type="submit" class="btn btn-primary rounded-s"> Próximo <i class="fas fa-angle-right btn-sm"></i></button>
+                                            <button type="submit" id="btn-proximo" class="btn btn-primary rounded-s"> Próximo <i class="fas fa-angle-right btn-sm"></i></button>
                                         </div>
                                     </div>
                                 </form>
@@ -215,6 +215,47 @@
     </section>
 </article>
 @push('javascript')
+<script>
+$(document).ready(function(){
+    function validarCapacidadeUH() {
+        var capacidade = parseInt($('#tipo option:selected').attr('data-capacidade'), 10) || 0;
+        var adultos = parseInt($('#adultos').val(), 10) || 0;
+        var criancas = parseInt($('#criancas').val(), 10) || 0;
+        var total = adultos + criancas;
+        var semCapacidade = !!$('#tipo').val() && capacidade <= 0;
+        var excedeu = capacidade > 0 && total > capacidade;
+
+        if (capacidade > 0) {
+            $('#capacidade-info').text('Capacidade máxima desta unidade: ' + capacidade + ' pessoas.').show();
+        } else {
+            $('#capacidade-info').hide();
+        }
+
+        if (excedeu) {
+            $('#capacidade-alerta').text(
+                'O número de hóspedes (' + total + ') excede a capacidade desta unidade (' + capacidade +
+                '). Solicite uma unidade adicional ou altere sua seleção para melhor acomodá-los.'
+            ).show();
+        } else if (semCapacidade) {
+            $('#capacidade-alerta').text(
+                'Não foi possível identificar a capacidade da unidade selecionada. Selecione outra unidade ou entre em contato com o administrador.'
+            ).show();
+        } else {
+            $('#capacidade-alerta').hide();
+        }
+
+        $('#btn-proximo').prop('disabled', excedeu || semCapacidade);
+        return !(excedeu || semCapacidade);
+    }
+
+    $('#tipo, #adultos, #criancas').on('input change', validarCapacidadeUH);
+    $('#btn-proximo').closest('form').on('submit', function(event) {
+        if (!validarCapacidadeUH()) event.preventDefault();
+    });
+    validarCapacidadeUH();
+});
+</script>
+
 <script src="{{ asset('js/litepickerBudler.js')}}"></script>
 <script src="{{ asset('js/mobilefriendly.js')}}"></script>
 
