@@ -2428,7 +2428,7 @@ public function store(Request $request)
 
         // Serializa os pedidos do mesmo usuário para impedir duas gravações
         // simultâneas quando a confirmação é enviada repetidamente.
-        DB::table('users')
+        DB::table('user')
             ->where('id', $usuario->id)
             ->lockForUpdate()
             ->first();
