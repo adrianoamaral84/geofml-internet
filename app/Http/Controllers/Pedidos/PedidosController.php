@@ -536,11 +536,11 @@ public function confimrarPedido(Request $request){
             ->withInput();
     }
 
-    if ($totalHospedes > $capacidadeMaxima) {
+    if ((int) $request->adultos > $capacidadeMaxima || $totalHospedes > $capacidadeMaxima + ((int) $request->criancas > 0 ? 1 : 0)) {
         return redirect()
             ->back()
             ->withErrors([
-                'adultos' => 'O número de hóspedes excede a capacidade máxima desta unidade (' . $capacidadeMaxima . ' pessoas). Solicite uma unidade adicional ou altere sua seleção para melhor acomodá-los.',
+                'adultos' => 'O número de hóspedes excede o limite desta unidade (' . $capacidadeMaxima . ' pessoas, com tolerância de 1 criança de até 6 anos). Reduza os ocupantes ou selecione outra unidade.',
             ])
             ->withInput();
     }
@@ -1615,11 +1615,11 @@ public function store(Request $request)
             ->withInput();
     }
 
-    if ($totalHospedes > $capacidadeMaxima) {
+    if ((int) $request->adultos > $capacidadeMaxima || $totalHospedes > $capacidadeMaxima + ((int) $request->criancas > 0 ? 1 : 0)) {
         return redirect()
             ->route('hospede.solicitarinscricao')
             ->withErrors([
-                'adultos' => 'O número de hóspedes excede a capacidade máxima desta unidade (' . $capacidadeMaxima . ' pessoas). Solicite uma unidade adicional ou altere sua seleção para melhor acomodá-los.',
+                'adultos' => 'O número de hóspedes excede o limite desta unidade (' . $capacidadeMaxima . ' pessoas, com tolerância de 1 criança de até 6 anos). Reduza os ocupantes ou selecione outra unidade.',
             ])
             ->withInput();
     }
