@@ -2426,6 +2426,34 @@ public function store(Request $request)
     try {
         DB::beginTransaction();
 
+        // Serializa os pedidos do mesmo usuário para impedir duas gravações
+        // simultâneas quando a confirmação é enviada repetidamente.
+        DB::table('users')
+            ->where('id', $usuario->id)
+            ->lockForUpdate()
+            ->first();
+
+        if (!$isEdicao) {
+            $pedidoDuplicado = \App\Hospede::where('user_id', $usuario->id)
+                ->where('tipo_und_id', (int) $request->tipo)
+                ->whereDate('data_inicio', $dataInicio->format('Y-m-d'))
+                ->whereDate('data_termino', $dataTermino->format('Y-m-d'))
+                ->where('adulto', (int) $request->adultos)
+                ->where('crianca', (int) $request->criancas)
+                ->whereIn('status', [0, 1, 2, 3, 4, 5])
+                ->exists();
+
+            if ($pedidoDuplicado) {
+                DB::rollBack();
+                \Session::flash('message', [
+                    'msg' => 'Este pedido já foi registrado. Verifique em Minhas Solicitações antes de tentar novamente.',
+                    'class' => 'warning',
+                ]);
+
+                return redirect()->route('hospede.meuspedidos');
+            }
+        }
+
         $consulta = $isEdicao
             ? $pedidoAtual
             : new \App\Hospede();
