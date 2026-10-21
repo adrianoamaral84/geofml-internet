@@ -235,7 +235,7 @@
                                     <hr>
                                     <div class="form-group row">
                                         <div class="col-sm-12 col-md-12 col-lg-12">
-                                            <button type="submit" class="btn btn-primary btn-sm rounded-s"><i class="fas fa-check-circle btn-sm "></i>d Confirmar Pedido! </button>
+                                            <button type="submit" id="btn-confirmar-pedido" onclick="return bloquearEnvioFinalPedido(this.form)" class="btn btn-primary btn-sm rounded-s"><i class="fas fa-check-circle btn-sm"></i> Confirmar Pedido!</button>
                                         </div>
                                     </div>
                                 </form>
