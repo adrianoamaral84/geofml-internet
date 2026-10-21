@@ -195,11 +195,20 @@ public function index($id){
     |
     */
 
+    $capacidadesPorTipo = \App\UnidadeHabitacional::select(
+            'tipo_und_hab_id',
+            DB::raw('MAX(CAST(capacidade_ocupacao AS UNSIGNED)) AS capacidade_maxima')
+        )
+        ->whereNotNull('tipo_und_hab_id')
+        ->groupBy('tipo_und_hab_id')
+        ->pluck('capacidade_maxima', 'tipo_und_hab_id');
+
     $unidadess = $unidades
-        ->map(function ($unidade) {
+        ->map(function ($unidade) use ($capacidadesPorTipo) {
             return [
                 'id' => $unidade->id,
                 'value' => $unidade->descricao,
+                'capacidade' => (int) $capacidadesPorTipo->get($unidade->id, 0),
             ];
         })
         ->values()
@@ -622,6 +631,34 @@ public function confirmaEdicao(Request $request)
             ->back()
             ->withErrors($validator)
             ->withInput();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Capacidade maxima da UH - mesma regra do Novo Pedido
+    |--------------------------------------------------------------------------
+    */
+    $capacidadeRegistro = DB::table('unidades_habitacionais')
+        ->selectRaw('MAX(CAST(capacidade_ocupacao AS UNSIGNED)) AS capacidade_maxima')
+        ->where('tipo_und_hab_id', (int) $request->tipo)
+        ->first();
+
+    $capacidadeMaxima = $capacidadeRegistro
+        ? (int) $capacidadeRegistro->capacidade_maxima
+        : 0;
+
+    $totalHospedes = (int) $request->adultos + (int) $request->criancas;
+
+    if ($capacidadeMaxima <= 0) {
+        return redirect()->back()->withErrors([
+            'tipo' => 'Não foi possível identificar a capacidade da unidade habitacional selecionada. Selecione outra unidade ou entre em contato com o administrador.',
+        ])->withInput();
+    }
+
+    if ($totalHospedes > $capacidadeMaxima) {
+        return redirect()->back()->withErrors([
+            'adultos' => 'O número de hóspedes excede a capacidade máxima desta unidade (' . $capacidadeMaxima . ' pessoas). Solicite uma unidade adicional ou altere sua seleção para melhor acomodá-los.',
+        ])->withInput();
     }
 
     /*
@@ -1760,6 +1797,34 @@ public function gravaEdicao(Request $request)
             ->back()
             ->withErrors($validator)
             ->withInput();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Capacidade maxima da UH - mesma regra do Novo Pedido
+    |--------------------------------------------------------------------------
+    */
+    $capacidadeRegistro = DB::table('unidades_habitacionais')
+        ->selectRaw('MAX(CAST(capacidade_ocupacao AS UNSIGNED)) AS capacidade_maxima')
+        ->where('tipo_und_hab_id', (int) $request->tipo)
+        ->first();
+
+    $capacidadeMaxima = $capacidadeRegistro
+        ? (int) $capacidadeRegistro->capacidade_maxima
+        : 0;
+
+    $totalHospedes = (int) $request->adultos + (int) $request->criancas;
+
+    if ($capacidadeMaxima <= 0) {
+        return redirect()->back()->withErrors([
+            'tipo' => 'Não foi possível identificar a capacidade da unidade habitacional selecionada. Selecione outra unidade ou entre em contato com o administrador.',
+        ])->withInput();
+    }
+
+    if ($totalHospedes > $capacidadeMaxima) {
+        return redirect()->back()->withErrors([
+            'adultos' => 'O número de hóspedes excede a capacidade máxima desta unidade (' . $capacidadeMaxima . ' pessoas). Solicite uma unidade adicional ou altere sua seleção para melhor acomodá-los.',
+        ])->withInput();
     }
 
     /*
