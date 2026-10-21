@@ -23,7 +23,7 @@
                     <div class="card-block">
                         <section class="example">
                             <div class="table-flip-scroll">
-                                <form id="password-form" action="{{ route('hospede.storeEdit.edita') }}" method="POST">
+                                <form onsubmit="return bloquearEnvioFinalPedido(this)" id="password-form" action="{{ route('hospede.storeEdit.edita') }}" method="POST">
                                     @csrf
                                  
         <div class="row has-error">
@@ -189,6 +189,59 @@
                                         </div>
                                     </div>
                                 </form>
+<script>
+function bloquearEnvioFinalPedido(formulario) {
+    if (formulario.dataset.enviando === '1') return false;
+    if (!formulario.checkValidity()) return false;
+
+    formulario.dataset.enviando = '1';
+    var botao = formulario.querySelector('button[type="submit"]');
+    if (botao) {
+        botao.dataset.rotuloOriginal = botao.innerHTML;
+        botao.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando pedido...';
+        botao.disabled = true;
+        botao.setAttribute('aria-busy', 'true');
+    }
+
+    // Sobreposição visível enquanto o pedido é gravado.
+    var camada = document.createElement('div');
+    camada.id = 'aviso-envio-pedido';
+    camada.setAttribute('role', 'status');
+    camada.setAttribute('aria-live', 'assertive');
+    camada.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(20,31,44,.7);display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;';
+    camada.innerHTML = '<div style="background:#fff;color:#263645;border-radius:8px;padding:32px;max-width:440px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.3);font-size:20px;font-weight:600;"><i class="fas fa-spinner fa-spin" style="margin-right:10px;"></i> Processando pedido...<p style="font-size:14px;font-weight:normal;margin-top:12px;">Aguarde, estamos enviando sua solicitação. Não clique novamente.</p></div>';
+    document.body.appendChild(camada);
+
+    var aviso = document.createElement('div');
+    aviso.className = 'alert alert-info';
+    aviso.setAttribute('role', 'status');
+    aviso.textContent = 'Processando pedido. Aguarde, não clique novamente.';
+    if (botao) botao.parentNode.insertBefore(aviso, botao);
+    else formulario.appendChild(aviso);
+
+    // Aguarda o navegador renderizar o estado de processamento antes de navegar.
+    // O submit nativo preserva os campos, o token CSRF e a validação já realizada.
+    window.setTimeout(function () {
+        HTMLFormElement.prototype.submit.call(formulario);
+    }, 900);
+
+    return false;
+}
+
+window.addEventListener('pageshow', function (evento) {
+    if (!evento.persisted) return;
+    var formulario = document.getElementById('password-form');
+    if (!formulario) return;
+    formulario.dataset.enviando = '0';
+    var botao = formulario.querySelector('button[type="submit"]');
+    if (botao) {
+        botao.disabled = false;
+        botao.removeAttribute('aria-busy');
+        if (botao.dataset.rotuloOriginal) botao.innerHTML = botao.dataset.rotuloOriginal;
+    }
+});
+</script>
+
                                
                             </div>
                             <div class="form-group row">
@@ -265,6 +318,7 @@
 
 </script>
 -->
+
 
 @endpush
 @endsection
