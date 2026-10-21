@@ -253,6 +253,15 @@ function bloquearEnvioFinalPedido(formulario) {
         botao.setAttribute('aria-busy', 'true');
     }
 
+    // Sobreposição visível enquanto o pedido é gravado.
+    var camada = document.createElement('div');
+    camada.id = 'aviso-envio-pedido';
+    camada.setAttribute('role', 'status');
+    camada.setAttribute('aria-live', 'assertive');
+    camada.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(20,31,44,.7);display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;';
+    camada.innerHTML = '<div style="background:#fff;color:#263645;border-radius:8px;padding:32px;max-width:440px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.3);font-size:20px;font-weight:600;"><i class="fas fa-spinner fa-spin" style="margin-right:10px;"></i> Processando pedido...<p style="font-size:14px;font-weight:normal;margin-top:12px;">Aguarde, estamos enviando sua solicitação. Não clique novamente.</p></div>';
+    document.body.appendChild(camada);
+
     var aviso = document.createElement('div');
     aviso.className = 'alert alert-info';
     aviso.setAttribute('role', 'status');
@@ -264,7 +273,7 @@ function bloquearEnvioFinalPedido(formulario) {
     // O submit nativo preserva os campos, o token CSRF e a validação já realizada.
     window.setTimeout(function () {
         HTMLFormElement.prototype.submit.call(formulario);
-    }, 450);
+    }, 900);
 
     return false;
 }
