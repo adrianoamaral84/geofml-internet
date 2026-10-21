@@ -23,7 +23,7 @@
                     <div class="card-block">
                         <section class="example">
                             <div class="table-flip-scroll">
-                                <form id="password-form" action="{{ route('hospede.store') }}" method="POST">
+                                <form onsubmit="return bloquearEnvioFinalPedido(this)" id="password-form" action="{{ route('hospede.store') }}" method="POST">
                                     @csrf
                                  
         <div class="row has-error">
@@ -239,6 +239,36 @@
                                         </div>
                                     </div>
                                 </form>
+<script>
+function bloquearEnvioFinalPedido(formulario) {
+    if (formulario.dataset.enviando === '1') return false;
+    if (!formulario.checkValidity()) return false;
+
+    formulario.dataset.enviando = '1';
+    var botao = formulario.querySelector('button[type="submit"]');
+    if (botao) {
+        botao.dataset.rotuloOriginal = botao.innerHTML;
+        botao.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando pedido...';
+        botao.setAttribute('aria-disabled', 'true');
+        // Desabilitar no próximo ciclo preserva o primeiro envio normal do formulário.
+        setTimeout(function () { botao.disabled = true; }, 0);
+    }
+    return true;
+}
+window.addEventListener('pageshow', function (evento) {
+    if (!evento.persisted) return;
+    var formulario = document.getElementById('password-form');
+    if (!formulario) return;
+    formulario.dataset.enviando = '0';
+    var botao = formulario.querySelector('button[type="submit"]');
+    if (botao) {
+        botao.disabled = false;
+        botao.removeAttribute('aria-disabled');
+        if (botao.dataset.rotuloOriginal) botao.innerHTML = botao.dataset.rotuloOriginal;
+    }
+});
+</script>
+
                                
                             </div>
                             <div class="form-group row">
@@ -316,6 +346,6 @@
 </script>
 -->
 
-@include('hospedagem.partials.protecao_duplo_envio')
+
 @endpush
 @endsection
