@@ -249,12 +249,19 @@ function bloquearEnvioFinalPedido(formulario) {
     if (botao) {
         botao.dataset.rotuloOriginal = botao.innerHTML;
         botao.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando pedido...';
-        botao.setAttribute('aria-disabled', 'true');
-        // Desabilitar no próximo ciclo preserva o primeiro envio normal do formulário.
-        setTimeout(function () { botao.disabled = true; }, 0);
+        botao.disabled = true;
+        botao.setAttribute('aria-busy', 'true');
     }
-    return true;
+
+    // Aguarda o navegador renderizar o estado de processamento antes de navegar.
+    // O submit nativo preserva os campos, o token CSRF e a validação já realizada.
+    window.setTimeout(function () {
+        HTMLFormElement.prototype.submit.call(formulario);
+    }, 180);
+
+    return false;
 }
+
 window.addEventListener('pageshow', function (evento) {
     if (!evento.persisted) return;
     var formulario = document.getElementById('password-form');
@@ -263,7 +270,7 @@ window.addEventListener('pageshow', function (evento) {
     var botao = formulario.querySelector('button[type="submit"]');
     if (botao) {
         botao.disabled = false;
-        botao.removeAttribute('aria-disabled');
+        botao.removeAttribute('aria-busy');
         if (botao.dataset.rotuloOriginal) botao.innerHTML = botao.dataset.rotuloOriginal;
     }
 });
