@@ -122,7 +122,7 @@
             </div>
 
            <div class="form-group col-sm-12 col-md-12 col-lg-6">
-                            <label class="control-label">{{ __('Crianças até 5 anos') }}</label>
+                            <label class="control-label">{{ __('Crianças até 6 anos') }}</label>
                             <small>Quantidade de crianças que ocuparão a UH</small>
                             <input type="number" min="0" class="form-control boxed @error('criancas') is-invalid @enderror" value="{{ old('criancas', $hospedagem->crianca) }}" name="criancas" id="criancas" autofocus required maxlength="10" onpaste="return false;">
                             @error('criancas')
@@ -223,18 +223,18 @@ $(document).ready(function(){
         var criancas = parseInt($('#criancas').val(), 10) || 0;
         var total = adultos + criancas;
         var semCapacidade = !!$('#tipo').val() && capacidade <= 0;
-        var excedeu = capacidade > 0 && total > capacidade;
+        var excedeu = capacidade > 0 && (adultos > capacidade || total > capacidade + (criancas > 0 ? 1 : 0));
 
         if (capacidade > 0) {
-            $('#capacidade-info').text('Capacidade máxima desta unidade: ' + capacidade + ' pessoas.').show();
+            $('#capacidade-info').text('Capacidade máxima desta unidade: ' + capacidade + ' pessoas. É permitida 1 criança de até 6 anos adicional.').show();
         } else {
             $('#capacidade-info').hide();
         }
 
         if (excedeu) {
             $('#capacidade-alerta').text(
-                'O número de hóspedes (' + total + ') excede a capacidade desta unidade (' + capacidade +
-                '). Solicite uma unidade adicional ou altere sua seleção para melhor acomodá-los.'
+                'O número de hóspedes (' + total + ') excede o limite desta unidade (' + capacidade +
+                '), incluindo a tolerância de 1 criança de até 6 anos. Reduza os ocupantes ou selecione outra unidade.'
             ).show();
         } else if (semCapacidade) {
             $('#capacidade-alerta').text(
