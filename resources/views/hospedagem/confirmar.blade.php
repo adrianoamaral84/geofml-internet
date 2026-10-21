@@ -253,11 +253,18 @@ function bloquearEnvioFinalPedido(formulario) {
         botao.setAttribute('aria-busy', 'true');
     }
 
+    var aviso = document.createElement('div');
+    aviso.className = 'alert alert-info';
+    aviso.setAttribute('role', 'status');
+    aviso.textContent = 'Processando pedido. Aguarde, não clique novamente.';
+    if (botao) botao.parentNode.insertBefore(aviso, botao);
+    else formulario.appendChild(aviso);
+
     // Aguarda o navegador renderizar o estado de processamento antes de navegar.
     // O submit nativo preserva os campos, o token CSRF e a validação já realizada.
     window.setTimeout(function () {
         HTMLFormElement.prototype.submit.call(formulario);
-    }, 180);
+    }, 450);
 
     return false;
 }
