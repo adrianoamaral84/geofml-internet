@@ -33,7 +33,7 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-         $this->middleware('auth')->except('solicitaacesso', 'pedido', 'reload', 'updatePassword', 'updatePasswordteste');
+         $this->middleware('auth')->except('solicitaacesso', 'pedido', 'updatePassword', 'updatePasswordteste');
     }
 
     /**
