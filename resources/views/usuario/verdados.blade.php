@@ -315,7 +315,7 @@
                            @if($user->documento) 
                           
                            
-                                <a href="{{ route('documentos.verdocumento', ['id' => Crypt::encrypt($user->id), 'doc' => Crypt::encrypt($user->tipo_doc), 'tipo' => '1']) }}" target="_blank" class="btn btn-secondary btn-xl rounded-s">
+                                <a href="{{ route('documentos.verdocumento', ['id' => Crypt::encrypt($user->id), 'doc' => Crypt::encrypt($user->tipo_doc), 'tipo' => '1']) }}" class="btn btn-secondary btn-xl rounded-s js-ver-documento" data-documento-titulo="Documento - Frente">
                                     <i class="fas fa-address-card"></i>
                                     Frente
                                 </a>
@@ -325,7 +325,7 @@
                           <div class="col-3 form-group">
                              @if($user->documento_verso)   
                            
-                                   <a href="{{ route('documentos.verdocumento', ['id' => Crypt::encrypt($user->id), 'doc' => Crypt::encrypt($user->tipo_doc_verso), 'tipo' => '2']) }}" target="_blank" class="btn btn-secondary btn-xl rounded-s">
+                                   <a href="{{ route('documentos.verdocumento', ['id' => Crypt::encrypt($user->id), 'doc' => Crypt::encrypt($user->tipo_doc_verso), 'tipo' => '2']) }}" class="btn btn-secondary btn-xl rounded-s js-ver-documento" data-documento-titulo="Documento - Verso">
                                     <i class="fas fa-address-card"></i>
                                     Verso
                                     </a>       
@@ -433,6 +433,8 @@
         </div>
     </div>
 </section>
+
+@include('usuario.partials.visualizador-documento')
 
 @push('javascript')
     <script src="{{asset('lib/jquery-mask-plugin/dist/jquery.mask.min.js')}}"></script>   
