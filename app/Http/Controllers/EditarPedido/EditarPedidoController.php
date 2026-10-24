@@ -804,7 +804,7 @@ public function confirmaEdicao(Request $request)
             ]);
     }
 
-    $diasHospedagem = $dataInicio->diffInDays(
+    $diasHospedagem = (int) $dataInicio->diffInDays(
         $dataTermino
     );
 
@@ -1990,7 +1990,7 @@ public function gravaEdicao(Request $request)
             ]);
     }
 
-    $diasHospedagem = $dataInicio->diffInDays(
+    $diasHospedagem = (int) $dataInicio->diffInDays(
         $dataTermino
     );
 
