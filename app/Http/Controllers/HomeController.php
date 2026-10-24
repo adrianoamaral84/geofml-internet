@@ -749,13 +749,7 @@ class HomeController extends Controller
     {    
         return view('pedido.home');
     }
-
-    public function reload(){
-        return response()->json(['captcha'=> captcha_img()]);
-    }
-
-
-    public function updatePassword(Request $request)
+public function updatePassword(Request $request)
 {
 
         //dd($request->all());
