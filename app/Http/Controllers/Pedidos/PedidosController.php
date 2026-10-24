@@ -658,7 +658,7 @@ public function confimrarPedido(Request $request){
             ]);
     }
 
-    $diasHospedagem = $dataInicio->diffInDays(
+    $diasHospedagem = (int) $dataInicio->diffInDays(
         $dataTermino
     );
 
@@ -1731,7 +1731,7 @@ public function store(Request $request)
             ]);
     }
 
-    $diasHospedagem = $dataInicio->diffInDays(
+    $diasHospedagem = (int) $dataInicio->diffInDays(
         $dataTermino
     );
 
