@@ -963,8 +963,8 @@ Route::prefix('precadastro')->group(function(){
 
 // MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
 // Route::get('/usuarios/{user}/documentos/{tipo}', 'UserDocumentoController@show')
-->name('usuarios.documentos.show')
-->middleware('auth');
+// ->name('usuarios.documentos.show')
+// ->middleware('auth');
 
 
 
