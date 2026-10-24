@@ -13,7 +13,6 @@ use \App\Nivel;
 use Carbon\Carbon;
 use \App\Http\Controllers\Mail\MailController;
 use Illuminate\Support\Facades\Hash;
-use Laratrust;
 use Config;
 use App\UserDocumento;
 use Illuminate\Support\Facades\Storage;
@@ -80,23 +79,23 @@ class HomeController extends Controller
     {
         
         
-        if(Laratrust::hasRole('administrador_especial')) {
+        if(Auth::user()->hasRole('administrador_especial')) {
             //dd('ADMIN');
             return redirect('/admin');
         }
-        if(Laratrust::hasRole('administrador_geral')) {
+        if(Auth::user()->hasRole('administrador_geral')) {
             //dd('USER');
             return redirect('/admin');
         }
-        if(Laratrust::hasRole('atendente')) {
+        if(Auth::user()->hasRole('atendente')) {
             //dd('USER');
             return redirect('/atendente');
         }
-        if(Laratrust::hasRole('hospede')) {
+        if(Auth::user()->hasRole('hospede')) {
             //dd('USER');
             return redirect('/hospede');
         }
-        if(Laratrust::hasRole('precadastro')) {
+        if(Auth::user()->hasRole('precadastro')) {
         
         return redirect()->route('precadastro');
           //dd('pre');
