@@ -437,7 +437,7 @@
     'id' => Crypt::encrypt($user->id),
     'doc' => Crypt::encrypt($docFrente->mime),
     'tipo' => '1'
-]) }}" target="_blank" class="btn btn-secondary btn-xl rounded-s">
+]) }}" class="btn btn-secondary btn-xl rounded-s js-ver-documento" data-documento-titulo="Documento - Frente">
     <i class="fas fa-address-card"></i>
     Frente
 </a>
@@ -451,7 +451,7 @@
     'id' => Crypt::encrypt($user->id),
     'doc' => Crypt::encrypt($docVerso->mime),
     'tipo' => '2'
-]) }}" target="_blank" class="btn btn-secondary btn-xl rounded-s">
+]) }}" class="btn btn-secondary btn-xl rounded-s js-ver-documento" data-documento-titulo="Documento - Verso">
     <i class="fas fa-address-card"></i>
     Verso
 </a>
@@ -529,6 +529,8 @@
     </div>
 </section>
 
+
+@include('usuario.partials.visualizador-documento')
 
 @push('javascript')
     <script src="{{ asset('js/jquery.mask.js')}}"></script>   
