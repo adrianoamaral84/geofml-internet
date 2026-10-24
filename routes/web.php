@@ -206,8 +206,6 @@ Route::prefix('usuario')->group(function(){
 });
 /* */
 
-// CAPTCHA
-Route::get('/reload', 'HomeController@reload')->name('reload');
 
 /* 	ROTAS ATENDENTES  */
 Route::prefix('atendente')->group(function(){
