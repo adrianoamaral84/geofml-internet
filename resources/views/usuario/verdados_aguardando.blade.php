@@ -263,7 +263,7 @@
                            @if($user->documento) 
                           
                            
-                                <a href="{{url('storage/'. $user->documento)}}" target="_blank" class="btn btn-secondary btn-xl rounded-s"> <i class="fas fa-address-card"></i> Frente
+                                <a href="{{url('storage/'. $user->documento)}}" class="btn btn-secondary btn-xl rounded-s js-ver-documento" data-documento-titulo="Documento - Frente"> <i class="fas fa-address-card"></i> Frente
                                 </a>
                             @endif
                         </div>
@@ -271,7 +271,7 @@
                              @if($user->documento)   
                            
                                           
-                                <a href="{{url('storage/'. $user->documento_verso)}}" target="_blank" class="btn btn-secondary btn-xl"><i class="fas fa-address-card"></i>
+                                <a href="{{url('storage/'. $user->documento_verso)}}" class="btn btn-secondary btn-xl rounded-s js-ver-documento" data-documento-titulo="Documento - Verso"><i class="fas fa-address-card"></i>
                                 Verso
                                 </a>
                                        
@@ -393,6 +393,8 @@
     </div>
 </section>
 
+
+@include('usuario.partials.visualizador-documento')
 
 @push('javascript')
 <script type="text/javascript">
