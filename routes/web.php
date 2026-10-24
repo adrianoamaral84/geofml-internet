@@ -108,7 +108,8 @@ Route::get('/envios', function(){
 });
 
 // OCUPACAO
-Route::get('/ocupacao/categoria/mes/{mes}', 'Ocupacao\OcupacaoController@listaPorMes')->name('ocupacao.lista.mes');
+// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+// Route::get('/ocupacao/categoria/mes/{mes}', 'Ocupacao\OcupacaoController@listaPorMes')->name('ocupacao.lista.mes');
 // OCUPACAO
 
 
@@ -210,16 +211,26 @@ Route::prefix('usuario')->group(function(){
 /* 	ROTAS ATENDENTES  */
 Route::prefix('atendente')->group(function(){
 
-	Route::get('/', 'CheckIn\CheckInController@atendente')->name('atendente');
-	Route::get('/checkin', 'CheckIn\CheckInController@checkIn')->name('checkIn');
-	Route::get('/checkout', 'CheckIn\CheckInController@checkOut')->name('checkOut');
-	Route::get('/buscar', 'CheckIn\CheckInController@buscar')->name('buscar');
-	Route::post('/buscahospedagem', 'CheckIn\CheckInController@buscahospedagem')->name('buscahospedagem');
-	Route::post('/cadastrar/produto/carrinho', 'CheckIn\CheckInController@cadastrarProdutoCarrinho')->name('cadastrarProdutoCarrinho');
-	Route::get('/adicionar/produto/hospedagem/{id}', 'CheckIn\CheckInController@adicionarProdutoHospedagem')->name('adicionar.produto.hospedagem');
-	Route::get('/{id}/deletar', 'CheckIn\CheckInController@deletarItem')->name('carrinho.deletar.item');
-	Route::post('/finalizar/carrinho', 'CheckIn\CheckInController@finalizarCarrinho')->name('carrinho.finalizar');
-	Route::get('/finalizar/carrinho', 'CheckIn\CheckInController@finalizarCarrinho')->name('carrinho.finalizar');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/', 'CheckIn\CheckInController@atendente')->name('atendente');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/checkin', 'CheckIn\CheckInController@checkIn')->name('checkIn');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/checkout', 'CheckIn\CheckInController@checkOut')->name('checkOut');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/buscar', 'CheckIn\CheckInController@buscar')->name('buscar');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/buscahospedagem', 'CheckIn\CheckInController@buscahospedagem')->name('buscahospedagem');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/cadastrar/produto/carrinho', 'CheckIn\CheckInController@cadastrarProdutoCarrinho')->name('cadastrarProdutoCarrinho');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/adicionar/produto/hospedagem/{id}', 'CheckIn\CheckInController@adicionarProdutoHospedagem')->name('adicionar.produto.hospedagem');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/{id}/deletar', 'CheckIn\CheckInController@deletarItem')->name('carrinho.deletar.item');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/finalizar/carrinho', 'CheckIn\CheckInController@finalizarCarrinho')->name('carrinho.finalizar');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/finalizar/carrinho', 'CheckIn\CheckInController@finalizarCarrinho')->name('carrinho.finalizar');
 	//Route::post('/{id}/deletar', 'CheckIn\CheckInController@deletarItem')->name('carrinho.deletar.item');
 
 });
@@ -272,11 +283,16 @@ Route::prefix('precadastro')->group(function(){
 		//
 		});
 		
-		Route::get('/edit/bloqueio/{id}', 'ConfigurarHospedagem\ConfigurarHospedagemController@edit')->name('configurarhospedagem.edit');
-		Route::get('/create', 'ConfigurarHospedagem\ConfigurarHospedagemController@create')->name('configurarhospedagem.create');
-		Route::post('/store', 'ConfigurarHospedagem\ConfigurarHospedagemController@store')->name('configurarhospedagem.store');
-		Route::post('/{id}/destroy', 'ConfigurarHospedagem\ConfigurarHospedagemController@destroy')->name('configurarhospedagem.destroy');
-		Route::get('/{id}/destroy', 'ConfigurarHospedagem\ConfigurarHospedagemController@destroy')->name('configurarhospedagem.destroy');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::get('/edit/bloqueio/{id}', 'ConfigurarHospedagem\ConfigurarHospedagemController@edit')->name('configurarhospedagem.edit');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::get('/create', 'ConfigurarHospedagem\ConfigurarHospedagemController@create')->name('configurarhospedagem.create');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::post('/store', 'ConfigurarHospedagem\ConfigurarHospedagemController@store')->name('configurarhospedagem.store');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::post('/{id}/destroy', 'ConfigurarHospedagem\ConfigurarHospedagemController@destroy')->name('configurarhospedagem.destroy');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::get('/{id}/destroy', 'ConfigurarHospedagem\ConfigurarHospedagemController@destroy')->name('configurarhospedagem.destroy');
 		Route::get('/{id}/negar', 'Hospedagem\HospedagemController@negar')->name('hospedagem.negar');
 		Route::get('/liberar', 'Hospedagem\HospedagemController@liberar')->name('hospedagem.liberar');
 		Route::post('/liberar', 'Hospedagem\HospedagemController@liberar')->name('hospedagem.liberar');
@@ -296,19 +312,31 @@ Route::prefix('precadastro')->group(function(){
 		Route::prefix('relatorio')->group(function(){
 
 		/* RELATORIO */
-		Route::get('/verdados/{id}', 'Relatorio\RelatorioController@verdados')->name('relatorio.verdados');
-		Route::post('/atualizar/', 'Relatorio\RelatorioController@atualizar')->name('relatorio.atualizar');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::get('/verdados/{id}', 'Relatorio\RelatorioController@verdados')->name('relatorio.verdados');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::post('/atualizar/', 'Relatorio\RelatorioController@atualizar')->name('relatorio.atualizar');
 		
-		Route::get('/index', 'Relatorio\RelatorioController@index')->name('relatorio.index');
-		Route::get('/view', 'Relatorio\RelatorioController@view')->name('relatorio.view');
-		Route::post('/view', 'Relatorio\RelatorioController@view')->name('relatorio.view');
-		Route::get('/arrecadacao', 'Relatorio\RelatorioController@arrecadacao')->name('relatorio.arrecadacao');
-		Route::get('/arrecadacao/view', 'Relatorio\RelatorioController@arrecadacaoview')->name('arrecadacao.view');
-		Route::post('/arrecadacao/view', 'Relatorio\RelatorioController@arrecadacaoview')->name('arrecadacao.view');
-		Route::get('/cancelados', 'Relatorio\RelatorioController@cancelados')->name('relatorio.cancelados');
-		Route::post('/cancelados/view', 'Relatorio\RelatorioController@canceladosview')->name('cancelados.view');
-		Route::get('/arrecadacao/total', 'Relatorio\RelatorioController@arrecadacaoTotal')->name('arrecadacaoTotlal.index');
-		Route::post('/arrecadacao/total/view', 'Relatorio\RelatorioController@arrecadacaoTotalview')->name('arrecadacao.total.view');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::get('/index', 'Relatorio\RelatorioController@index')->name('relatorio.index');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::get('/view', 'Relatorio\RelatorioController@view')->name('relatorio.view');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::post('/view', 'Relatorio\RelatorioController@view')->name('relatorio.view');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::get('/arrecadacao', 'Relatorio\RelatorioController@arrecadacao')->name('relatorio.arrecadacao');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::get('/arrecadacao/view', 'Relatorio\RelatorioController@arrecadacaoview')->name('arrecadacao.view');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::post('/arrecadacao/view', 'Relatorio\RelatorioController@arrecadacaoview')->name('arrecadacao.view');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::get('/cancelados', 'Relatorio\RelatorioController@cancelados')->name('relatorio.cancelados');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::post('/cancelados/view', 'Relatorio\RelatorioController@canceladosview')->name('cancelados.view');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::get('/arrecadacao/total', 'Relatorio\RelatorioController@arrecadacaoTotal')->name('arrecadacaoTotlal.index');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::post('/arrecadacao/total/view', 'Relatorio\RelatorioController@arrecadacaoTotalview')->name('arrecadacao.total.view');
 
 
 		});
@@ -317,10 +345,14 @@ Route::prefix('precadastro')->group(function(){
 		Route::prefix('administracao')->group(function(){
 
 		// HOSPEDAGEM CONFIGURAR
-		Route::get('/configurar/hospedagem', 'ConfigurarHospedagem\ConfigurarHospedagemController@index')->name('configurarhospedagem.index');
-		Route::get('/createDia/{id}', 'ConfigurarHospedagem\ConfigurarHospedagemController@createDia')->name('configurarhospedagem.create.dia');
-		Route::post('/createDiaPost', 'ConfigurarHospedagem\ConfigurarHospedagemController@createDiaPost')->name('configurarhospedagem.create.dia.post');
-		Route::post('/update/bloqueio/dia', 'ConfigurarHospedagem\ConfigurarHospedagemController@update')->name('configurarhospedagem.update.dia');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::get('/configurar/hospedagem', 'ConfigurarHospedagem\ConfigurarHospedagemController@index')->name('configurarhospedagem.index');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::get('/createDia/{id}', 'ConfigurarHospedagem\ConfigurarHospedagemController@createDia')->name('configurarhospedagem.create.dia');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::post('/createDiaPost', 'ConfigurarHospedagem\ConfigurarHospedagemController@createDiaPost')->name('configurarhospedagem.create.dia.post');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::post('/update/bloqueio/dia', 'ConfigurarHospedagem\ConfigurarHospedagemController@update')->name('configurarhospedagem.update.dia');
 
 		/* PAGTESOURO */
 		Route::get('/admin/pagamento/index', 'Pagamento\PagamentoController@index')->name('pagamento.index');
@@ -329,13 +361,20 @@ Route::prefix('precadastro')->group(function(){
 		/* TEMPOARADA */
 		Route::prefix('temporada')->group(function(){
 
-			Route::get('/', 'Temporada\TemporadaController@index')->name('temporada.index');
-			Route::get('/{id}/edit', 'Temporada\TemporadaController@edit')->name('temporada.edit');
-			Route::post('/update', 'Temporada\TemporadaController@update')->name('temporada.update');
-			Route::get('/create', 'Temporada\TemporadaController@create')->name('temporada.create');
-			Route::post('/store', 'Temporada\TemporadaController@store')->name('temporada.store');
-			Route::get('/{id}/delete', 'Temporada\TemporadaController@delete')->name('temporada.delete');
-			Route::post('/{id}/delete', 'Temporada\TemporadaController@delete')->name('temporada.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/', 'Temporada\TemporadaController@index')->name('temporada.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/edit', 'Temporada\TemporadaController@edit')->name('temporada.edit');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/update', 'Temporada\TemporadaController@update')->name('temporada.update');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/create', 'Temporada\TemporadaController@create')->name('temporada.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/store', 'Temporada\TemporadaController@store')->name('temporada.store');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/delete', 'Temporada\TemporadaController@delete')->name('temporada.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/{id}/delete', 'Temporada\TemporadaController@delete')->name('temporada.delete');
 		});
 
 		
@@ -343,89 +382,145 @@ Route::prefix('precadastro')->group(function(){
 		/* HORARIO */
 		Route::prefix('horario')->group(function(){
 
-			Route::get('/', 'Horario\HorarioController@index')->name('horario.index');
-			Route::get('/{id}/edit', 'Horario\HorarioController@edit')->name('horario.edit');
-			Route::post('/update', 'Horario\HorarioController@update')->name('horario.update');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/', 'Horario\HorarioController@index')->name('horario.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/edit', 'Horario\HorarioController@edit')->name('horario.edit');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/update', 'Horario\HorarioController@update')->name('horario.update');
 			
 		});
 
 		/* DADOS GERAIS */
 		Route::prefix('dadosgerais')->group(function(){
 
-			Route::get('/', 'DadosGerais\DadosGeraisController@index')->name('dadosgerais.index');
-			Route::get('/{id}/edit', 'DadosGerais\DadosGeraisController@edit')->name('dadosgerais.edit');
-			Route::post('/update', 'DadosGerais\DadosGeraisController@update')->name('dadosgerais.update');
-			Route::get('/create', 'DadosGerais\DadosGeraisController@create')->name('dadosgerais.create');
-			Route::post('/store', 'DadosGerais\DadosGeraisController@store')->name('dadosgerais.store');
-			Route::get('/{id}/delete', 'DadosGerais\DadosGeraisController@delete')->name('dadosgerais.delete');
-			Route::post('/{id}/delete', 'DadosGerais\DadosGeraisController@delete')->name('dadosgerais.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/', 'DadosGerais\DadosGeraisController@index')->name('dadosgerais.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/edit', 'DadosGerais\DadosGeraisController@edit')->name('dadosgerais.edit');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/update', 'DadosGerais\DadosGeraisController@update')->name('dadosgerais.update');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/create', 'DadosGerais\DadosGeraisController@create')->name('dadosgerais.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/store', 'DadosGerais\DadosGeraisController@store')->name('dadosgerais.store');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/delete', 'DadosGerais\DadosGeraisController@delete')->name('dadosgerais.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/{id}/delete', 'DadosGerais\DadosGeraisController@delete')->name('dadosgerais.delete');
 		});
 		
 			/** GUARNICOES */
-			Route::get('/guarnicao', 'Guarnicao\GuarnicaoController@index')->name('guarnicao.index');
-			Route::post('/guarnicao', 'Guarnicao\GuarnicaoController@index')->name('guarnicao.index');
-			Route::get('/guarnicao/create', 'Guarnicao\GuarnicaoController@showFormCadastra')->name('showFormCadastra');
-			Route::post('/guarnicao/create', 'Guarnicao\GuarnicaoController@create')->name('guarnicao.create');
-			Route::get('/guarnicao/{id}/edit', 'Guarnicao\GuarnicaoController@edit')->name('guarnicao.edit');
-			Route::post('/guarnicao/update', 'Guarnicao\GuarnicaoController@update')->name('guarnicao.update');
-			Route::get('/guarnicao/{id}/destroy', 'Guarnicao\GuarnicaoController@destroy')->name('guarnicao.destroy');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/guarnicao', 'Guarnicao\GuarnicaoController@index')->name('guarnicao.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/guarnicao', 'Guarnicao\GuarnicaoController@index')->name('guarnicao.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/guarnicao/create', 'Guarnicao\GuarnicaoController@showFormCadastra')->name('showFormCadastra');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/guarnicao/create', 'Guarnicao\GuarnicaoController@create')->name('guarnicao.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/guarnicao/{id}/edit', 'Guarnicao\GuarnicaoController@edit')->name('guarnicao.edit');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/guarnicao/update', 'Guarnicao\GuarnicaoController@update')->name('guarnicao.update');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/guarnicao/{id}/destroy', 'Guarnicao\GuarnicaoController@destroy')->name('guarnicao.destroy');
 			/* FIM GUARNICOES */
 			
 			/** ROTAS UF */
-			Route::get('/uf', 'Uf\UfController@index')->name('indexuf');
-			Route::post('/uf', 'Uf\UfController@index')->name('indexuf');
-			Route::get('/uf/{id}/delete', 'Uf\UfController@deleteUf')->name('deleteuf');
-			Route::get('/uf/create', 'Uf\UfController@ufcreate')->name('uf.create');
-			Route::post('/uf/cadastrar', 'Uf\UfController@cadastruf')->name('cadastruf');
-			Route::get('/uf/{id}/edit', 'Uf\UfController@editUf')->name('edituf');
-			Route::post('/uf/update', 'Uf\UfController@ufupdate')->name('ufupdate');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/uf', 'Uf\UfController@index')->name('indexuf');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/uf', 'Uf\UfController@index')->name('indexuf');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/uf/{id}/delete', 'Uf\UfController@deleteUf')->name('deleteuf');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/uf/create', 'Uf\UfController@ufcreate')->name('uf.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/uf/cadastrar', 'Uf\UfController@cadastruf')->name('cadastruf');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/uf/{id}/edit', 'Uf\UfController@editUf')->name('edituf');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/uf/update', 'Uf\UfController@ufupdate')->name('ufupdate');
 			/** FIM ROTAS UF */
 
 			/** ROTAS FORCA */
-			Route::get('/forca', 'Forca\ForcaController@index')->name('forca.index');
-			Route::post('/forca', 'Forca\ForcaController@index')->name('forca.index');
-			Route::get('/forca/{id}/delete', 'Forca\ForcaController@forcadelete')->name('forca.delete');
-			Route::get('/forca/create', 'Forca\ForcaController@forcacreate')->name('forca.create');
-			Route::post('/forca/create', 'Forca\ForcaController@forcacreate')->name('forca.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/forca', 'Forca\ForcaController@index')->name('forca.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/forca', 'Forca\ForcaController@index')->name('forca.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/forca/{id}/delete', 'Forca\ForcaController@forcadelete')->name('forca.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/forca/create', 'Forca\ForcaController@forcacreate')->name('forca.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/forca/create', 'Forca\ForcaController@forcacreate')->name('forca.create');
 
-			Route::post('/forca/cadastrar', 'Forca\ForcaController@forcacadastra')->name('forca.cadastra');
-			Route::get('/forca/{id}/edit', 'Forca\ForcaController@forcaedit')->name('forca.edit');
-			Route::post('/forca/update', 'Forca\ForcaController@forcaupdate')->name('forca.update');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/forca/cadastrar', 'Forca\ForcaController@forcacadastra')->name('forca.cadastra');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/forca/{id}/edit', 'Forca\ForcaController@forcaedit')->name('forca.edit');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/forca/update', 'Forca\ForcaController@forcaupdate')->name('forca.update');
 			/** FIM ROTAS FORCA */
 
 			/** CIDADES 	*/
-			Route::get('/cidade/{id}/index', 'Uf\Cidade\CidadeController@index')->name('cidade.index');
-			Route::post('/cidade/{id}/index', 'Uf\Cidade\CidadeController@index')->name('cidade.index');
-			Route::get('/cidade/{id}/{iduf}/create', 'Uf\Cidade\CidadeController@ShowFormCreate')->name('cidade.create.show');
-			Route::get('/cidade/create', 'Uf\Cidade\CidadeController@create')->name('cidade.create');
-			Route::post('/cidade/create', 'Uf\Cidade\CidadeController@create')->name('cidade.create');
-			Route::get('/cidade/{id}/{iduf}/edit', 'Uf\Cidade\CidadeController@edit')->name('cidade.edit');
-			Route::post('/cidade/update', 'Uf\Cidade\CidadeController@cidadeupdate')->name('cidade.update');
-			Route::get('/cidade/{id}/delete', 'Uf\Cidade\CidadeController@delete')->name('cidade.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/cidade/{id}/index', 'Uf\Cidade\CidadeController@index')->name('cidade.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/cidade/{id}/index', 'Uf\Cidade\CidadeController@index')->name('cidade.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/cidade/{id}/{iduf}/create', 'Uf\Cidade\CidadeController@ShowFormCreate')->name('cidade.create.show');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/cidade/create', 'Uf\Cidade\CidadeController@create')->name('cidade.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/cidade/create', 'Uf\Cidade\CidadeController@create')->name('cidade.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/cidade/{id}/{iduf}/edit', 'Uf\Cidade\CidadeController@edit')->name('cidade.edit');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/cidade/update', 'Uf\Cidade\CidadeController@cidadeupdate')->name('cidade.update');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/cidade/{id}/delete', 'Uf\Cidade\CidadeController@delete')->name('cidade.delete');
 			/** FIM CIDADES */
 
 			/*** INICIO POSTO GRADUACAO ***/
-			Route::get('/postograduacao', 'PostoGraduacao\PostoGraduacaoController@index')->name('postograduacao.index');
-			Route::post('/postograduacao', 'PostoGraduacao\PostoGraduacaoController@index')->name('postograduacao.index');
-			Route::get('/postograduacao/{id}/show', 'PostoGraduacao\PostoGraduacaoController@showFormCadastra')->name('postograduacao.create.show');
-			Route::get('/postograduacao/{id}/edit', 'PostoGraduacao\PostoGraduacaoController@edit')->name('postograduacao.edit');
-			Route::post('/postograduacao/update', 'PostoGraduacao\PostoGraduacaoController@update')->name('postograduacao.update');
-			Route::post('/postograduacao/create', 'PostoGraduacao\PostoGraduacaoController@create')->name('postograduacao.create');
-			Route::get('/postograduacao/{id}/destroy', 'PostoGraduacao\PostoGraduacaoController@destroy')->name('postograduacao.destroy');
-			Route::get('/postograduacao/list', 'PostoGraduacao\PostoGraduacaoController@list')->name('postograduacao.list');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/postograduacao', 'PostoGraduacao\PostoGraduacaoController@index')->name('postograduacao.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/postograduacao', 'PostoGraduacao\PostoGraduacaoController@index')->name('postograduacao.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/postograduacao/{id}/show', 'PostoGraduacao\PostoGraduacaoController@showFormCadastra')->name('postograduacao.create.show');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/postograduacao/{id}/edit', 'PostoGraduacao\PostoGraduacaoController@edit')->name('postograduacao.edit');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/postograduacao/update', 'PostoGraduacao\PostoGraduacaoController@update')->name('postograduacao.update');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/postograduacao/create', 'PostoGraduacao\PostoGraduacaoController@create')->name('postograduacao.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/postograduacao/{id}/destroy', 'PostoGraduacao\PostoGraduacaoController@destroy')->name('postograduacao.destroy');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/postograduacao/list', 'PostoGraduacao\PostoGraduacaoController@list')->name('postograduacao.list');
 			
 			/* FIM POSTO GRADUACAO */
 
 			/*** Gerenciar OM */
-			Route::get('/om', 'GerenciarOm\GerenciarOmController@index')->name('gerenciarom.index');
-			Route::post('/om', 'GerenciarOm\GerenciarOmController@index')->name('gerenciarom.index');
-			Route::get('/om/{id}/create', 'GerenciarOm\GerenciarOmController@showFormCadastra')->name('gerenciarom.create.show');
-			Route::post('/om/create', 'GerenciarOm\GerenciarOmController@create')->name('gerenciarom.create');
-			Route::post('/om/update', 'GerenciarOm\GerenciarOmController@update')->name('gerenciarom.update');
-			Route::get('/om/{id}/edit', 'GerenciarOm\GerenciarOmController@edit')->name('gerenciarom.edit');
-			Route::get('/om/{id}/destroy', 'GerenciarOm\GerenciarOmController@destroy')->name('gerenciarom.destroy');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/om', 'GerenciarOm\GerenciarOmController@index')->name('gerenciarom.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/om', 'GerenciarOm\GerenciarOmController@index')->name('gerenciarom.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/om/{id}/create', 'GerenciarOm\GerenciarOmController@showFormCadastra')->name('gerenciarom.create.show');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/om/create', 'GerenciarOm\GerenciarOmController@create')->name('gerenciarom.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/om/update', 'GerenciarOm\GerenciarOmController@update')->name('gerenciarom.update');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/om/{id}/edit', 'GerenciarOm\GerenciarOmController@edit')->name('gerenciarom.edit');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/om/{id}/destroy', 'GerenciarOm\GerenciarOmController@destroy')->name('gerenciarom.destroy');
 			/*		    */
-			Route::get('/om', 'GerenciarOm\GerenciarOmController@listOMs')->name('gerenciarom.listOMs');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/om', 'GerenciarOm\GerenciarOmController@listOMs')->name('gerenciarom.listOMs');
 			/* Gerenciar OM */
 
 	});
@@ -459,25 +554,39 @@ Route::prefix('precadastro')->group(function(){
 		/* TARIFAS */
 		Route::prefix('tarifas')->group(function(){
 		
-			Route::get('/', 'Tarifas\TarifasUndController@index')->name('tarifas.index');
-			Route::get('/{id}/edit', 'Tarifas\TarifasUndController@edit')->name('tarifas.edit');
-			Route::post('/update', 'Tarifas\TarifasUndController@update')->name('tarifas.update');
-			Route::get('/create', 'Tarifas\TarifasUndController@create')->name('tarifas.create');
-			Route::post('/store', 'Tarifas\TarifasUndController@store')->name('tarifas.store');
-			Route::get('/{id}/delete', 'Tarifas\TarifasUndController@delete')->name('tarifas.delete');
-			Route::post('/{id}/delete', 'Tarifas\TarifasUndController@delete')->name('tarifas.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/', 'Tarifas\TarifasUndController@index')->name('tarifas.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/edit', 'Tarifas\TarifasUndController@edit')->name('tarifas.edit');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/update', 'Tarifas\TarifasUndController@update')->name('tarifas.update');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/create', 'Tarifas\TarifasUndController@create')->name('tarifas.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/store', 'Tarifas\TarifasUndController@store')->name('tarifas.store');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/delete', 'Tarifas\TarifasUndController@delete')->name('tarifas.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/{id}/delete', 'Tarifas\TarifasUndController@delete')->name('tarifas.delete');
 		
 		});
 		/* TARIFAS EXTRAS*/
 		Route::prefix('tarifasextras')->group(function(){
 		
-			Route::get('/', 'TarifaExtra\TarifaExtraController@index')->name('tarifaextra.index');
-			Route::get('/{id}/edit', 'TarifaExtra\TarifaExtraController@edit')->name('tarifaextra.edit');
-			Route::post('/update', 'TarifaExtra\TarifaExtraController@update')->name('tarifaextra.update');
-			Route::get('/create', 'TarifaExtra\TarifaExtraController@create')->name('tarifaextra.create');
-			Route::post('/store', 'TarifaExtra\TarifaExtraController@store')->name('tarifaextra.store');
-			Route::get('/{id}/delete', 'TarifaExtra\TarifaExtraController@delete')->name('tarifaextra.delete');
-			Route::post('/{id}/delete', 'TarifaExtra\TarifaExtraController@delete')->name('tarifaextra.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/', 'TarifaExtra\TarifaExtraController@index')->name('tarifaextra.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/edit', 'TarifaExtra\TarifaExtraController@edit')->name('tarifaextra.edit');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/update', 'TarifaExtra\TarifaExtraController@update')->name('tarifaextra.update');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/create', 'TarifaExtra\TarifaExtraController@create')->name('tarifaextra.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/store', 'TarifaExtra\TarifaExtraController@store')->name('tarifaextra.store');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/delete', 'TarifaExtra\TarifaExtraController@delete')->name('tarifaextra.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/{id}/delete', 'TarifaExtra\TarifaExtraController@delete')->name('tarifaextra.delete');
 		
 		});
 		/* TIPO UNIDADE HABITACIONAL */
@@ -496,26 +605,40 @@ Route::prefix('precadastro')->group(function(){
 		/* CLASSE HABITACIONAL */
 		Route::prefix('classe_habitacional')->group(function(){
 		
-			Route::get('/', 'ClasseHabitacional\ClasseHabitacionalController@index')->name('classehabitacao.index');
-			Route::get('/{id}/edit', 'ClasseHabitacional\ClasseHabitacionalController@edit')->name('classehabitacao.edit');
-			Route::post('/update', 'ClasseHabitacional\ClasseHabitacionalController@update')->name('classehabitacao.update');
-			Route::get('/create', 'ClasseHabitacional\ClasseHabitacionalController@create')->name('classehabitacao.create');
-			Route::post('/store', 'ClasseHabitacional\ClasseHabitacionalController@store')->name('classehabitacao.store');
-			Route::get('/{id}/delete', 'ClasseHabitacional\ClasseHabitacionalController@delete')->name('classehabitacao.delete');
-			Route::post('/{id}/delete', 'ClasseHabitacional\ClasseHabitacionalController@delete')->name('classehabitacao.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/', 'ClasseHabitacional\ClasseHabitacionalController@index')->name('classehabitacao.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/edit', 'ClasseHabitacional\ClasseHabitacionalController@edit')->name('classehabitacao.edit');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/update', 'ClasseHabitacional\ClasseHabitacionalController@update')->name('classehabitacao.update');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/create', 'ClasseHabitacional\ClasseHabitacionalController@create')->name('classehabitacao.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/store', 'ClasseHabitacional\ClasseHabitacionalController@store')->name('classehabitacao.store');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/delete', 'ClasseHabitacional\ClasseHabitacionalController@delete')->name('classehabitacao.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/{id}/delete', 'ClasseHabitacional\ClasseHabitacionalController@delete')->name('classehabitacao.delete');
 		
 		});
 
 		/* GRUPO DESTINACAO */
 		Route::prefix('grupo_destinacao')->group(function(){
 		
-			Route::get('/', 'GrupoDestinacao\GrupoDestinacaoController@index')->name('grupo_destinacao.index');
-			Route::get('/{id}/edit', 'GrupoDestinacao\GrupoDestinacaoController@edit')->name('grupo_destinacao.edit');
-			Route::post('/update', 'GrupoDestinacao\GrupoDestinacaoController@update')->name('grupo_destinacao.update');
-			Route::get('/create', 'GrupoDestinacao\GrupoDestinacaoController@create')->name('grupo_destinacao.create');
-			Route::post('/store', 'GrupoDestinacao\GrupoDestinacaoController@store')->name('grupo_destinacao.store');
-			Route::get('/{id}/delete', 'GrupoDestinacao\GrupoDestinacaoController@delete')->name('grupo_destinacao.delete');
-			Route::post('/{id}/delete', 'GrupoDestinacao\GrupoDestinacaoController@delete')->name('grupo_destinacao.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/', 'GrupoDestinacao\GrupoDestinacaoController@index')->name('grupo_destinacao.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/edit', 'GrupoDestinacao\GrupoDestinacaoController@edit')->name('grupo_destinacao.edit');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/update', 'GrupoDestinacao\GrupoDestinacaoController@update')->name('grupo_destinacao.update');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/create', 'GrupoDestinacao\GrupoDestinacaoController@create')->name('grupo_destinacao.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/store', 'GrupoDestinacao\GrupoDestinacaoController@store')->name('grupo_destinacao.store');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/delete', 'GrupoDestinacao\GrupoDestinacaoController@delete')->name('grupo_destinacao.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/{id}/delete', 'GrupoDestinacao\GrupoDestinacaoController@delete')->name('grupo_destinacao.delete');
 		
 		});
 
@@ -523,13 +646,20 @@ Route::prefix('precadastro')->group(function(){
 		/* GRUPO TARIFA */
 		Route::prefix('grupo_tarifa')->group(function(){
 		
-			Route::get('/', 'GrupoTarifa\GrupoTarifaController@index')->name('grupo_tarifa.index');
-			Route::get('/{id}/edit', 'GrupoTarifa\GrupoTarifaController@edit')->name('grupo_tarifa.edit');
-			Route::post('/update', 'GrupoTarifa\GrupoTarifaController@update')->name('grupo_tarifa.update');
-			Route::get('/create', 'GrupoTarifa\GrupoTarifaController@create')->name('grupo_tarifa.create');
-			Route::post('/store', 'GrupoTarifa\GrupoTarifaController@store')->name('grupo_tarifa.store');
-			Route::get('/{id}/delete', 'GrupoTarifa\GrupoTarifaController@delete')->name('grupo_tarifa.delete');
-			Route::post('/{id}/delete', 'GrupoTarifa\GrupoTarifaController@delete')->name('grupo_tarifa.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/', 'GrupoTarifa\GrupoTarifaController@index')->name('grupo_tarifa.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/edit', 'GrupoTarifa\GrupoTarifaController@edit')->name('grupo_tarifa.edit');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/update', 'GrupoTarifa\GrupoTarifaController@update')->name('grupo_tarifa.update');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/create', 'GrupoTarifa\GrupoTarifaController@create')->name('grupo_tarifa.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/store', 'GrupoTarifa\GrupoTarifaController@store')->name('grupo_tarifa.store');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/delete', 'GrupoTarifa\GrupoTarifaController@delete')->name('grupo_tarifa.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/{id}/delete', 'GrupoTarifa\GrupoTarifaController@delete')->name('grupo_tarifa.delete');
 		
 		});
 
@@ -537,13 +667,20 @@ Route::prefix('precadastro')->group(function(){
 		
 		Route::prefix('unidadehabitacional')->group(function(){
 		
-			Route::get('/', 'UnidadeHabitacional\UnidadeHabitacionalController@index')->name('uh.index');
-			Route::get('/{id}/edit', 'UnidadeHabitacional\UnidadeHabitacionalController@edit')->name('uh.edit');
-			Route::post('/update', 'UnidadeHabitacional\UnidadeHabitacionalController@update')->name('uh.update');
-			Route::get('/create', 'UnidadeHabitacional\UnidadeHabitacionalController@create')->name('uh.create');
-			Route::post('/store', 'UnidadeHabitacional\UnidadeHabitacionalController@store')->name('uh.store');
-			Route::get('/{id}/delete', 'UnidadeHabitacional\UnidadeHabitacionalController@delete')->name('uh.delete');
-			Route::post('/{id}/delete', 'UnidadeHabitacional\UnidadeHabitacionalController@delete')->name('uh.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/', 'UnidadeHabitacional\UnidadeHabitacionalController@index')->name('uh.index');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/edit', 'UnidadeHabitacional\UnidadeHabitacionalController@edit')->name('uh.edit');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/update', 'UnidadeHabitacional\UnidadeHabitacionalController@update')->name('uh.update');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/create', 'UnidadeHabitacional\UnidadeHabitacionalController@create')->name('uh.create');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/store', 'UnidadeHabitacional\UnidadeHabitacionalController@store')->name('uh.store');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::get('/{id}/delete', 'UnidadeHabitacional\UnidadeHabitacionalController@delete')->name('uh.delete');
+			// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+			// Route::post('/{id}/delete', 'UnidadeHabitacional\UnidadeHabitacionalController@delete')->name('uh.delete');
 		
 		});
 		
@@ -569,134 +706,223 @@ Route::prefix('precadastro')->group(function(){
 	/* FIM USUARIOS */
 
 	/*** ROTAS AREA */
-	Route::get('/area', 'AreaController@index')->name('listArea');
-	Route::post('/area', 'AreaController@index')->name('listArea');
-	Route::get('/busca', 'AreaController@buscaarea')->name('buscaarea');
-	Route::post('/busca', 'AreaController@buscaarea')->name('buscaarea');
-	Route::get('/area/cadastra', 'AreaController@showFormCadastraArea')->name('showFormCadastraArea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/area', 'AreaController@index')->name('listArea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/area', 'AreaController@index')->name('listArea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/busca', 'AreaController@buscaarea')->name('buscaarea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/busca', 'AreaController@buscaarea')->name('buscaarea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/area/cadastra', 'AreaController@showFormCadastraArea')->name('showFormCadastraArea');
 	//Route::post('/area/cadastra', 'AreaController@showFormCadastraArea')->name('showFormCadastraArea');
-	Route::get('/area/{id}/show', 'AreaController@showArea')->name('showarea');
-	Route::get('/area/{id}/edit', 'AreaController@editArea')->name('editarea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/area/{id}/show', 'AreaController@showArea')->name('showarea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/area/{id}/edit', 'AreaController@editArea')->name('editarea');
 
 	/** CRUD AREA */
 	/*
-	Route::get('/area/{id}/delete', 'AreaController@deleteArea')->name('deletearea');
-	Route::post('/area/cadastrar', 'AreaController@cadastraarea')->name('cadastraarea');
-	Route::get('/area/cadastrar', 'AreaController@cadastraarea')->name('cadastraarea');
-	Route::post('/area/{id}/update', 'AreaController@updatearea')->name('updatearea');
-	Route::get('/area/{id}/update', 'AreaController@updatearea')->name('updatearea');
-	Route::post('/area/update', 'AreaController@areaupdate')->name('areaupdate');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/area/{id}/delete', 'AreaController@deleteArea')->name('deletearea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/area/cadastrar', 'AreaController@cadastraarea')->name('cadastraarea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/area/cadastrar', 'AreaController@cadastraarea')->name('cadastraarea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/area/{id}/update', 'AreaController@updatearea')->name('updatearea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/area/{id}/update', 'AreaController@updatearea')->name('updatearea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/area/update', 'AreaController@areaupdate')->name('areaupdate');
 	*/
 	/** FIM CRUD AREA */
 
 	/** CRUD AREA */
-	Route::get('/area/{id}/delete', 'AreaController@deleteArea')->name('deletearea');
-	Route::post('/area/cadastrar', 'AreaController@cadastraarea')->name('cadastraarea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/area/{id}/delete', 'AreaController@deleteArea')->name('deletearea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/area/cadastrar', 'AreaController@cadastraarea')->name('cadastraarea');
 	//Route::get('/area/cadastrar', 'AreaController@cadastraarea')->name('cadastraarea');
-	Route::post('/area/{id}/update', 'AreaController@updatearea')->name('updatearea');
-	Route::get('/area/{id}/update', 'AreaController@updatearea')->name('updatearea');
-	Route::post('/area/update', 'AreaController@areaupdate')->name('areaupdate');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/area/{id}/update', 'AreaController@updatearea')->name('updatearea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/area/{id}/update', 'AreaController@updatearea')->name('updatearea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/area/update', 'AreaController@areaupdate')->name('areaupdate');
 	/** FIM CRUD AREA */
 
 	/** SUBAREA */
-	Route::get('/model', 'SubArea\SubAreaController@index')->name('indexsubarea');
-	Route::get('/subarea/{id}/index', 'SubArea\SubAreaController@index')->name('subarea.index');
-	Route::post('/subarea/{id}/index', 'SubArea\SubAreaController@index')->name('subarea.index');
-	Route::post('/subarea/create', 'SubArea\SubAreaController@create')->name('subarea.create');
-	Route::get('/subarea/{id}/edit', 'SubArea\SubAreaController@edit')->name('subarea.edit');
-	Route::post('/subarea/update', 'SubArea\SubAreaController@subareaupdate')->name('subarea.update');
-	Route::get('/subarea/{id}/create', 'SubArea\SubAreaController@ShowFormCreate')->name('subarea.create.show');
-	Route::get('/subarea/{id}/delete', 'SubArea\SubAreaController@deleteSubArea')->name('deletesubarea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/model', 'SubArea\SubAreaController@index')->name('indexsubarea');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/subarea/{id}/index', 'SubArea\SubAreaController@index')->name('subarea.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/subarea/{id}/index', 'SubArea\SubAreaController@index')->name('subarea.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/subarea/create', 'SubArea\SubAreaController@create')->name('subarea.create');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/subarea/{id}/edit', 'SubArea\SubAreaController@edit')->name('subarea.edit');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/subarea/update', 'SubArea\SubAreaController@subareaupdate')->name('subarea.update');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/subarea/{id}/create', 'SubArea\SubAreaController@ShowFormCreate')->name('subarea.create.show');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/subarea/{id}/delete', 'SubArea\SubAreaController@deleteSubArea')->name('deletesubarea');
 	/** FIM SUBAREA */
 
 	/*** ESTADO CIVIL */
-	Route::get('/estadocivil', 'EstadoCivil\EstadoCivilController@index')->name('estadocivil.index');
-	Route::post('/estadocivil', 'EstadoCivil\EstadoCivilController@index')->name('estadocivil.index');
-	Route::get('/estadocivil/create', 'EstadoCivil\EstadoCivilController@showFormCadastra')->name('estadocivil.create.show');
-	Route::post('/estadocivil/create', 'EstadoCivil\EstadoCivilController@create')->name('estadocivil.create');
-	Route::post('/estadocivil/update', 'EstadoCivil\EstadoCivilController@update')->name('estadocivil.update');
-	Route::get('/estadocivil/{id}/edit', 'EstadoCivil\EstadoCivilController@edit')->name('estadocivil.edit');
-	Route::get('/estadocivil/{id}/destroy', 'EstadoCivil\EstadoCivilController@destroy')->name('estadocivil.destroy');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/estadocivil', 'EstadoCivil\EstadoCivilController@index')->name('estadocivil.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/estadocivil', 'EstadoCivil\EstadoCivilController@index')->name('estadocivil.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/estadocivil/create', 'EstadoCivil\EstadoCivilController@showFormCadastra')->name('estadocivil.create.show');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/estadocivil/create', 'EstadoCivil\EstadoCivilController@create')->name('estadocivil.create');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/estadocivil/update', 'EstadoCivil\EstadoCivilController@update')->name('estadocivil.update');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/estadocivil/{id}/edit', 'EstadoCivil\EstadoCivilController@edit')->name('estadocivil.edit');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/estadocivil/{id}/destroy', 'EstadoCivil\EstadoCivilController@destroy')->name('estadocivil.destroy');
 	/* FIM ESTADO CIVIL */
 
 	/*** SITUACAO CANDIDATO */
-	Route::get('/situacaocandidato', 'SituacaoCandidato\SituacaoCandidatoController@index')->name('situacaocandidato.index');
-	Route::post('/situacaocandidato', 'SituacaoCandidato\SituacaoCandidatoController@index')->name('situacaocandidato.index');
-	Route::get('/situacaocandidato/create', 'SituacaoCandidato\SituacaoCandidatoController@showFormCadastra')->name('situacaocandidato.create.show');
-	Route::post('/situacaocandidato/create', 'SituacaoCandidato\SituacaoCandidatoController@create')->name('situacaocandidato.create');
-	Route::post('/situacaocandidato/update', 'SituacaoCandidato\SituacaoCandidatoController@update')->name('situacaocandidato.update');
-	Route::get('/situacaocandidato/{id}/edit', 'SituacaoCandidato\SituacaoCandidatoController@edit')->name('situacaocandidato.edit');
-	Route::get('/situacaocandidato/{id}/destroy', 'SituacaoCandidato\SituacaoCandidatoController@destroy')->name('situacaocandidato.destroy');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/situacaocandidato', 'SituacaoCandidato\SituacaoCandidatoController@index')->name('situacaocandidato.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/situacaocandidato', 'SituacaoCandidato\SituacaoCandidatoController@index')->name('situacaocandidato.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/situacaocandidato/create', 'SituacaoCandidato\SituacaoCandidatoController@showFormCadastra')->name('situacaocandidato.create.show');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/situacaocandidato/create', 'SituacaoCandidato\SituacaoCandidatoController@create')->name('situacaocandidato.create');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/situacaocandidato/update', 'SituacaoCandidato\SituacaoCandidatoController@update')->name('situacaocandidato.update');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/situacaocandidato/{id}/edit', 'SituacaoCandidato\SituacaoCandidatoController@edit')->name('situacaocandidato.edit');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/situacaocandidato/{id}/destroy', 'SituacaoCandidato\SituacaoCandidatoController@destroy')->name('situacaocandidato.destroy');
 	/* FIM SITUACAO CANDIDATO */
 
 	/*** DOCUMENTO MILITAR */
-	Route::get('/documentomilitar', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@index')->name('documentomilitar.index');
-	Route::post('/documentomilitar', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@index')->name('documentomilitar.index');
-	Route::get('/documentomilitar/create', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@showFormCadastra')->name('documentomilitar.create.show');
-	Route::post('/documentomilitar/create', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@create')->name('documentomilitar.create');
-	Route::post('/documentomilitar/update', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@update')->name('documentomilitar.update');
-	Route::get('/documentomilitar/{id}/edit', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@edit')->name('documentomilitar.edit');
-	Route::get('/documentomilitar/{id}/destroy', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@destroy')->name('documentomilitar.destroy');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/documentomilitar', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@index')->name('documentomilitar.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/documentomilitar', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@index')->name('documentomilitar.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/documentomilitar/create', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@showFormCadastra')->name('documentomilitar.create.show');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/documentomilitar/create', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@create')->name('documentomilitar.create');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/documentomilitar/update', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@update')->name('documentomilitar.update');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/documentomilitar/{id}/edit', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@edit')->name('documentomilitar.edit');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/documentomilitar/{id}/destroy', 'TipoDocumentoMilitar\TipoDocumentoMilitarController@destroy')->name('documentomilitar.destroy');
 	/* FIM DOCUMENTO MILITAR */
 
 	/*** INICIO CATEGORIA ***/
-	Route::get('/categoria', 'Categoria\CategoriaController@index')->name('categoria.index');
-	Route::post('/categoria', 'Categoria\CategoriaController@index')->name('categoria.index');
-	Route::get('/categoria/show', 'Categoria\CategoriaController@showFormCadastra')->name('categoria.create.show');
-	Route::get('/categoria/{id}/edit', 'Categoria\CategoriaController@edit')->name('categoria.edit');
-	Route::post('/categoria/update', 'Categoria\CategoriaController@update')->name('categoria.update');
-	Route::post('/categoria/create', 'Categoria\CategoriaController@create')->name('categoria.create');
-	Route::get('/categoria/{id}/destroy', 'Categoria\CategoriaController@destroy')->name('categoria.destroy');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/categoria', 'Categoria\CategoriaController@index')->name('categoria.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/categoria', 'Categoria\CategoriaController@index')->name('categoria.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/categoria/show', 'Categoria\CategoriaController@showFormCadastra')->name('categoria.create.show');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/categoria/{id}/edit', 'Categoria\CategoriaController@edit')->name('categoria.edit');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/categoria/update', 'Categoria\CategoriaController@update')->name('categoria.update');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/categoria/create', 'Categoria\CategoriaController@create')->name('categoria.create');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/categoria/{id}/destroy', 'Categoria\CategoriaController@destroy')->name('categoria.destroy');
 	/* FIM CATEGORIA */
 
 	/*** Título / Diploma */
-	Route::get('/titulodiploma', 'TituloDiploma\TituloDiplomaController@index')->name('titulodiploma.index');
-	Route::post('/titulodiploma', 'TituloDiploma\TituloDiplomaController@index')->name('titulodiploma.index');
-	Route::get('/titulodiploma/create', 'TituloDiploma\TituloDiplomaController@showFormCadastra')->name('titulodiploma.create.show');
-	Route::post('/titulodiploma/create', 'TituloDiploma\TituloDiplomaController@create')->name('titulodiploma.create');
-	Route::post('/titulodiploma/update', 'TituloDiploma\TituloDiplomaController@update')->name('titulodiploma.update');
-	Route::get('/titulodiploma/{id}/edit', 'TituloDiploma\TituloDiplomaController@edit')->name('titulodiploma.edit');
-	Route::get('/titulodiploma/{id}/destroy', 'TituloDiploma\TituloDiplomaController@destroy')->name('titulodiploma.destroy');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/titulodiploma', 'TituloDiploma\TituloDiplomaController@index')->name('titulodiploma.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/titulodiploma', 'TituloDiploma\TituloDiplomaController@index')->name('titulodiploma.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/titulodiploma/create', 'TituloDiploma\TituloDiplomaController@showFormCadastra')->name('titulodiploma.create.show');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/titulodiploma/create', 'TituloDiploma\TituloDiplomaController@create')->name('titulodiploma.create');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/titulodiploma/update', 'TituloDiploma\TituloDiplomaController@update')->name('titulodiploma.update');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/titulodiploma/{id}/edit', 'TituloDiploma\TituloDiplomaController@edit')->name('titulodiploma.edit');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/titulodiploma/{id}/destroy', 'TituloDiploma\TituloDiplomaController@destroy')->name('titulodiploma.destroy');
 	/* FIM Título / Diploma */
 
 	/*** CURSO */
-	Route::get('/curso', 'Curso\CursoController@index')->name('curso.index');
-	Route::post('/curso', 'Curso\CursoController@index')->name('curso.index');
-	Route::get('/curso/create', 'Curso\CursoController@showFormCadastra')->name('curso.create.show');
-	Route::post('/curso/create', 'Curso\CursoController@create')->name('curso.create');
-	Route::post('/curso/update', 'Curso\CursoController@update')->name('curso.update');
-	Route::get('/curso/{id}/edit', 'Curso\CursoController@edit')->name('curso.edit');
-	Route::get('/curso/{id}/destroy', 'Curso\CursoController@destroy')->name('curso.destroy');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/curso', 'Curso\CursoController@index')->name('curso.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/curso', 'Curso\CursoController@index')->name('curso.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/curso/create', 'Curso\CursoController@showFormCadastra')->name('curso.create.show');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/curso/create', 'Curso\CursoController@create')->name('curso.create');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/curso/update', 'Curso\CursoController@update')->name('curso.update');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/curso/{id}/edit', 'Curso\CursoController@edit')->name('curso.edit');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/curso/{id}/destroy', 'Curso\CursoController@destroy')->name('curso.destroy');
 	/* FIM CURSO */
 
 	/*** Proficiencia */
-	Route::get('/proficiencia', 'Proficiencia\ProficienciaController@index')->name('proficiencia.index');
-	Route::post('/proficiencia', 'Proficiencia\ProficienciaController@index')->name('proficiencia.index');
-	Route::get('/proficiencia/create', 'Proficiencia\ProficienciaController@showFormCadastra')->name('proficiencia.create.show');
-	Route::post('/proficiencia/create', 'Proficiencia\ProficienciaController@create')->name('proficiencia.create');
-	Route::post('/proficiencia/update', 'Proficiencia\ProficienciaController@update')->name('proficiencia.update');
-	Route::get('/proficiencia/{id}/edit', 'Proficiencia\ProficienciaController@edit')->name('proficiencia.edit');
-	Route::get('/proficiencia/{id}/destroy', 'Proficiencia\ProficienciaController@destroy')->name('proficiencia.destroy');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/proficiencia', 'Proficiencia\ProficienciaController@index')->name('proficiencia.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/proficiencia', 'Proficiencia\ProficienciaController@index')->name('proficiencia.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/proficiencia/create', 'Proficiencia\ProficienciaController@showFormCadastra')->name('proficiencia.create.show');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/proficiencia/create', 'Proficiencia\ProficienciaController@create')->name('proficiencia.create');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/proficiencia/update', 'Proficiencia\ProficienciaController@update')->name('proficiencia.update');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/proficiencia/{id}/edit', 'Proficiencia\ProficienciaController@edit')->name('proficiencia.edit');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/proficiencia/{id}/destroy', 'Proficiencia\ProficienciaController@destroy')->name('proficiencia.destroy');
 	/* FIM Proficiencia */
 
 	/*** ConselhoProfissional */
-	Route::get('/conselhoprofissional', 'ConselhoProfissional\ConselhoProfissionalController@index')->name('conselhoprofissional.index');
-	Route::post('/conselhoprofissional', 'ConselhoProfissional\ConselhoProfissionalController@index')->name('conselhoprofissional.index');
-	Route::get('/conselhoprofissional/create', 'ConselhoProfissional\ConselhoProfissionalController@showFormCadastra')->name('conselhoprofissional.create.show');
-	Route::post('/conselhoprofissional/create', 'ConselhoProfissional\ConselhoProfissionalController@create')->name('conselhoprofissional.create');
-	Route::post('/conselhoprofissional/update', 'ConselhoProfissional\ConselhoProfissionalController@update')->name('conselhoprofissional.update');
-	Route::get('/conselhoprofissional/{id}/edit', 'ConselhoProfissional\ConselhoProfissionalController@edit')->name('conselhoprofissional.edit');
-	Route::get('/conselhoprofissional/{id}/destroy', 'ConselhoProfissional\ConselhoProfissionalController@destroy')->name('conselhoprofissional.destroy');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/conselhoprofissional', 'ConselhoProfissional\ConselhoProfissionalController@index')->name('conselhoprofissional.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/conselhoprofissional', 'ConselhoProfissional\ConselhoProfissionalController@index')->name('conselhoprofissional.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/conselhoprofissional/create', 'ConselhoProfissional\ConselhoProfissionalController@showFormCadastra')->name('conselhoprofissional.create.show');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/conselhoprofissional/create', 'ConselhoProfissional\ConselhoProfissionalController@create')->name('conselhoprofissional.create');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/conselhoprofissional/update', 'ConselhoProfissional\ConselhoProfissionalController@update')->name('conselhoprofissional.update');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/conselhoprofissional/{id}/edit', 'ConselhoProfissional\ConselhoProfissionalController@edit')->name('conselhoprofissional.edit');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/conselhoprofissional/{id}/destroy', 'ConselhoProfissional\ConselhoProfissionalController@destroy')->name('conselhoprofissional.destroy');
 	/* FIM ConselhoProfissional */
 
 	/*** TipoPublicacao */
-	Route::get('/tipopublicacao', 'TipoPublicacao\TipoPublicacaoController@index')->name('tipopublicacao.index');
-	Route::post('/tipopublicacao', 'TipoPublicacao\TipoPublicacaoController@index')->name('tipopublicacao.index');
-	Route::get('/tipopublicacao/create', 'TipoPublicacao\TipoPublicacaoController@showFormCadastra')->name('tipopublicacao.create.show');
-	Route::post('/tipopublicacao/create', 'TipoPublicacao\TipoPublicacaoController@create')->name('tipopublicacao.create');
-	Route::post('/tipopublicacao/update', 'TipoPublicacao\TipoPublicacaoController@update')->name('tipopublicacao.update');
-	Route::get('/tipopublicacao/{id}/edit', 'TipoPublicacao\TipoPublicacaoController@edit')->name('tipopublicacao.edit');
-	Route::get('/tipopublicacao/{id}/destroy', 'TipoPublicacao\TipoPublicacaoController@destroy')->name('tipopublicacao.destroy');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/tipopublicacao', 'TipoPublicacao\TipoPublicacaoController@index')->name('tipopublicacao.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/tipopublicacao', 'TipoPublicacao\TipoPublicacaoController@index')->name('tipopublicacao.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/tipopublicacao/create', 'TipoPublicacao\TipoPublicacaoController@showFormCadastra')->name('tipopublicacao.create.show');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/tipopublicacao/create', 'TipoPublicacao\TipoPublicacaoController@create')->name('tipopublicacao.create');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/tipopublicacao/update', 'TipoPublicacao\TipoPublicacaoController@update')->name('tipopublicacao.update');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/tipopublicacao/{id}/edit', 'TipoPublicacao\TipoPublicacaoController@edit')->name('tipopublicacao.edit');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/tipopublicacao/{id}/destroy', 'TipoPublicacao\TipoPublicacaoController@destroy')->name('tipopublicacao.destroy');
 	/* FIM ConselhoProfissional */
 
 	
@@ -711,21 +937,32 @@ Route::prefix('precadastro')->group(function(){
 
 
 	// GERENCIAR E-MAILS
-	Route::get('/email/gerenciar', 'GerenciarEmails\GerenciaEmailController@index')->name('email.index');
-	Route::get('/email/editar/{id}', 'GerenciarEmails\GerenciaEmailController@editar')->name('email.editar');
-	Route::post('/email/atualizar', 'GerenciarEmails\GerenciaEmailController@atualizar')->name('email.atualizar');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/email/gerenciar', 'GerenciarEmails\GerenciaEmailController@index')->name('email.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/email/editar/{id}', 'GerenciarEmails\GerenciaEmailController@editar')->name('email.editar');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/email/atualizar', 'GerenciarEmails\GerenciaEmailController@atualizar')->name('email.atualizar');
 	
-	Route::get('/email/gerenciar/assinatura', 'Assinatura\AssinaturaController@index')->name('assinatura.index');
-	Route::get('/email/gerenciar/assinatura/{id}/edit', 'Assinatura\AssinaturaController@edit')->name('assinatura.edit');
-	Route::post('/email/gerenciar/assinatura/update', 'Assinatura\AssinaturaController@update')->name('assinatura.update');
-	Route::get('/email/gerenciar/assinatura/create', 'Assinatura\AssinaturaController@create')->name('assinatura.create');
-	Route::post('/email/gerenciar/assinatura/store', 'Assinatura\AssinaturaController@store')->name('assinatura.store');
-	Route::get('/email/gerenciar/assinatura/{id}/delete', 'Assinatura\AssinaturaController@delete')->name('assinatura.delete');
-	Route::post('/email/gerenciar/assinatura/{id}/delete', 'Assinatura\AssinaturaController@delete')->name('assinatura.delete');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/email/gerenciar/assinatura', 'Assinatura\AssinaturaController@index')->name('assinatura.index');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/email/gerenciar/assinatura/{id}/edit', 'Assinatura\AssinaturaController@edit')->name('assinatura.edit');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/email/gerenciar/assinatura/update', 'Assinatura\AssinaturaController@update')->name('assinatura.update');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/email/gerenciar/assinatura/create', 'Assinatura\AssinaturaController@create')->name('assinatura.create');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/email/gerenciar/assinatura/store', 'Assinatura\AssinaturaController@store')->name('assinatura.store');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::get('/email/gerenciar/assinatura/{id}/delete', 'Assinatura\AssinaturaController@delete')->name('assinatura.delete');
+	// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+	// Route::post('/email/gerenciar/assinatura/{id}/delete', 'Assinatura\AssinaturaController@delete')->name('assinatura.delete');
 	
 
 
-Route::get('/usuarios/{user}/documentos/{tipo}', 'UserDocumentoController@show')
+// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+// Route::get('/usuarios/{user}/documentos/{tipo}', 'UserDocumentoController@show')
 ->name('usuarios.documentos.show')
 ->middleware('auth');
 
@@ -734,7 +971,8 @@ Route::get('/usuarios/{user}/documentos/{tipo}', 'UserDocumentoController@show')
 	/* GRAFICOS */
 	Route::prefix('graficos')->group(function(){
 
-		Route::get('/get/usuarios/ativos', 'Graficos\GraficosController@geUsuariosAtivos')->name('graficos.getUsuariosAtivos');
+		// MIGRACAO: controller ausente no modulo Internet; rota desabilitada ate restauracao.
+		// Route::get('/get/usuarios/ativos', 'Graficos\GraficosController@geUsuariosAtivos')->name('graficos.getUsuariosAtivos');
 
 	});
 	/* FIM DE GRAFICOS */
