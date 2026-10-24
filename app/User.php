@@ -120,10 +120,10 @@ class User extends Authenticatable
         $ids = [];
         foreach ($roles as $role) {
             $model = is_numeric($role)
-                ? \\App\\Models\\Role::find((int) $role)
-                : \\App\\Models\\Role::where('name', (string) $role)->first();
+                ? \App\Models\Role::find((int) $role)
+                : \App\Models\Role::where('name', (string) $role)->first();
             if (!$model) {
-                throw new \\InvalidArgumentException('Perfil de acesso inexistente: ' . $role);
+                throw new \InvalidArgumentException('Perfil de acesso inexistente: ' . $role);
             }
             $ids[] = $model->getKey();
         }
