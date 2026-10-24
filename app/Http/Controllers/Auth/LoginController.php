@@ -24,6 +24,12 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
+    /** Login uses CPF, not the Laravel UI default email field. */
+    public function username()
+    {
+        return 'cpf';
+    }
+
     protected function credentials(Request $request)
     {
         if (isset($request['cpf'])) {
