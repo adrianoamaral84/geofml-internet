@@ -1982,37 +1982,10 @@ public function store(Request $request)
         true
     );
 
-    $consultaDuplicidade = \App\Hospede::where(
-            'data_inicio',
-            $dataInicio->format('Y-m-d')
-        )
-        ->where(
-            'data_termino',
-            $dataTermino->format('Y-m-d')
-        )
-        ->where(
-            'user_id',
-            $usuario->id
-        );
-
-    if ($isEdicao) {
-        $consultaDuplicidade->where(
-            'id',
-            '<>',
-            $pedidoAtual->id
-        );
-    }
-
-    if ($tipoCampingMotorhome) {
-        // Limite mensal por categoria substitui a validacao redundante por periodo.
-    } elseif ($possuiAltaTemporada && $consultaDuplicidade->exists()) {
-        return redirect()
-            ->route('hospede.solicitarinscricao')
-            ->withInput()
-            ->withErrors([
-                'peridoinicial' =>
-                    'Você já possui uma inscrição para esse mesmo período.',
-            ]);
+    $mensagemDuplicidadeAlta = $possuiAltaTemporada ? \App\Services\LimiteMensalPedidos::mensagemDuplicidadeAlta((int) $usuario->id, $dataInicio, $dataTermino, ($isEdicao ? $pedidoAtual->id : null)) : null;
+    if ($mensagemDuplicidadeAlta !== null) {
+        return redirect()->route('hospede.solicitarinscricao')->withInput()
+            ->withErrors(['peridoinicial' => $mensagemDuplicidadeAlta]);
     }
 
     /*
@@ -2423,24 +2396,11 @@ public function store(Request $request)
             return redirect()->route('hospede.solicitarinscricao')->withInput()->withErrors(['tipo' => $erroCota]);
         }
 
-        if (!$isEdicao) {
-            $pedidoDuplicado = \App\Hospede::where('user_id', $usuario->id)
-                ->where('tipo_und_id', (int) $request->tipo)
-                ->whereDate('data_inicio', $dataInicio->format('Y-m-d'))
-                ->whereDate('data_termino', $dataTermino->format('Y-m-d'))
-                ->where('adulto', (int) $request->adultos)
-                ->where('crianca', (int) $request->criancas)
-                ->whereIn('status', [0, 1, 2, 3, 4, 5])
-                ->exists();
-
-            if ($possuiAltaTemporada && $pedidoDuplicado) {
+        if ($possuiAltaTemporada) {
+            $erroDuplicado = \App\Services\LimiteMensalPedidos::mensagemDuplicidadeAlta((int) $usuario->id, $dataInicio, $dataTermino, ($isEdicao ? $pedidoAtual->id : null));
+            if ($erroDuplicado !== null) {
                 DB::rollBack();
-                \Session::flash('message', [
-                    'msg' => 'Este pedido já foi registrado. Verifique em Minhas Solicitações antes de tentar novamente.',
-                    'class' => 'warning',
-                ]);
-
-                return redirect()->route('hospede.meuspedidos');
+                return redirect()->route('hospede.solicitarinscricao')->withInput()->withErrors(['peridoinicial' => $erroDuplicado]);
             }
         }
 
