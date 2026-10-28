@@ -1117,7 +1117,7 @@ public function confimrarPedido(Request $request){
         );
 
     $pedidosDoMes =
-        (clone $consultaPedidosDoMes)->count();
+        (clone $consultaPedidosDoMes)->whereNotIn('tipo_und_id', [11, 12])->whereNotIn('status', [6])->count();
 
     $pedidosCampingMotorhome =
         (clone $consultaPedidosDoMes)
@@ -1125,6 +1125,7 @@ public function confimrarPedido(Request $request){
                 'tipo_und_id',
                 [11, 12]
             )
+            ->whereNotIn('status', [6])
             ->count();
 
     $tipoCampingMotorhome = in_array(
@@ -1155,7 +1156,7 @@ public function confimrarPedido(Request $request){
             ? (int) $quantidadeReservas->reservas
             : 2; // Baixa temporada: duas UHs comuns por usuario/mes.
 
-        if (($possuiAltaTemporada ? $pedidosDoMes : ($pedidosDoMes - $pedidosCampingMotorhome)) >= $limiteMensal) {
+        if (($possuiAltaTemporada ? ($pedidosDoMes + $pedidosCampingMotorhome) : $pedidosDoMes) >= $limiteMensal) {
             return redirect()
                 ->back()
                 ->withInput()
@@ -2298,7 +2299,7 @@ public function store(Request $request)
     }
 
     $pedidosDoMes =
-        (clone $consultaPedidosDoMes)->count();
+        (clone $consultaPedidosDoMes)->whereNotIn('tipo_und_id', [11, 12])->whereNotIn('status', [6])->count();
 
     $pedidosCampingMotorhome =
         (clone $consultaPedidosDoMes)
@@ -2306,6 +2307,7 @@ public function store(Request $request)
                 'tipo_und_id',
                 [11, 12]
             )
+            ->whereNotIn('status', [6])
             ->count();
 
     if ($tipoCampingMotorhome) {
@@ -2324,7 +2326,7 @@ public function store(Request $request)
             ? (int) $quantidadeReservas->reservas
             : 2; // Baixa temporada: duas UHs comuns por usuario/mes.
 
-        if (($possuiAltaTemporada ? $pedidosDoMes : ($pedidosDoMes - $pedidosCampingMotorhome)) >= $limiteMensal) {
+        if (($possuiAltaTemporada ? ($pedidosDoMes + $pedidosCampingMotorhome) : $pedidosDoMes) >= $limiteMensal) {
             return redirect()
             ->route('hospede.solicitarinscricao')
                 ->withInput()
