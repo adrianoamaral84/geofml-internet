@@ -118,6 +118,83 @@
 
 </div>
 <section class="section">
+    <style>
+.pedido-timeline { margin: 0 0 22px; padding: 23px; border-radius: 8px; background: #fff; border: 1px solid #e4e9ee; }
+.pedido-timeline h4 { margin: 0 0 7px; font-size: 19px; }
+.pedido-timeline .timeline-intro { color: #65727f; margin-bottom: 23px; }
+.pedido-timeline ol { margin: 0; padding: 0; list-style: none; }
+.pedido-timeline li { position: relative; padding: 0 0 24px 43px; min-height: 55px; }
+.pedido-timeline li:last-child { padding-bottom: 0; }
+.pedido-timeline li:not(:last-child)::before { content: ''; position: absolute; top: 27px; bottom: -3px; left: 13px; width: 2px; background: #dce2e9; }
+.pedido-timeline li.concluido:not(:last-child)::before { background: #6abf86; }
+.pedido-timeline .marcador { position: absolute; left: 0; top: 0; width: 28px; height: 28px; border: 2px solid #cbd5df; background: #f7f9fb; border-radius: 50%; text-align: center; line-height: 24px; color: #84909b; font-weight: bold; }
+.pedido-timeline .concluido .marcador { background: #e5f5e9; border-color: #36a665; color: #237c49; }
+.pedido-timeline .atual .marcador { background: #e5f0ff; border-color: #377cc3; color: #23619f; }
+.pedido-timeline .interrompido .marcador { background: #fdebea; border-color: #c75151; color: #aa3434; }
+.pedido-timeline .etapa-titulo { font-weight: 600; color: #354454; }
+.pedido-timeline .etapa-descricao { color: #697785; font-size: 13px; margin: 3px 0 0; }
+.pedido-timeline .etapa-data { font-size: 12px; color: #667686; margin-top: 3px; }
+@media (max-width: 576px) { .pedido-timeline { padding: 17px 14px; } }
+</style>
+@php
+    // Exibe apenas marcos confirmados pelos campos existentes, sem inventar histórico de aprovações.
+    $situacao = (int) $hospedagem->status;
+    $checkinRealizado = !empty($hospedagem->checkin_at);
+    $checkoutRealizado = !empty($hospedagem->checkout_at);
+    $interrompido = in_array($situacao, [1, 6], true);
+    $confirmado = $situacao === 2 || $checkinRealizado || $checkoutRealizado;
+    $etapaAtual = $interrompido ? 1 : ($checkoutRealizado ? 6 : ($checkinRealizado ? 5 : ($confirmado ? 4 : (in_array($situacao, [3, 4, 5], true) ? 3 : 2))));
+    $etapasPedido = [
+        ['titulo' => 'Pedido enviado', 'descricao' => 'Solicitação registrada no sistema.'],
+        ['titulo' => 'Análise da solicitação', 'descricao' => 'Acompanhamento pela administração.'],
+        ['titulo' => 'Pagamento e comprovante', 'descricao' => 'Consulte as orientações e os documentos do pedido.'],
+        ['titulo' => 'Reserva confirmada', 'descricao' => 'Confirmação da hospedagem.'],
+        ['titulo' => 'Check-in', 'descricao' => 'Entrada na hospedagem.'],
+        ['titulo' => 'Check-out', 'descricao' => 'Encerramento da hospedagem.'],
+    ];
+@endphp
+<div class="pedido-timeline" aria-label="Acompanhamento da hospedagem">
+    <h4>Acompanhamento da hospedagem</h4>
+    <p class="timeline-intro">Veja a situação atual do seu pedido e as próximas etapas.</p>
+    <ol>
+        @foreach($etapasPedido as $indice => $etapa)
+            @php
+                $numero = $indice + 1;
+                // Sem histórico de mudanças, a sequência anterior não é marcada como concluída automaticamente.
+                $concluida = $numero === 1 || ($numero === 5 && $checkinRealizado) || ($numero === 6 && $checkoutRealizado);
+                $atual = !$interrompido && $numero === $etapaAtual;
+                $classe = $concluida ? 'concluido' : ($atual ? 'atual' : '');
+            @endphp
+            <li class="{{ $classe }}">
+                <span class="marcador" aria-hidden="true">{{ $concluida ? '✓' : $numero }}</span>
+                <div class="etapa-titulo">{{ $etapa['titulo'] }} @if($atual) <small>(etapa atual)</small> @endif</div>
+                <p class="etapa-descricao">{{ $etapa['descricao'] }}</p>
+                @if($numero === 1 && $hospedagem->created_at)
+                    <div class="etapa-data">Registrado em {{ $hospedagem->created_at->format('d/m/Y H:i') }}</div>
+                @elseif($numero === 5 && $checkinRealizado)
+                    <div class="etapa-data">{{ \Carbon\Carbon::parse($hospedagem->checkin_at)->format('d/m/Y H:i') }}</div>
+                @elseif($numero === 6 && $checkoutRealizado)
+                    <div class="etapa-data">{{ \Carbon\Carbon::parse($hospedagem->checkout_at)->format('d/m/Y H:i') }}</div>
+                @endif
+            </li>
+        @endforeach
+        @if($interrompido)
+            <li class="interrompido">
+                <span class="marcador" aria-hidden="true">!</span>
+                <div class="etapa-titulo">{{ $hospedagem->status_hospedagem->status ?? 'Pedido encerrado' }}</div>
+                <p class="etapa-descricao">Este pedido não está seguindo o fluxo normal de confirmação. Consulte os detalhes abaixo.</p>
+            </li>
+        @elseif(in_array($situacao, [0, 7], true))
+            <li class="atual">
+                <span class="marcador" aria-hidden="true">•</span>
+                <div class="etapa-titulo">{{ $hospedagem->status_hospedagem->status ?? 'Aguardando andamento' }}</div>
+                <p class="etapa-descricao">Acompanhe as atualizações da sua solicitação.</p>
+            </li>
+        @endif
+    </ol>
+    <small class="text-muted">Etapas ilustrativas: datas são mostradas somente quando registradas no sistema.</small>
+</div>
+
     <div class="row sameheight-container">
         <div class="col-12">
 
