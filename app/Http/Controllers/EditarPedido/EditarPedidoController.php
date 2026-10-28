@@ -1334,10 +1334,9 @@ public function confirmaEdicao(Request $request)
 
         $limiteMensal = $possuiAltaTemporada
             ? (int) $quantidadeReservas->reservas
-            : (int) $quantidadeReservas
-                ->qnt_reservas_baixa_temporada;
+            : 2; // Baixa temporada: duas UHs comuns por usuario/mes.
 
-        if ($pedidosDoMes >= $limiteMensal) {
+        if (($possuiAltaTemporada ? $pedidosDoMes : ($pedidosDoMes - $pedidosCampingMotorhome)) >= $limiteMensal) {
             return redirect()
                 ->back()
                 ->withInput()
@@ -2205,7 +2204,7 @@ public function gravaEdicao(Request $request)
         )
         ->exists();
 
-    if ($pedidoDuplicado) {
+    if ($possuiAltaTemporada && $pedidoDuplicado) {
         return redirect()
             ->back()
             ->withInput()
@@ -2508,10 +2507,9 @@ public function gravaEdicao(Request $request)
     } else {
         $limiteMensal = $possuiAltaTemporada
             ? (int) $quantidadeReservas->reservas
-            : (int) $quantidadeReservas
-                ->qnt_reservas_baixa_temporada;
+            : 2; // Baixa temporada: duas UHs comuns por usuario/mes.
 
-        if ($pedidosDoMes >= $limiteMensal) {
+        if (($possuiAltaTemporada ? $pedidosDoMes : ($pedidosDoMes - $pedidosCampingMotorhome)) >= $limiteMensal) {
             return redirect()
                 ->back()
                 ->withInput()
