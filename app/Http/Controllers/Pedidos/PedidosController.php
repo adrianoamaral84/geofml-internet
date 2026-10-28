@@ -1117,7 +1117,7 @@ public function confimrarPedido(Request $request){
         );
 
     $pedidosDoMes =
-        (clone $consultaPedidosDoMes)->whereNotIn('tipo_und_id', [11, 12])->whereNotIn('status', [6])->count();
+        (clone $consultaPedidosDoMes)->whereNotIn('tipo_und_id', [11, 12])->whereNotIn('status', [1, 6])->count();
 
     $pedidosCampingMotorhome =
         (clone $consultaPedidosDoMes)
@@ -1125,7 +1125,7 @@ public function confimrarPedido(Request $request){
                 'tipo_und_id',
                 [11, 12]
             )
-            ->whereNotIn('status', [6])
+            ->whereNotIn('status', [1, 6])
             ->count();
 
     $tipoCampingMotorhome = in_array(
@@ -2299,7 +2299,7 @@ public function store(Request $request)
     }
 
     $pedidosDoMes =
-        (clone $consultaPedidosDoMes)->whereNotIn('tipo_und_id', [11, 12])->whereNotIn('status', [6])->count();
+        (clone $consultaPedidosDoMes)->whereNotIn('tipo_und_id', [11, 12])->whereNotIn('status', [1, 6])->count();
 
     $pedidosCampingMotorhome =
         (clone $consultaPedidosDoMes)
@@ -2307,7 +2307,7 @@ public function store(Request $request)
                 'tipo_und_id',
                 [11, 12]
             )
-            ->whereNotIn('status', [6])
+            ->whereNotIn('status', [1, 6])
             ->count();
 
     if ($tipoCampingMotorhome) {
