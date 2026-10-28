@@ -1982,11 +1982,8 @@ public function store(Request $request)
         true
     );
 
-    $mensagemDuplicidadeAlta = $possuiAltaTemporada ? \App\Services\LimiteMensalPedidos::mensagemDuplicidadeAlta((int) $usuario->id, $dataInicio, $dataTermino, ($isEdicao ? $pedidoAtual->id : null)) : null;
-    if ($mensagemDuplicidadeAlta !== null) {
-        return redirect()->route('hospede.solicitarinscricao')->withInput()
-            ->withErrors(['peridoinicial' => $mensagemDuplicidadeAlta]);
-    }
+    // A duplicidade da alta temporada e revalidada apos classificar as diarias,
+    // dentro da transacao com bloqueio, antes de gravar o pedido.
 
     /*
     |--------------------------------------------------------------------------
