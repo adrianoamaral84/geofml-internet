@@ -119,66 +119,80 @@
 </div>
 <section class="section">
     <style>
-.pedido-progresso { background: #fff; border: 1px solid #e2e9ef; border-radius: 12px; padding: 18px 22px 14px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(29,52,75,.04); }
-.pedido-progresso-topo { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
-.pedido-progresso h4 { font-size:17px; color:#33495e; margin:0; font-weight:600; }
-.pedido-progresso .situacao { font-size:12px; background:#eaf3ff; border:1px solid #cfe1f8; color:#245c92; border-radius:20px; padding:5px 11px; font-weight:600; }
-.pedido-progresso .situacao.encerrado { background:#fff0ef; border-color:#f2cecb; color:#a3443b; }
-.pedido-progresso .etapas-rolagem { width:100%; overflow-x:auto; padding:5px 0 9px; }
-.pedido-progresso ol { list-style:none; padding:0; margin:0; display:flex; min-width:620px; }
-.pedido-progresso li { flex:1; text-align:center; position:relative; min-width:100px; padding:0 3px; }
-.pedido-progresso li:not(:last-child)::after { content:''; position:absolute; height:3px; background:#dbe3ea; left:calc(50% + 18px); right:calc(-50% + 18px); top:15px; z-index:0; }
-.pedido-progresso li.concluido:not(:last-child)::after { background:#55b785; }
-.pedido-progresso .bolinha { position:relative; z-index:1; margin:0 auto 9px; width:33px; height:33px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:13px; font-weight:700; color:#8796a5; background:#f4f7fa; border:2px solid #d5dfe7; }
-.pedido-progresso .concluido .bolinha { color:#fff; background:#36a36b; border-color:#36a36b; }
-.pedido-progresso .atual .bolinha { background:#e9f2ff; border-color:#3986d4; color:#2368a8; box-shadow:0 0 0 4px rgba(57,134,212,.10); }
-.pedido-progresso .nome-etapa { font-size:12px; color:#758393; line-height:1.3; font-weight:500; }
-.pedido-progresso .atual .nome-etapa, .pedido-progresso .concluido .nome-etapa { color:#344b60; font-weight:700; }
-.pedido-progresso .resumo { color:#66798a; font-size:12px; margin-top:9px; margin-bottom:0; }
-@media(max-width:767px) { .pedido-progresso { padding:15px; } .pedido-progresso li { min-width:105px; } .pedido-progresso ol { min-width:630px; } }
+.pedido-progresso { background:#fff;border:1px solid #e2e9ef;border-radius:12px;padding:18px 22px 14px;margin-bottom:20px;box-shadow:0 2px 10px rgba(29,52,75,.04); }
+.pedido-progresso-topo { display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px; }
+.pedido-progresso h4 { font-size:17px;color:#33495e;margin:0;font-weight:600; }
+.pedido-progresso .situacao {font-size:12px;background:#eaf3ff;border:1px solid #cfe1f8;color:#245c92;border-radius:20px;padding:5px 11px;font-weight:600;}
+.pedido-progresso .situacao.interrompido {background:#fff0ef;border-color:#f2cecb;color:#a3443b;}
+.pedido-progresso .situacao.espera {background:#fff8e7;border-color:#e9d8a8;color:#856215;}
+.pedido-progresso .etapas-rolagem {width:100%;overflow-x:auto;padding:5px 0 9px;}
+.pedido-progresso ol {list-style:none;padding:0;margin:0;display:flex;min-width:760px;}
+.pedido-progresso li {flex:1;text-align:center;position:relative;min-width:95px;padding:0 3px;}
+.pedido-progresso li:not(:last-child)::after {content:'';position:absolute;height:3px;background:#dbe3ea;left:calc(50% + 18px);right:calc(-50% + 18px);top:15px;z-index:0;}
+.pedido-progresso li.concluido:not(:last-child)::after {background:#55b785;}
+.pedido-progresso .bolinha {position:relative;z-index:1;margin:0 auto 9px;width:33px;height:33px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:13px;font-weight:700;color:#8796a5;background:#f4f7fa;border:2px solid #d5dfe7;}
+.pedido-progresso .concluido .bolinha {color:#fff;background:#36a36b;border-color:#36a36b;}
+.pedido-progresso .atual .bolinha {background:#e9f2ff;border-color:#3986d4;color:#2368a8;box-shadow:0 0 0 4px rgba(57,134,212,.10);}
+.pedido-progresso .nome-etapa {font-size:12px;color:#758393;line-height:1.3;font-weight:500;}
+.pedido-progresso .atual .nome-etapa,.pedido-progresso .concluido .nome-etapa {color:#344b60;font-weight:700;}
+.pedido-progresso .resumo {background:#f4f8fc;border-radius:7px;padding:11px 13px;color:#4b6075;font-size:13px;margin:9px 0 0;}
+.pedido-progresso .resumo.interrompido {background:#fff2f1;color:#973f36;}
+.pedido-progresso .resumo.espera {background:#fff8e9;color:#806017;}
+@media(max-width:767px){.pedido-progresso{padding:15px;}.pedido-progresso ol{min-width:760px;}}
 </style>
 @php
+    // O status é a situação atual, não uma sequência numérica de etapas.
     $statusLinha = (int) $hospedagem->status;
     $temCheckin = !empty($hospedagem->checkin_at);
     $temCheckout = !empty($hospedagem->checkout_at);
-    $pedidoInterrompido = in_array($statusLinha, [1, 6], true);
-    $reservaConfirmada = $statusLinha === 2 || $temCheckin || $temCheckout;
-    $etapaLinha = $temCheckout ? 5 : ($temCheckin ? 4 : ($reservaConfirmada ? 3 : (in_array($statusLinha, [3, 4, 5], true) ? 2 : 1)));
-    $etapasLinha = ['Enviado', 'Em análise', 'Pagamento', 'Confirmado', 'Check-in', 'Check-out'];
+    $interrompido = in_array($statusLinha, [1, 6], true);
+    $filaEspera = $statusLinha === 7;
     $situacaoTexto = optional($hospedagem->status_hospedagem)->status ?? 'Em acompanhamento';
+    $indiceEtapa = [0 => 1, 3 => 2, 5 => 3, 4 => 4, 2 => 5][$statusLinha] ?? 1;
+    if ($statusLinha === 2 && $temCheckin) $indiceEtapa = 6;
+    if ($statusLinha === 2 && $temCheckout) $indiceEtapa = 7;
+    $etapasLinha = ['Pedido enviado','Aprovação','Pagamento','Comprovante','Liberação','Aprovado','Check-in','Check-out'];
+    $orientacoes = [
+        0 => 'Seu pedido foi recebido e está aguardando análise da administração.',
+        3 => 'A solicitação foi aceita. Siga as orientações de pagamento disponíveis nos detalhes do pedido.',
+        5 => 'Envie o comprovante de pagamento para que a administração possa dar continuidade à reserva.',
+        4 => 'O comprovante foi encaminhado. Aguarde a liberação da unidade pela administração.',
+        2 => 'Sua unidade foi liberada. Confira as orientações e a data prevista para o check-in.',
+        7 => 'O pedido está na fila de espera. Acompanhe as atualizações da administração.',
+        1 => 'Seu pedido foi negado. Consulte os detalhes ou entre em contato com a administração.',
+        6 => 'Este pedido foi cancelado pelo usuário.',
+    ];
+    $orientacaoLinha = $orientacoes[$statusLinha] ?? 'Acompanhe as próximas atualizações do pedido.';
+    if ($statusLinha === 2 && $temCheckin) {
+        $orientacaoLinha = 'Check-in realizado em '.\Carbon\Carbon::parse($hospedagem->checkin_at)->format('d/m/Y H:i').'.';
+    }
+    if ($statusLinha === 2 && $temCheckout) {
+        $orientacaoLinha = 'Check-out registrado em '.\Carbon\Carbon::parse($hospedagem->checkout_at)->format('d/m/Y H:i').'.';
+    }
 @endphp
 <div class="pedido-progresso" aria-label="Acompanhamento da hospedagem">
     <div class="pedido-progresso-topo">
         <h4><i class="fas fa-route" aria-hidden="true"></i> Acompanhamento do pedido</h4>
-        <span class="situacao {{ $pedidoInterrompido ? 'encerrado' : '' }}">{{ $situacaoTexto }}</span>
+        <span class="situacao {{ $interrompido ? 'interrompido' : ($filaEspera ? 'espera' : '') }}">{{ $situacaoTexto }}</span>
     </div>
     <div class="etapas-rolagem" role="region" aria-label="Etapas do pedido" tabindex="0">
         <ol>
             @foreach($etapasLinha as $indice => $nome)
                 @php
-                    $concluido = $indice === 0 || ($indice === 4 && $temCheckin) || ($indice === 5 && $temCheckout);
-                    $atual = !$pedidoInterrompido && $indice === $etapaLinha;
+                    // Etapas anteriores são progresso inferido do fluxo informado; não representam datas auditadas.
+                    $concluido = !$interrompido && !$filaEspera && $indice < $indiceEtapa;
+                    $atual = !$interrompido && !$filaEspera && $indice === $indiceEtapa;
+                    if ($interrompido || $filaEspera) $concluido = $indice === 0;
                 @endphp
-                <li class="{{ $concluido ? 'concluido' : ($atual ? 'atual' : '') }}"
-                    {{ $atual ? 'aria-current=step' : '' }}>
+                <li class="{{ $concluido ? 'concluido' : ($atual ? 'atual' : '') }}" @if($atual) aria-current="step" @endif>
                     <span class="bolinha">{{ $concluido ? '✓' : ($indice + 1) }}</span>
                     <div class="nome-etapa">{{ $nome }}</div>
                 </li>
             @endforeach
         </ol>
     </div>
-    <p class="resumo">
-        @if($pedidoInterrompido)
-            O pedido está com a situação "{{ $situacaoTexto }}". Consulte os detalhes abaixo.
-        @elseif($temCheckout)
-            Check-out registrado em {{ \Carbon\Carbon::parse($hospedagem->checkout_at)->format('d/m/Y H:i') }}.
-        @elseif($temCheckin)
-            Check-in registrado em {{ \Carbon\Carbon::parse($hospedagem->checkin_at)->format('d/m/Y H:i') }}.
-        @elseif($reservaConfirmada)
-            Reserva confirmada. Acompanhe as orientações para a entrada.
-        @else
-            Situação atual: {{ $situacaoTexto }}. Acompanhe as próximas atualizações.
-        @endif
+    <p class="resumo {{ $interrompido ? 'interrompido' : ($filaEspera ? 'espera' : '') }}">
+        <strong>{{ $interrompido || $filaEspera ? $situacaoTexto : 'Próxima orientação' }}:</strong> {{ $orientacaoLinha }}
     </p>
 </div>
 
