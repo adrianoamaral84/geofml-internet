@@ -132,6 +132,12 @@
 .pedido-progresso li.concluido:not(:last-child)::after {background:#55b785;}
 .pedido-progresso .bolinha {position:relative;z-index:1;margin:0 auto 9px;width:33px;height:33px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:13px;font-weight:700;color:#8796a5;background:#f4f7fa;border:2px solid #d5dfe7;}
 .pedido-progresso .concluido .bolinha {color:#fff;background:#36a36b;border-color:#36a36b;}
+.pedido-progresso .negado .bolinha {background:#fce8e7;border-color:#c94a4a;color:#ba3535;box-shadow:0 0 0 4px rgba(201,74,74,.09);}
+.pedido-progresso .negado .nome-etapa {color:#a43737;font-weight:700;}
+.pedido-progresso .esperando .bolinha {background:#fff4d8;border-color:#d6a23d;color:#926716;}
+.pedido-progresso .esperando .nome-etapa {color:#926716;font-weight:700;}
+.pedido-progresso .cancelado .bolinha {background:#fce8e7;border-color:#c94a4a;color:#ba3535;}
+.pedido-progresso .cancelado .nome-etapa {color:#a43737;font-weight:700;}
 .pedido-progresso .atual .bolinha {background:#e9f2ff;border-color:#3986d4;color:#2368a8;box-shadow:0 0 0 4px rgba(57,134,212,.10);}
 .pedido-progresso .nome-etapa {font-size:12px;color:#758393;line-height:1.3;font-weight:500;}
 .pedido-progresso .atual .nome-etapa,.pedido-progresso .concluido .nome-etapa {color:#344b60;font-weight:700;}
@@ -189,9 +195,13 @@
                     $concluido = !$interrompido && !$filaEspera && $indice < $indiceEtapa;
                     $atual = !$interrompido && !$filaEspera && $indice === $indiceEtapa;
                     if ($interrompido || $filaEspera) $concluido = $indice === 0;
+                    $negadoNaEtapa = $statusLinha === 1 && $indice === 1;
+                    $filaNaEtapa = $filaEspera && $indice === 1;
+                    $canceladoNaEtapa = $statusLinha === 6 && $indice === 1;
+                    $classeEtapa = $negadoNaEtapa ? 'negado' : ($filaNaEtapa ? 'esperando' : ($canceladoNaEtapa ? 'cancelado' : ($concluido ? 'concluido' : ($atual ? 'atual' : ''))));
                 @endphp
-                <li class="{{ $concluido ? 'concluido' : ($atual ? 'atual' : '') }}" @if($atual) aria-current="step" @endif>
-                    <span class="bolinha">{{ $concluido ? '✓' : ($indice + 1) }}</span>
+                <li class="{{ $classeEtapa }}" @if($atual || $negadoNaEtapa || $filaNaEtapa || $canceladoNaEtapa) aria-current="step" @endif>
+                    <span class="bolinha">{{ $negadoNaEtapa || $canceladoNaEtapa ? '✕' : ($filaNaEtapa ? '!' : ($concluido ? '✓' : ($indice + 1))) }}</span>
                     <div class="nome-etapa">{{ $nome }}</div>
                 </li>
             @endforeach
