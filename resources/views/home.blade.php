@@ -18,12 +18,52 @@
 .gh-dashboard .gh-month{margin-bottom:20px}
 .gh-dashboard .gh-label{display:flex;justify-content:space-between;gap:8px;margin:8px 0 5px}
 @media(max-width:767px){.gh-dashboard .gh-hero{padding:20px}.gh-dashboard .gh-panel{padding:16px}}
+.gh-dashboard .gh-highlight{background:#f4f8fa;border:1px solid #e2ebee;border-radius:10px;padding:17px;margin-bottom:15px}
+.gh-dashboard .gh-count{font-size:34px;font-weight:700;line-height:1.1;color:#207985}
+.gh-dashboard .gh-timeline{display:flex;gap:4px;justify-content:space-between;margin:12px 0 18px}
+.gh-dashboard .gh-step{flex:1;text-align:center;font-size:11px;color:#78848c}
+.gh-dashboard .gh-step i{display:block;background:#e8edf0;border-radius:50%;width:30px;height:30px;line-height:30px;margin:0 auto 5px;font-size:13px}
+.gh-dashboard .gh-step.gh-done i{background:#d8eee7;color:#16775c}
+.gh-dashboard .gh-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.gh-dashboard .gh-day{border:1px solid #edf1f4;min-height:45px;border-radius:6px;padding:5px;font-size:12px}
+.gh-dashboard .gh-day.gh-booked{background:#e5f3ef;border-color:#abd7c7;color:#116449}
+.gh-dashboard .gh-day.gh-wait{background:#fff5df;border-color:#f4db9c}
+.gh-dashboard .gh-weekday{text-align:center;font-size:11px;font-weight:bold;color:#667781;padding:6px 0}
 </style>
 <article class="items-list-page gh-dashboard">
     <div class="gh-hero">
         <small>GEOFML · ÁREA DO HÓSPEDE</small>
         <h2>Olá, {{ $usuario->name }}!</h2>
         <p style="margin-bottom:0">Acompanhe suas solicitações de hospedagem e confira as próximas etapas.</p>
+    </div>
+    <div class="row">
+      <div class="col-lg-5">
+        <div class="gh-panel">
+          <h4><i class="fa fa-hourglass-half text-info"></i> Contagem regressiva da hospedagem</h4>
+          @if($proximaHospedagem)
+          <div class="gh-highlight">
+            <span class="gh-count">{{ $diasParaHospedagem }}</span>
+            <strong>{{ $diasParaHospedagem === 1 ? 'dia' : 'dias' }} até a entrada</strong>
+            <div class="gh-muted" style="margin-top:8px">{{ optional($proximaHospedagem->tipouh)->descricao ?? 'Hospedagem' }} · {{ \Carbon\Carbon::parse($proximaHospedagem->data_inicio)->format('d/m/Y') }}</div>
+            <small>{{ optional($proximaHospedagem->status_hospedagem)->status ?? 'Situação indisponível' }}</small>
+          </div>
+          @else
+          <p class="gh-muted">Nenhuma hospedagem futura identificada.</p>
+          @endif
+          <small class="gh-muted">Inclui solicitações ainda não aprovadas; confira sempre o status.</small>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="gh-panel">
+          <h4><i class="fa fa-wallet text-info"></i> Resumo financeiro das solicitações</h4>
+          <div class="row">
+            <div class="col-sm-4"><small class="gh-muted">Valor dos pedidos</small><h4>R$ {{ number_format($financeiro['total'],2,',','.') }}</h4></div>
+            <div class="col-sm-4"><small class="gh-muted">Valor registrado como pago</small><h4>R$ {{ number_format($financeiro['pago'],2,',','.') }}</h4></div>
+            <div class="col-sm-4"><small class="gh-muted">Diferença estimada</small><h4>R$ {{ number_format($financeiro['restante'],2,',','.') }}</h4></div>
+          </div>
+          <small class="gh-muted">Resumo informativo calculado dos valores salvos nas solicitações não negadas/canceladas. A diferença não representa necessariamente uma cobrança vencida; confirme no detalhe de cada pedido.</small>
+        </div>
+      </div>
     </div>
     <div class="row">
         @foreach ([
@@ -46,6 +86,65 @@
         <a class="btn btn-primary" href="{{ route('hospede.solicitarinscricao') }}"><i class="fa fa-plus"></i> Nova solicitação</a>
         <a class="btn btn-secondary" href="{{ route('hospede.meuspedidos') }}"><i class="fa fa-list"></i> Meus pedidos</a>
         <a class="btn btn-secondary" href="{{ route('profile') }}"><i class="fa fa-user"></i> Meu cadastro</a>
+    </div>
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="gh-panel">
+          <h4><i class="fa fa-bell text-warning"></i> Alertas prioritários</h4>
+          @forelse($alertas as $alerta)
+          <div class="gh-entry">
+            <strong>{{ $alerta['titulo'] }}</strong>
+            <p class="gh-muted" style="margin:5px 0">{{ $alerta['descricao'] }}</p>
+            <a href="{{ $alerta['url'] }}">Ver detalhes</a>
+          </div>
+          @empty
+          <p class="gh-muted">Nenhum alerta prioritário no momento.</p>
+          @endforelse
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="gh-panel">
+          <h4><i class="fa fa-route text-info"></i> Acompanhamento da solicitação</h4>
+          @if($proximaHospedagem)
+          @php
+            $etapa = match((int)$proximaHospedagem->status) {
+                0 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 3, default => 1
+            };
+          @endphp
+          <strong>{{ optional($proximaHospedagem->tipouh)->descricao ?? 'Hospedagem' }}</strong>
+          <p class="gh-muted" style="margin:3px 0">{{ optional($proximaHospedagem->status_hospedagem)->status ?? 'Status não informado' }}</p>
+          <div class="gh-timeline">
+            @foreach(['Solicitado','Aprovado','Pagamento','Liberação'] as $numero => $nome)
+            <div class="gh-step {{ ($numero + 1) <= $etapa ? 'gh-done' : '' }}">
+              <i class="fa {{ ($numero + 1) <= $etapa ? 'fa-check' : 'fa-circle' }}"></i>
+              {{ $nome }}
+            </div>
+            @endforeach
+          </div>
+          <small class="gh-muted">Indicador ilustrativo das etapas. O status acima é o estado oficial; pagamento e liberação devem ser confirmados no pedido.</small>
+          @else
+          <p class="gh-muted">Envie uma solicitação para acompanhar suas etapas.</p>
+          @endif
+        </div>
+      </div>
+    </div>
+    <div class="gh-panel">
+      <h4><i class="fa fa-calendar text-info"></i> Calendário das suas solicitações — <span style="text-transform:capitalize">{{ $calendarioTitulo }}</span></h4>
+      <div class="gh-calendar">
+        @foreach(['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'] as $diaSemana)
+        <div class="gh-weekday">{{ $diaSemana }}</div>
+        @endforeach
+        @for($i = 0; $i < $calendarioOffset; $i++)
+        <div></div>
+        @endfor
+        @foreach($calendarioDias as $dia)
+        <div title="{{ $dia['data'] }} · {{ $dia['total'] }} solicitação(ões)" class="gh-day {{ $dia['aprovados'] > 0 ? 'gh-booked' : ($dia['espera'] > 0 ? 'gh-wait' : ($dia['total'] > 0 ? 'gh-booked' : '')) }}">
+          <strong>{{ $dia['dia'] }}</strong>
+          @if($dia['total'] > 0)<div><i class="fa fa-calendar-check"></i> {{ $dia['total'] }}</div>@endif
+        </div>
+        @endforeach
+      </div>
+      <div class="gh-muted" style="margin-top:12px"><small>Verde: há solicitação no dia (incluindo aprovadas ou em análise). Amarelo: há solicitação na fila de espera. Os períodos podem se sobrepor. O calendário não informa disponibilidade de UHs.</small></div>
     </div>
     <div class="row">
         <div class="col-lg-7">
