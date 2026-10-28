@@ -15,6 +15,15 @@
            
         </div>
     </div>
+    @if($filtroStatus !== null || $mesFiltro || $categoriaFiltro)
+    <div class="alert alert-info">
+        <strong>Pedidos filtrados</strong>
+        @if($filtroStatus !== null) · {{ [0 => 'Aguardando Aprovação', 1 => 'Negado', 2 => 'Aprovado', 3 => 'Aguardando Pagamento', 4 => 'Aguardando Liberação', 5 => 'Aguardando Comprovante', 6 => 'Cancelado pelo Usuário', 7 => 'Fila de Espera'][$filtroStatus] }} @endif
+        @if($mesFiltro) · Mês de entrada {{ substr($mesFiltro,5,2) }}/{{ substr($mesFiltro,0,4) }} @endif
+        @if($categoriaFiltro) · {{ $categoriaFiltro === 'camping' ? 'Camping / Motorhome' : 'Apartamento / Casa' }} @endif
+        <a href="{{ route('hospede.meuspedidos') }}" class="btn btn-sm btn-secondary" style="margin-left:10px">Limpar filtros</a>
+    </div>
+    @endif
     <section class="section">
         <div class="row">
             <div class="col-lg-12">
