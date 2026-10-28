@@ -85,6 +85,7 @@ class HomeController extends Controller
             $limiteComum = $alta ? ($configuracao ? (int) $configuracao->reservas : null) : 2;
             $meses->push([
                 'titulo' => $mes->locale('pt_BR')->translatedFormat('F/Y'),
+                'chave' => $mes->format('Y-m'),
                 'alta' => $alta,
                 'temporada_definida' => (bool) $temporada,
                 'comuns' => $porMes->filter(fn ($p) => !in_array((int) $p->tipo_und_id, [11, 12], true))->count(),
