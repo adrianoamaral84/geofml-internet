@@ -4852,20 +4852,21 @@ if ($mesAtual == 12) {
 
     }
 
-    public function meuspedidos(){
+    public function meuspedidos()
+    {
+        $filtroStatus = request()->query('status');
+        $statusPermitidos = ['0', '1', '2', '3', '4', '5', '6', '7'];
+        $filtroStatus = in_array((string) $filtroStatus, $statusPermitidos, true) ? (int) $filtroStatus : null;
 
-       
-        $consulta = \App\Hospede::where('user_id', Auth::user()->id)
-        ->orderBy('id', 'DESC')
-        ->with('tipouh')
-        ->paginate(20);
-        
-        //dd($consulta);
+        $query = \App\Hospede::where('user_id', Auth::id())
+            ->with(['tipouh', 'status_hospedagem']);
+        if ($filtroStatus !== null) {
+            $query->where('status', $filtroStatus);
+        }
+        $consulta = $query->orderBy('id', 'DESC')->paginate(20)->withQueryString();
 
-        return view('meuspedidos.index', compact('consulta'));
-
+        return view('meuspedidos.index', compact('consulta', 'filtroStatus'));
     }
-
 
 public function meuspedido($id)
     {
@@ -4873,7 +4874,7 @@ public function meuspedido($id)
 
     $id = Crypt::decrypt($id);
 
-    $hospedagem = \App\Hospede::with('user')->findOrFail($id);
+    $hospedagem = \App\Hospede::with('user')->where('user_id', Auth::id())->findOrFail($id);
 
     $cancelar = Auth::user()->id === $hospedagem->user->id ? 1 : 0;
 
