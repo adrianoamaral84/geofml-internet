@@ -1292,7 +1292,7 @@ public function confirmaEdicao(Request $request)
         );
 
     $pedidosDoMes =
-        (clone $consultaPedidosDoMes)->count();
+        (clone $consultaPedidosDoMes)->whereNotIn('tipo_und_id', [11, 12])->whereNotIn('status', [6])->count();
 
     $pedidosCampingMotorhome =
         (clone $consultaPedidosDoMes)
@@ -1300,6 +1300,7 @@ public function confirmaEdicao(Request $request)
                 'tipo_und_id',
                 [11, 12]
             )
+            ->whereNotIn('status', [6])
             ->count();
 
     $tipoCampingMotorhome = in_array(
@@ -1336,7 +1337,7 @@ public function confirmaEdicao(Request $request)
             ? (int) $quantidadeReservas->reservas
             : 2; // Baixa temporada: duas UHs comuns por usuario/mes.
 
-        if (($possuiAltaTemporada ? $pedidosDoMes : ($pedidosDoMes - $pedidosCampingMotorhome)) >= $limiteMensal) {
+        if (($possuiAltaTemporada ? ($pedidosDoMes + $pedidosCampingMotorhome) : $pedidosDoMes) >= $limiteMensal) {
             return redirect()
                 ->back()
                 ->withInput()
@@ -2477,7 +2478,7 @@ public function gravaEdicao(Request $request)
         );
 
     $pedidosDoMes =
-        (clone $consultaPedidosDoMes)->count();
+        (clone $consultaPedidosDoMes)->whereNotIn('tipo_und_id', [11, 12])->whereNotIn('status', [6])->count();
 
     $pedidosCampingMotorhome =
         (clone $consultaPedidosDoMes)
@@ -2485,6 +2486,7 @@ public function gravaEdicao(Request $request)
                 'tipo_und_id',
                 [11, 12]
             )
+            ->whereNotIn('status', [6])
             ->count();
 
     $tipoCampingMotorhome = in_array(
@@ -2509,7 +2511,7 @@ public function gravaEdicao(Request $request)
             ? (int) $quantidadeReservas->reservas
             : 2; // Baixa temporada: duas UHs comuns por usuario/mes.
 
-        if (($possuiAltaTemporada ? $pedidosDoMes : ($pedidosDoMes - $pedidosCampingMotorhome)) >= $limiteMensal) {
+        if (($possuiAltaTemporada ? ($pedidosDoMes + $pedidosCampingMotorhome) : $pedidosDoMes) >= $limiteMensal) {
             return redirect()
                 ->back()
                 ->withInput()
