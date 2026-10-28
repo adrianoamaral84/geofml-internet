@@ -26,7 +26,7 @@ class LimiteMensalPedidos
         if (in_array($tipoUh, [11, 12], true)) {
             $total = (clone $consulta)->whereIn('tipo_und_id', [11, 12])->count();
             return $total >= 2
-                ? 'Voce ja alcancou o limite de 2 pedidos para Camping e/ou Motor-Home neste mes.'
+                ? 'Você já alcançou o limite de 2 pedidos de Camping e/ou Motorhome neste mês.'
                 : null;
         }
 
@@ -34,7 +34,28 @@ class LimiteMensalPedidos
         $limite = $altaTemporada ? $limiteAlta : 2;
 
         return $total >= $limite
-            ? 'Voce ja alcancou o limite de ' . $limite . ' pedido(s) de apartamento/casa neste mes.'
+            ? 'Você já alcançou o limite de ' . $limite . ' pedido(s) de apartamento/casa neste mês.'
             : null;
     }
+    /**
+     * Na alta temporada, outro pedido ativo com as mesmas datas
+     * impede nova inscrição ou edição, independente da categoria.
+     * Períodos parcialmente sobrepostos seguem a regra já existente.
+     */
+    public static function mensagemDuplicidadeAlta(int $usuarioId, Carbon $entrada, Carbon $saida, ?int $ignorarPedidoId = null): ?string
+    {
+        $consulta = Hospede::where('user_id', $usuarioId)
+            ->whereDate('data_inicio', $entrada->format('Y-m-d'))
+            ->whereDate('data_termino', $saida->format('Y-m-d'))
+            ->whereNotIn('status', [1, 6]);
+
+        if ($ignorarPedidoId !== null) {
+            $consulta->where('id', '<>', $ignorarPedidoId);
+        }
+
+        return $consulta->exists()
+            ? 'Você já possui outro pedido ativo para esse mesmo período na alta temporada.'
+            : null;
+    }
+
 }
