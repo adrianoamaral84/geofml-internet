@@ -2186,17 +2186,8 @@ public function gravaEdicao(Request $request)
     |
     */
 
-    $mensagemDuplicidadeAlta = $possuiAltaTemporada ? \App\Services\LimiteMensalPedidos::mensagemDuplicidadeAlta((int) $usuario->id, $dataInicio, $dataTermino, $hospedagem->id) : null;
-
-    if ($mensagemDuplicidadeAlta !== null) {
-        return redirect()
-            ->back()
-            ->withInput()
-            ->withErrors([
-                'peridoinicial' =>
-                    $mensagemDuplicidadeAlta,
-            ]);
-    }
+    // A duplicidade da alta temporada e revalidada apos classificar as diarias,
+    // dentro da transacao com bloqueio, antes de gravar o pedido.
 
     /*
     |--------------------------------------------------------------------------
