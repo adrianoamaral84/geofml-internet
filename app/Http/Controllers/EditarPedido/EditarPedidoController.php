@@ -1337,7 +1337,7 @@ public function confirmaEdicao(Request $request)
             ? (int) $quantidadeReservas->reservas
             : 2; // Baixa temporada: duas UHs comuns por usuario/mes.
 
-        if (($possuiAltaTemporada ? ($pedidosDoMes + $pedidosCampingMotorhome) : $pedidosDoMes) >= $limiteMensal) {
+        if ($pedidosDoMes >= $limiteMensal) {
             return redirect()
                 ->back()
                 ->withInput()
@@ -2511,7 +2511,7 @@ public function gravaEdicao(Request $request)
             ? (int) $quantidadeReservas->reservas
             : 2; // Baixa temporada: duas UHs comuns por usuario/mes.
 
-        if (($possuiAltaTemporada ? ($pedidosDoMes + $pedidosCampingMotorhome) : $pedidosDoMes) >= $limiteMensal) {
+        if ($pedidosDoMes >= $limiteMensal) {
             return redirect()
                 ->back()
                 ->withInput()
@@ -2619,11 +2619,15 @@ public function gravaEdicao(Request $request)
                 $diasHospedagem,
                 $totalValorLiquido,
                 $valorTarifaComDesconto
+                $possuiAltaTemporada,
+                $quantidadeReservas
             ) {
                 /*
                  * Bloqueia o registro durante a atualização.
                  * Também confirma novamente o usuário e o status.
                  */
+
+                DB::table('user')->where('id', $usuario->id)->lockForUpdate()->first();
 
                 $registro = \App\Hospede::where(
                         'id',
@@ -2646,6 +2650,12 @@ public function gravaEdicao(Request $request)
                     throw new \RuntimeException(
                         'O pedido mudou de status e não pode mais ser editado.'
                     );
+                }
+
+                // Revalida a cota depois do bloqueio, dentro da transacao.
+                $erroCota = \App\Services\LimiteMensalPedidos::mensagem((int) $usuario->id, $dataInicio, (int) $request->tipo, $possuiAltaTemporada, (int) $quantidadeReservas->reservas, $hospedagem->id);
+                if ($erroCota !== null) {
+                    throw new \RuntimeException($erroCota);
                 }
 
                 $registro->user_cpf =
