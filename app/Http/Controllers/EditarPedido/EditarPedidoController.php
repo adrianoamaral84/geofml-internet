@@ -655,9 +655,9 @@ public function confirmaEdicao(Request $request)
         ])->withInput();
     }
 
-    if ((int) $request->adultos > $capacidadeMaxima || $totalHospedes > $capacidadeMaxima + ((int) $request->criancas > 0 ? 1 : 0)) {
+    if ((int) $request->adultos > $capacidadeMaxima || $totalHospedes > $capacidadeMaxima + min((int) $request->criancas, 2)) {
         return redirect()->back()->withErrors([
-            'adultos' => 'O número de hóspedes excede o limite desta unidade (' . $capacidadeMaxima . ' pessoas, com tolerância de 1 criança de até 6 anos). Reduza os ocupantes ou selecione outra unidade.',
+            'adultos' => 'O número de hóspedes excede o limite desta unidade (' . $capacidadeMaxima . ' pessoas, com tolerância de até 2 crianças de até 6 anos). Reduza os ocupantes ou selecione outra unidade.',
         ])->withInput();
     }
 
@@ -1821,9 +1821,9 @@ public function gravaEdicao(Request $request)
         ])->withInput();
     }
 
-    if ((int) $request->adultos > $capacidadeMaxima || $totalHospedes > $capacidadeMaxima + ((int) $request->criancas > 0 ? 1 : 0)) {
+    if ((int) $request->adultos > $capacidadeMaxima || $totalHospedes > $capacidadeMaxima + min((int) $request->criancas, 2)) {
         return redirect()->back()->withErrors([
-            'adultos' => 'O número de hóspedes excede o limite desta unidade (' . $capacidadeMaxima . ' pessoas, com tolerância de 1 criança de até 6 anos). Reduza os ocupantes ou selecione outra unidade.',
+            'adultos' => 'O número de hóspedes excede o limite desta unidade (' . $capacidadeMaxima . ' pessoas, com tolerância de até 2 crianças de até 6 anos). Reduza os ocupantes ou selecione outra unidade.',
         ])->withInput();
     }
 
