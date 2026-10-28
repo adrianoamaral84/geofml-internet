@@ -2186,32 +2186,15 @@ public function gravaEdicao(Request $request)
     |
     */
 
-    $pedidoDuplicado = \App\Hospede::where(
-            'user_id',
-            $usuario->id
-        )
-        ->where(
-            'id',
-            '<>',
-            $hospedagem->id
-        )
-        ->whereDate(
-            'data_inicio',
-            $dataInicio->format('Y-m-d')
-        )
-        ->whereDate(
-            'data_termino',
-            $dataTermino->format('Y-m-d')
-        )
-        ->exists();
+    $mensagemDuplicidadeAlta = $possuiAltaTemporada ? \App\Services\LimiteMensalPedidos::mensagemDuplicidadeAlta((int) $usuario->id, $dataInicio, $dataTermino, $hospedagem->id) : null;
 
-    if ($possuiAltaTemporada && $pedidoDuplicado) {
+    if ($mensagemDuplicidadeAlta !== null) {
         return redirect()
             ->back()
             ->withInput()
             ->withErrors([
                 'peridoinicial' =>
-                    'Você já possui outro pedido para esse mesmo período.',
+                    $mensagemDuplicidadeAlta,
             ]);
     }
 
