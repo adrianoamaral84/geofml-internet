@@ -122,14 +122,14 @@ class HomeController extends Controller
             $alertas->push([
                 'titulo' => optional($pedido->status_hospedagem)->status ?? 'Pendência de hospedagem',
                 'descricao' => 'Consulte a solicitação com entrada em ' . Carbon::parse($pedido->data_inicio)->format('d/m/Y') . '.',
-                'url' => route('hospede.meuspedidos'),
+                'url' => route('hospede.meupedido', ['id' => Crypt::encrypt($pedido->id)]),
             ]);
         }
         if ($proximaHospedagem && $diasParaHospedagem === 0) {
             $alertas->push([
                 'titulo' => 'Hospedagem com entrada hoje',
                 'descricao' => 'Confira as orientações de sua solicitação.',
-                'url' => route('hospede.meuspedidos'),
+                'url' => route('hospede.meupedido', ['id' => Crypt::encrypt($proximaHospedagem->id)]),
             ]);
         }
 
@@ -148,6 +148,7 @@ class HomeController extends Controller
                 'dia' => $data->day,
                 'data' => $data->format('d/m/Y'),
                 'total' => $reservasDoDia->count(),
+                'pedidos' => $reservasDoDia->map(fn ($p) => ['id' => $p->id, 'tipo' => optional($p->tipouh)->descricao ?? 'Hospedagem'])->values()->all(),
                 'aprovados' => $reservasDoDia->where('status', 2)->count(),
                 'espera' => $reservasDoDia->where('status', 7)->count(),
             ]);
