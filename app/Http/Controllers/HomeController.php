@@ -94,10 +94,71 @@ class HomeController extends Controller
             ]);
         }
 
+        // Indicadores adicionais, calculados somente sobre os pedidos do usuário.
+        $proximaHospedagem = $proximosPedidos->first();
+        $diasParaHospedagem = $proximaHospedagem
+            ? max(0, (int) $hoje->diffInDays(Carbon::parse($proximaHospedagem->data_inicio)->startOfDay(), false))
+            : null;
+
+        $pedidosFinanceiros = $pedidos->filter(fn ($pedido) => !in_array((int) $pedido->status, [1, 6], true));
+        $financeiro = [
+            'total' => round((float) $pedidosFinanceiros->sum(fn ($p) => (float) ($p->valor ?? 0)), 2),
+            'pago' => round((float) $pedidosFinanceiros->sum(fn ($p) => (float) ($p->valor_pago ?? 0)), 2),
+        ];
+        $financeiro['restante'] = max(0, round($financeiro['total'] - $financeiro['pago'], 2));
+
+        $alertas = collect();
+        if ((int) ($usuario->indeterminado ?? 0) !== 1 && !empty($usuario->validade)) {
+            $validade = Carbon::parse($usuario->validade)->startOfDay();
+            if ($validade->lte($hoje->copy()->addDays(30))) {
+                $alertas->push([
+                    'titulo' => $validade->lt($hoje) ? 'Documento vencido' : 'Documento próximo do vencimento',
+                    'descricao' => 'Confira a validade do seu documento no cadastro.',
+                    'url' => route('profile'),
+                ]);
+            }
+        }
+        foreach ($pendencias as $pedido) {
+            $alertas->push([
+                'titulo' => optional($pedido->status_hospedagem)->status ?? 'Pendência de hospedagem',
+                'descricao' => 'Consulte a solicitação com entrada em ' . Carbon::parse($pedido->data_inicio)->format('d/m/Y') . '.',
+                'url' => route('hospede.meuspedidos'),
+            ]);
+        }
+        if ($proximaHospedagem && $diasParaHospedagem === 0) {
+            $alertas->push([
+                'titulo' => 'Hospedagem com entrada hoje',
+                'descricao' => 'Confira as orientações de sua solicitação.',
+                'url' => route('hospede.meuspedidos'),
+            ]);
+        }
+
+        // Mini calendário: somente datas das solicitações, sem presumir disponibilidade.
+        $calendarioInicio = $hoje->copy()->startOfMonth();
+        $calendarioDias = collect();
+        for ($dia = 0; $dia < $calendarioInicio->daysInMonth; $dia++) {
+            $data = $calendarioInicio->copy()->addDays($dia);
+            $reservasDoDia = $pedidos->filter(function ($pedido) use ($data) {
+                return !in_array((int) $pedido->status, [1, 6], true)
+                    && $pedido->data_inicio && $pedido->data_termino
+                    && Carbon::parse($pedido->data_inicio)->startOfDay()->lte($data)
+                    && Carbon::parse($pedido->data_termino)->startOfDay()->gt($data);
+            });
+            $calendarioDias->push([
+                'dia' => $data->day,
+                'data' => $data->format('d/m/Y'),
+                'total' => $reservasDoDia->count(),
+                'aprovados' => $reservasDoDia->where('status', 2)->count(),
+                'espera' => $reservasDoDia->where('status', 7)->count(),
+            ]);
+        }
+        $calendarioOffset = $calendarioInicio->dayOfWeek;
+        $calendarioTitulo = $calendarioInicio->locale('pt_BR')->translatedFormat('F/Y');
+
         $count = \App\Message::countMsg($usuario->id);
         $mensagens = \App\Message::newMessage($usuario->id)->take(3);
 
-        return view('home', compact('usuario', 'resumo', 'proximosPedidos', 'pendencias', 'meses', 'count', 'mensagens'));
+        return view('home', compact('usuario', 'resumo', 'proximosPedidos', 'pendencias', 'meses', 'count', 'mensagens', 'proximaHospedagem', 'diasParaHospedagem', 'financeiro', 'alertas', 'calendarioDias', 'calendarioOffset', 'calendarioTitulo'));
     }
 
     public function logout(Request $request){
