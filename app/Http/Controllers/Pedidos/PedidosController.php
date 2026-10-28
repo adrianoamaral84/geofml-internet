@@ -1153,10 +1153,9 @@ public function confimrarPedido(Request $request){
     } else {
         $limiteMensal = $possuiAltaTemporada
             ? (int) $quantidadeReservas->reservas
-            : (int) $quantidadeReservas
-                ->qnt_reservas_baixa_temporada;
+            : 2; // Baixa temporada: duas UHs comuns por usuario/mes.
 
-        if ($pedidosDoMes >= $limiteMensal) {
+        if (($possuiAltaTemporada ? $pedidosDoMes : ($pedidosDoMes - $pedidosCampingMotorhome)) >= $limiteMensal) {
             return redirect()
                 ->back()
                 ->withInput()
@@ -2021,7 +2020,7 @@ public function store(Request $request)
                         'Você já possui 2 pedidos de Camping e/ou Motor-Home para esse mesmo período.',
                 ]);
         }
-    } elseif ($consultaDuplicidade->exists()) {
+    } elseif ($possuiAltaTemporada && $consultaDuplicidade->exists()) {
         return redirect()
             ->route('hospede.solicitarinscricao')
             ->withInput()
@@ -2323,10 +2322,9 @@ public function store(Request $request)
     } else {
         $limiteMensal = $possuiAltaTemporada
             ? (int) $quantidadeReservas->reservas
-            : (int) $quantidadeReservas
-                ->qnt_reservas_baixa_temporada;
+            : 2; // Baixa temporada: duas UHs comuns por usuario/mes.
 
-        if ($pedidosDoMes >= $limiteMensal) {
+        if (($possuiAltaTemporada ? $pedidosDoMes : ($pedidosDoMes - $pedidosCampingMotorhome)) >= $limiteMensal) {
             return redirect()
             ->route('hospede.solicitarinscricao')
                 ->withInput()
@@ -2443,7 +2441,7 @@ public function store(Request $request)
                 ->whereIn('status', [0, 1, 2, 3, 4, 5])
                 ->exists();
 
-            if ($pedidoDuplicado) {
+            if ($possuiAltaTemporada && $pedidoDuplicado) {
                 DB::rollBack();
                 \Session::flash('message', [
                     'msg' => 'Este pedido já foi registrado. Verifique em Minhas Solicitações antes de tentar novamente.',
