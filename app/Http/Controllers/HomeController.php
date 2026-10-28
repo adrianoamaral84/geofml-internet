@@ -168,17 +168,11 @@ class HomeController extends Controller
         
     }
 
-    public function administrador(){
-
-        $message = \App\Message::newMessage(Auth::user()->id);
-        $count = \App\Message::countMsg(Auth::user()->id);
-        //dd($count);
-
-
-        $userCPF = Auth::user()->cpf;
-       
-        return view('home', compact('userCPF', 'message', 'count'));
+    public function administrador()
+    {
+        return $this->index();
     }
+
     public function homehome()
     {
         
