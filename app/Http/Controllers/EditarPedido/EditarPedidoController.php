@@ -2641,6 +2641,15 @@ public function gravaEdicao(Request $request)
                     throw new \RuntimeException($erroCota);
                 }
 
+                if ($possuiAltaTemporada) {
+                    $erroDuplicado = \App\Services\LimiteMensalPedidos::mensagemDuplicidadeAlta(
+                        (int) $usuario->id, $dataInicio, $dataTermino, (int) $hospedagem->id
+                    );
+                    if ($erroDuplicado !== null) {
+                        throw new \RuntimeException($erroDuplicado);
+                    }
+                }
+
                 $registro->user_cpf =
                     $usuario->cpf;
 
