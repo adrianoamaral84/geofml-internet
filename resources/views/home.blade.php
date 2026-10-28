@@ -16,7 +16,7 @@
 .gh-dashboard .gh-meter > span{height:100%;display:block;background:#268a78;border-radius:10px}
 .gh-dashboard .gh-muted{color:#667781}
 .gh-dashboard .gh-month{margin-bottom:20px}
-.gh-dashboard .gh-label{display:flex;justify-content:space-between;gap:8px;margin:8px 0 5px}
+.gh-dashboard a.gh-label{color:inherit;text-decoration:none}.gh-dashboard a.gh-label:hover{color:#147c8b;text-decoration:underline}.gh-dashboard .gh-label{display:flex;justify-content:space-between;gap:8px;margin:8px 0 5px}
 @media(max-width:767px){.gh-dashboard .gh-hero{padding:20px}.gh-dashboard .gh-panel{padding:16px}}
 .gh-dashboard .gh-highlight{background:#f4f8fa;border:1px solid #e2ebee;border-radius:10px;padding:17px;margin-bottom:15px}
 .gh-dashboard .gh-count{font-size:34px;font-weight:700;line-height:1.1;color:#207985}
@@ -202,9 +202,9 @@
                     @else
                     <small class="d-block gh-muted">Baixa temporada</small>
                     @endif
-                    <div class="gh-label"><span>Apartamento / Casa</span><strong>{{ $mes['comuns'] }} / {{ $mes['limite_comum'] ?? '—' }}</strong></div>
+                    <a class="gh-label" href="{{ route('hospede.meuspedidos', ['mes' => $mes['chave'], 'categoria' => 'comum']) }}" title="Ver apartamentos e casas deste mês"><span>Apartamento / Casa <i class="fa fa-arrow-right"></i></span><strong>{{ $mes['comuns'] }} / {{ $mes['limite_comum'] ?? '—' }}</strong></a>
                     <div class="gh-meter"><span style="width:{{ $mes['limite_comum'] ? min(100, ($mes['comuns'] / max(1,$mes['limite_comum'])) * 100) : 0 }}%"></span></div>
-                    <div class="gh-label"><span>Camping / Motorhome</span><strong>{{ $mes['camping'] }} / 2</strong></div>
+                    <a class="gh-label" href="{{ route('hospede.meuspedidos', ['mes' => $mes['chave'], 'categoria' => 'camping']) }}" title="Ver Camping e Motorhome deste mês"><span>Camping / Motorhome <i class="fa fa-arrow-right"></i></span><strong>{{ $mes['camping'] }} / 2</strong></a>
                     <div class="gh-meter"><span style="width:{{ min(100,($mes['camping'] / 2) * 100) }}%"></span></div>
                 </div>
                 @endforeach
