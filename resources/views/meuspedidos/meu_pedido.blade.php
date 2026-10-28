@@ -143,8 +143,10 @@
 @php
     // O status é a situação atual, não uma sequência numérica de etapas.
     $statusLinha = (int) $hospedagem->status;
-    $temCheckin = !empty($hospedagem->checkin_at);
-    $temCheckout = !empty($hospedagem->checkout_at);
+    // O campo checkin controla a etapa: 1 = entrada, 2 = saída.
+    $estadoCheckin = (int) $hospedagem->checkin;
+    $temCheckin = in_array($estadoCheckin, [1, 2], true);
+    $temCheckout = $estadoCheckin === 2;
     $interrompido = in_array($statusLinha, [1, 6], true);
     $filaEspera = $statusLinha === 7;
     $situacaoTexto = optional($hospedagem->status_hospedagem)->status ?? 'Em acompanhamento';
@@ -164,10 +166,14 @@
     ];
     $orientacaoLinha = $orientacoes[$statusLinha] ?? 'Acompanhe as próximas atualizações do pedido.';
     if ($statusLinha === 2 && $temCheckin) {
-        $orientacaoLinha = 'Check-in realizado em '.\Carbon\Carbon::parse($hospedagem->checkin_at)->format('d/m/Y H:i').'.';
+        $orientacaoLinha = 'Check-in realizado'
+            . ($hospedagem->checkin_at ? ' em '.\Carbon\Carbon::parse($hospedagem->checkin_at)->format('d/m/Y H:i') : '')
+            . '.';
     }
     if ($statusLinha === 2 && $temCheckout) {
-        $orientacaoLinha = 'Check-out registrado em '.\Carbon\Carbon::parse($hospedagem->checkout_at)->format('d/m/Y H:i').'.';
+        $orientacaoLinha = 'Check-out realizado'
+            . ($hospedagem->checkout_at ? ' em '.\Carbon\Carbon::parse($hospedagem->checkout_at)->format('d/m/Y H:i') : '')
+            . '.';
     }
 @endphp
 <div class="pedido-progresso" aria-label="Acompanhamento da hospedagem">
