@@ -37,7 +37,7 @@
         <p style="margin-bottom:0">Acompanhe suas solicitações de hospedagem e confira as próximas etapas.</p>
     </div>
     <div class="row">
-      <div class="col-lg-5">
+      <div class="col-lg-12">
         <div class="gh-panel">
           <h4><i class="fa fa-hourglass-half text-info"></i> Contagem regressiva da hospedagem</h4>
           @if($proximaHospedagem)
@@ -51,17 +51,6 @@
           <p class="gh-muted">Nenhuma hospedagem futura identificada.</p>
           @endif
           <small class="gh-muted">Inclui solicitações ainda não aprovadas; confira sempre o status.</small>
-        </div>
-      </div>
-      <div class="col-lg-7">
-        <div class="gh-panel">
-          <h4><i class="fa fa-wallet text-info"></i> Resumo financeiro das solicitações</h4>
-          <div class="row">
-            <div class="col-sm-4"><small class="gh-muted">Valor dos pedidos</small><h4>R$ {{ number_format($financeiro['total'],2,',','.') }}</h4></div>
-            <div class="col-sm-4"><small class="gh-muted">Valor registrado como pago</small><h4>R$ {{ number_format($financeiro['pago'],2,',','.') }}</h4></div>
-            <div class="col-sm-4"><small class="gh-muted">Diferença estimada</small><h4>R$ {{ number_format($financeiro['restante'],2,',','.') }}</h4></div>
-          </div>
-          <small class="gh-muted">Resumo informativo calculado dos valores salvos nas solicitações não negadas/canceladas. A diferença não representa necessariamente uma cobrança vencida; confirme no detalhe de cada pedido.</small>
         </div>
       </div>
     </div>
@@ -203,21 +192,6 @@
                 </div>
                 @endforeach
                 <small class="gh-muted">Em períodos que atravessam temporadas, o limite aplicável é definido pelas diárias do pedido. A consulta acima é informativa.</small>
-            </div>
-            <div class="gh-panel">
-                <h4><i class="fa fa-bullhorn text-info"></i> Avisos e mensagens</h4>
-                @if($count > 0)
-                <div class="alert alert-info"><i class="fa fa-envelope"></i> Você possui {{ $count }} mensagem(ns) não lida(s).</div>
-                @else
-                <p class="gh-muted">Não há mensagens novas.</p>
-                @endif
-                <p class="gh-muted" style="margin-bottom:0">Fique atento aos comunicados da administração e acompanhe o status dos seus pedidos.</p>
-            </div>
-            <div class="gh-panel">
-                <h4><i class="fa fa-info-circle text-info"></i> Informações importantes</h4>
-                <p>Na baixa temporada, você pode solicitar até <strong>2 apartamentos/casas</strong> e <strong>2 Camping/Motorhome</strong> por mês.</p>
-                <p>Datas iguais ou sobrepostas são permitidas na baixa temporada, respeitando os limites e as demais condições.</p>
-                <p style="margin-bottom:0">A edição de solicitações está disponível somente enquanto estiverem <strong>Aguardando Aprovação</strong>.</p>
             </div>
         </div>
     </div>
