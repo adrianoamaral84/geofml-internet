@@ -1156,7 +1156,7 @@ public function confimrarPedido(Request $request){
             ? (int) $quantidadeReservas->reservas
             : 2; // Baixa temporada: duas UHs comuns por usuario/mes.
 
-        if (($possuiAltaTemporada ? ($pedidosDoMes + $pedidosCampingMotorhome) : $pedidosDoMes) >= $limiteMensal) {
+        if ($pedidosDoMes >= $limiteMensal) {
             return redirect()
                 ->back()
                 ->withInput()
@@ -2004,23 +2004,7 @@ public function store(Request $request)
     }
 
     if ($tipoCampingMotorhome) {
-        $pedidosCampingMotorhomeMesmoPeriodo =
-            (clone $consultaDuplicidade)
-                ->whereIn(
-                    'tipo_und_id',
-                    [11, 12]
-                )
-                ->count();
-
-        if ($pedidosCampingMotorhomeMesmoPeriodo >= 2) {
-            return redirect()
-                ->route('hospede.solicitarinscricao')
-                ->withInput()
-                ->withErrors([
-                    'peridoinicial' =>
-                        'Você já possui 2 pedidos de Camping e/ou Motor-Home para esse mesmo período.',
-                ]);
-        }
+        // Limite mensal por categoria substitui a validacao redundante por periodo.
     } elseif ($possuiAltaTemporada && $consultaDuplicidade->exists()) {
         return redirect()
             ->route('hospede.solicitarinscricao')
@@ -2326,7 +2310,7 @@ public function store(Request $request)
             ? (int) $quantidadeReservas->reservas
             : 2; // Baixa temporada: duas UHs comuns por usuario/mes.
 
-        if (($possuiAltaTemporada ? ($pedidosDoMes + $pedidosCampingMotorhome) : $pedidosDoMes) >= $limiteMensal) {
+        if ($pedidosDoMes >= $limiteMensal) {
             return redirect()
             ->route('hospede.solicitarinscricao')
                 ->withInput()
@@ -2432,6 +2416,12 @@ public function store(Request $request)
             ->where('id', $usuario->id)
             ->lockForUpdate()
             ->first();
+
+        $erroCota = \App\Services\LimiteMensalPedidos::mensagem((int) $usuario->id, $dataInicio, (int) $request->tipo, $possuiAltaTemporada, (int) $quantidadeReservas->reservas, ($isEdicao ? $pedidoAtual->id : null));
+        if ($erroCota !== null) {
+            DB::rollBack();
+            return redirect()->route('hospede.solicitarinscricao')->withInput()->withErrors(['tipo' => $erroCota]);
+        }
 
         if (!$isEdicao) {
             $pedidoDuplicado = \App\Hospede::where('user_id', $usuario->id)
