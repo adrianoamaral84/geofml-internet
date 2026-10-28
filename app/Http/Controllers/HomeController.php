@@ -43,18 +43,61 @@ class HomeController extends Controller
      */
     public function index()
     {
-        
-        
-        $message = \App\Message::newMessage(Auth::user()->id);
-        $count = \App\Message::countMsg(Auth::user()->id);
-        //dd($count);
+        $usuario = Auth::user();
+        $hoje = Carbon::today();
+        $pedidos = \App\Hospede::where('user_id', $usuario->id)
+            ->with(['tipouh', 'status_hospedagem'])
+            ->orderBy('data_inicio')
+            ->get();
 
+        $resumo = [
+            'total' => $pedidos->count(),
+            'aguardando' => $pedidos->where('status', 0)->count(),
+            'aprovados' => $pedidos->where('status', 2)->count(),
+            'fila' => $pedidos->where('status', 7)->count(),
+        ];
 
-        $userCPF = Auth::user()->cpf;
-        //dd($userCPF);
-        $message = "teste";
+        $proximosPedidos = $pedidos->filter(function ($pedido) use ($hoje) {
+            return !in_array((int) $pedido->status, [1, 6], true)
+                && $pedido->data_termino
+                && Carbon::parse($pedido->data_termino)->startOfDay()->gte($hoje);
+        })->take(5);
 
-        return view('home', compact('userCPF', 'message', 'count'));
+        $pendencias = $pedidos->filter(function ($pedido) {
+            return in_array((int) $pedido->status, [3, 4, 5], true);
+        })->take(5);
+
+        $competencia = $hoje->copy()->startOfMonth();
+        $meses = collect();
+        for ($i = 0; $i < 3; $i++) {
+            $mes = $competencia->copy()->addMonthsNoOverflow($i);
+            $porMes = $pedidos->filter(function ($pedido) use ($mes) {
+                if (in_array((int) $pedido->status, [1, 6], true) || !$pedido->data_inicio) {
+                    return false;
+                }
+                $entrada = Carbon::parse($pedido->data_inicio);
+                return $entrada->year === $mes->year && $entrada->month === $mes->month;
+            });
+            $temporada = \App\Temporada::whereDate('data_inicio', '<=', $mes->toDateString())
+                ->whereDate('data_termino', '>=', $mes->toDateString())->first();
+            $alta = $temporada && (int) $temporada->tipo_temporada_id === 1;
+            $configuracao = \App\QuantidadeReserva::first();
+            $limiteComum = $alta ? ($configuracao ? (int) $configuracao->reservas : null) : 2;
+            $meses->push([
+                'titulo' => $mes->locale('pt_BR')->translatedFormat('F/Y'),
+                'alta' => $alta,
+                'temporada_definida' => (bool) $temporada,
+                'comuns' => $porMes->filter(fn ($p) => !in_array((int) $p->tipo_und_id, [11, 12], true))->count(),
+                'camping' => $porMes->filter(fn ($p) => in_array((int) $p->tipo_und_id, [11, 12], true))->count(),
+                'limite_comum' => $limiteComum,
+                'limite_camping' => 2,
+            ]);
+        }
+
+        $count = \App\Message::countMsg($usuario->id);
+        $mensagens = \App\Message::newMessage($usuario->id)->take(3);
+
+        return view('home', compact('usuario', 'resumo', 'proximosPedidos', 'pendencias', 'meses', 'count', 'mensagens'));
     }
 
     public function logout(Request $request){
