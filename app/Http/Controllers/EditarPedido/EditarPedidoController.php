@@ -2618,7 +2618,7 @@ public function gravaEdicao(Request $request)
                 $dataTermino,
                 $diasHospedagem,
                 $totalValorLiquido,
-                $valorTarifaComDesconto
+                $valorTarifaComDesconto,
                 $possuiAltaTemporada,
                 $quantidadeReservas
             ) {
