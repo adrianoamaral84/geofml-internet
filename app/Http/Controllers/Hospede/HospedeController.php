@@ -4863,9 +4863,24 @@ if ($mesAtual == 12) {
         if ($filtroStatus !== null) {
             $query->where('status', $filtroStatus);
         }
+        $mesFiltro = request()->query('mes');
+        if (is_string($mesFiltro) && preg_match('/^\\d{4}-(0[1-9]|1[0-2])$/', $mesFiltro)) {
+            $query->whereYear('data_inicio', (int) substr($mesFiltro, 0, 4))
+                ->whereMonth('data_inicio', (int) substr($mesFiltro, 5, 2));
+        } else {
+            $mesFiltro = null;
+        }
+        $categoriaFiltro = request()->query('categoria');
+        if ($categoriaFiltro === 'camping') {
+            $query->whereIn('tipo_und_id', [11, 12]);
+        } elseif ($categoriaFiltro === 'comum') {
+            $query->whereNotIn('tipo_und_id', [11, 12]);
+        } else {
+            $categoriaFiltro = null;
+        }
         $consulta = $query->orderBy('id', 'DESC')->paginate(20)->withQueryString();
 
-        return view('meuspedidos.index', compact('consulta', 'filtroStatus'));
+        return view('meuspedidos.index', compact('consulta', 'filtroStatus', 'mesFiltro', 'categoriaFiltro'));
     }
 
 public function meuspedido($id)
