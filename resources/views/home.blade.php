@@ -5,7 +5,7 @@
 .gh-dashboard .gh-hero {background:linear-gradient(110deg,#1b5064,#237e89);color:#fff;border-radius:12px;padding:26px;margin-bottom:20px}
 .gh-dashboard .gh-hero h2{color:#fff;margin:7px 0}
 .gh-dashboard .gh-stat{background:#fff;border:1px solid #e8edf0;border-radius:12px;padding:19px;min-height:135px;margin-bottom:17px}
-.gh-dashboard .gh-stat i{font-size:22px;color:#287c87}
+.gh-dashboard a.gh-stat{display:block;color:inherit;text-decoration:none;transition:box-shadow .15s,transform .15s}.gh-dashboard a.gh-stat:hover,.gh-dashboard a.gh-entry:hover,.gh-dashboard a.gh-highlight:hover{box-shadow:0 5px 16px rgba(0,0,0,.12);transform:translateY(-2px);text-decoration:none}.gh-dashboard a.gh-entry{display:block;color:inherit;text-decoration:none}.gh-dashboard a.gh-highlight{display:block;color:inherit;text-decoration:none}.gh-dashboard a.gh-month{display:block;color:inherit;text-decoration:none}.gh-dashboard .gh-stat i{font-size:22px;color:#287c87}
 .gh-dashboard .gh-stat strong{display:block;font-size:30px;line-height:1.4;color:#263b47}
 .gh-dashboard .gh-panel{background:#fff;border:1px solid #e8edf0;border-radius:12px;padding:22px;margin-bottom:20px}
 .gh-dashboard .gh-panel h4{font-size:18px;margin-bottom:16px}
@@ -28,7 +28,7 @@
 .gh-dashboard .gh-day{border:1px solid #edf1f4;min-height:45px;border-radius:6px;padding:5px;font-size:12px}
 .gh-dashboard .gh-day.gh-booked{background:#e5f3ef;border-color:#abd7c7;color:#116449}
 .gh-dashboard .gh-day.gh-wait{background:#fff5df;border-color:#f4db9c}
-.gh-dashboard .gh-weekday{text-align:center;font-size:11px;font-weight:bold;color:#667781;padding:6px 0}
+.gh-dashboard .gh-calendar-detail{position:relative;z-index:2;background:#fff;box-shadow:0 3px 10px #0002;padding:5px;border-radius:5px;min-width:110px}.gh-dashboard .gh-calendar-detail a{display:block;padding:4px;color:#176c78;font-size:11px}.gh-dashboard .gh-weekday{text-align:center;font-size:11px;font-weight:bold;color:#667781;padding:6px 0}
 </style>
 <article class="items-list-page gh-dashboard">
     <div class="gh-hero">
@@ -41,12 +41,13 @@
         <div class="gh-panel">
           <h4><i class="fa fa-hourglass-half text-info"></i> Contagem regressiva da hospedagem</h4>
           @if($proximaHospedagem)
-          <div class="gh-highlight">
+          <a class="gh-highlight" href="{{ route('hospede.meupedido', ['id' => Crypt::encrypt($proximaHospedagem->id)]) }}" title="Abrir hospedagem">
             <span class="gh-count">{{ $diasParaHospedagem }}</span>
             <strong>{{ $diasParaHospedagem === 1 ? 'dia' : 'dias' }} até a entrada</strong>
             <div class="gh-muted" style="margin-top:8px">{{ optional($proximaHospedagem->tipouh)->descricao ?? 'Hospedagem' }} · {{ \Carbon\Carbon::parse($proximaHospedagem->data_inicio)->format('d/m/Y') }}</div>
             <small>{{ optional($proximaHospedagem->status_hospedagem)->status ?? 'Situação indisponível' }}</small>
-          </div>
+            <div style="margin-top:8px;color:#147c8b;font-weight:600">Ver hospedagem <i class="fa fa-arrow-right"></i></div>
+          </a>
           @else
           <p class="gh-muted">Nenhuma hospedagem futura identificada.</p>
           @endif
@@ -56,17 +57,17 @@
     </div>
     <div class="row">
         @foreach ([
-            ['icon'=>'fa-clipboard-list','title'=>'Total de pedidos','value'=>$resumo['total']],
-            ['icon'=>'fa-clock','title'=>'Aguardando aprovação','value'=>$resumo['aguardando']],
-            ['icon'=>'fa-check-circle','title'=>'Aprovados','value'=>$resumo['aprovados']],
-            ['icon'=>'fa-users','title'=>'Fila de espera','value'=>$resumo['fila']]
+            ['icon'=>'fa-clipboard-list','title'=>'Total de pedidos','value'=>$resumo['total'],'status'=>null],
+            ['icon'=>'fa-clock','title'=>'Aguardando aprovação','value'=>$resumo['aguardando'],'status'=>0],
+            ['icon'=>'fa-check-circle','title'=>'Aprovados','value'=>$resumo['aprovados'],'status'=>2],
+            ['icon'=>'fa-users','title'=>'Fila de espera','value'=>$resumo['fila'],'status'=>7]
         ] as $item)
         <div class="col-lg-3 col-md-6 col-sm-6">
-            <div class="gh-stat">
+            <a class="gh-stat" href="{{ route('hospede.meuspedidos', $item['status'] === null ? [] : ['status' => $item['status']]) }}" title="Ver pedidos: {{ $item['title'] }}">
                 <i class="fas {{ $item['icon'] }}" aria-hidden="true"></i>
                 <strong>{{ $item['value'] }}</strong>
-                <span class="gh-muted">{{ $item['title'] }}</span>
-            </div>
+                <span class="gh-muted">{{ $item['title'] }} <i class="fa fa-arrow-right" aria-hidden="true" style="font-size:12px"></i></span>
+            </a>
         </div>
         @endforeach
     </div>
@@ -81,11 +82,11 @@
         <div class="gh-panel">
           <h4><i class="fa fa-bell text-warning"></i> Alertas prioritários</h4>
           @forelse($alertas as $alerta)
-          <div class="gh-entry">
+          <a class="gh-entry" href="{{ $alerta['url'] }}">
             <strong>{{ $alerta['titulo'] }}</strong>
             <p class="gh-muted" style="margin:5px 0">{{ $alerta['descricao'] }}</p>
-            <a href="{{ $alerta['url'] }}">Ver detalhes</a>
-          </div>
+            <div style="color:#147c8b">Ver detalhes <i class="fa fa-arrow-right"></i></div>
+          </a>
           @empty
           <p class="gh-muted">Nenhum alerta prioritário no momento.</p>
           @endforelse
@@ -100,7 +101,7 @@
                 0 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 3, default => 1
             };
           @endphp
-          <strong>{{ optional($proximaHospedagem->tipouh)->descricao ?? 'Hospedagem' }}</strong>
+          <a href="{{ route('hospede.meupedido', ['id' => Crypt::encrypt($proximaHospedagem->id)]) }}" style="font-weight:bold"> {{ optional($proximaHospedagem->tipouh)->descricao ?? 'Hospedagem' }} <i class="fa fa-arrow-right"></i></a>
           <p class="gh-muted" style="margin:3px 0">{{ optional($proximaHospedagem->status_hospedagem)->status ?? 'Status não informado' }}</p>
           <div class="gh-timeline">
             @foreach(['Solicitado','Aprovado','Pagamento','Liberação'] as $numero => $nome)
@@ -110,6 +111,7 @@
             </div>
             @endforeach
           </div>
+          <a class="d-block" href="{{ route('hospede.meupedido', ['id' => Crypt::encrypt($proximaHospedagem->id)]) }}">Abrir solicitação e acompanhar status <i class="fa fa-arrow-right"></i></a>
           <small class="gh-muted">Indicador ilustrativo das etapas. O status acima é o estado oficial; pagamento e liberação devem ser confirmados no pedido.</small>
           @else
           <p class="gh-muted">Envie uma solicitação para acompanhar suas etapas.</p>
@@ -128,8 +130,22 @@
         @endfor
         @foreach($calendarioDias as $dia)
         <div title="{{ $dia['data'] }} · {{ $dia['total'] }} solicitação(ões)" class="gh-day {{ $dia['aprovados'] > 0 ? 'gh-booked' : ($dia['espera'] > 0 ? 'gh-wait' : ($dia['total'] > 0 ? 'gh-booked' : '')) }}">
+          @if($dia['total'] === 1)
+          <a href="{{ route('hospede.meupedido', ['id' => Crypt::encrypt($dia['pedidos'][0]['id'])]) }}" title="Abrir hospedagem de {{ $dia['data'] }}" style="display:block;color:inherit;text-decoration:none">
+            <strong>{{ $dia['dia'] }}</strong><div><i class="fa fa-calendar-check"></i> 1</div>
+          </a>
+          @elseif($dia['total'] > 1)
+          <details>
+            <summary style="cursor:pointer"><strong>{{ $dia['dia'] }}</strong><div><i class="fa fa-calendar-check"></i> {{ $dia['total'] }}</div></summary>
+            <div class="gh-calendar-detail">
+              @foreach($dia['pedidos'] as $itemDia)
+              <a href="{{ route('hospede.meupedido', ['id' => Crypt::encrypt($itemDia['id'])]) }}" title="Abrir hospedagem">{{ $itemDia['tipo'] }} <i class="fa fa-arrow-right"></i></a>
+              @endforeach
+            </div>
+          </details>
+          @else
           <strong>{{ $dia['dia'] }}</strong>
-          @if($dia['total'] > 0)<div><i class="fa fa-calendar-check"></i> {{ $dia['total'] }}</div>@endif
+          @endif
         </div>
         @endforeach
       </div>
@@ -140,7 +156,7 @@
             <div class="gh-panel">
                 <h4><i class="fa fa-calendar-alt text-info"></i> Próximas hospedagens e solicitações</h4>
                 @forelse ($proximosPedidos as $pedido)
-                <div class="gh-entry">
+                <a class="gh-entry" href="{{ route('hospede.meupedido', ['id' => Crypt::encrypt($pedido->id)]) }}" title="Abrir detalhes da hospedagem">
                     <div class="d-flex justify-content-between flex-wrap">
                         <strong>{{ optional($pedido->tipouh)->descricao ?? 'Unidade habitacional' }}</strong>
                         <span class="badge badge-info">{{ optional($pedido->status_hospedagem)->status ?? 'Status ' . $pedido->status }}</span>
@@ -151,7 +167,8 @@
                         a {{ \Carbon\Carbon::parse($pedido->data_termino)->format('d/m/Y') }}
                         · {{ (int) $pedido->adulto }} adulto(s) · {{ (int) $pedido->crianca }} criança(s)
                     </div>
-                </div>
+                    <small style="color:#147c8b">Abrir hospedagem <i class="fa fa-arrow-right"></i></small>
+                </a>
                 @empty
                 <p class="gh-muted">Você ainda não possui hospedagens futuras ou em andamento.</p>
                 @endforelse
@@ -160,11 +177,11 @@
             <div class="gh-panel">
                 <h4><i class="fa fa-exclamation-circle text-warning"></i> Pendências e próximas etapas</h4>
                 @forelse($pendencias as $pedido)
-                <div class="gh-entry">
+                <a class="gh-entry" href="{{ route('hospede.meupedido', ['id' => Crypt::encrypt($pedido->id)]) }}">
                     <strong>{{ optional($pedido->tipouh)->descricao ?? 'Hospedagem' }}</strong>
                     <div class="gh-muted">{{ optional($pedido->status_hospedagem)->status ?? 'Aguardando andamento' }} · Entrada {{ \Carbon\Carbon::parse($pedido->data_inicio)->format('d/m/Y') }}</div>
-                    <small>Consulte os detalhes do pedido para verificar se existe alguma ação necessária.</small>
-                </div>
+                    <small style="color:#147c8b">Abrir pedido para verificar as ações necessárias <i class="fa fa-arrow-right"></i></small>
+                </a>
                 @empty
                 <p class="gh-muted">Nenhuma solicitação aguardando pagamento, liberação ou comprovante no momento.</p>
                 @endforelse
