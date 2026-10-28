@@ -127,7 +127,8 @@ class LoginController extends Controller
         }
 
         if ($user->hasRole('hospede')) {
-            return redirect('/hospede');
+            // Abre o dashboard após o login, mantendo o formulário de pedidos acessível pelo menu.
+            return redirect()->route('home');
         }
 
         if ($user->hasRole('precadastro')) {
