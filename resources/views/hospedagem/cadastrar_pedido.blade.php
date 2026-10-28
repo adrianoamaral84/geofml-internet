@@ -266,12 +266,12 @@ function validarCapacidadeUH() {
     var adultos = parseInt($('#adultos').val(), 10) || 0;
     var criancas = parseInt($('#criancas').val(), 10) || 0;
     var totalHospedes = adultos + criancas;
-    var excedeu = capacidade > 0 && (adultos > capacidade || totalHospedes > capacidade + (criancas > 0 ? 1 : 0));
+    var excedeu = capacidade > 0 && (adultos > capacidade || totalHospedes > capacidade + Math.min(criancas, 2));
     var semCapacidade = $('#tipo').val() && capacidade <= 0;
 
     if (capacidade > 0) {
         $('#capacidade-info')
-            .text('Capacidade máxima desta unidade: ' + capacidade + ' pessoas. É permitida 1 criança de até 6 anos adicional.')
+            .text('Capacidade máxima desta unidade: ' + capacidade + ' pessoas. São permitidas até 2 crianças de até 6 anos adicionais.')
             .show();
     } else {
         $('#capacidade-info').hide();
@@ -282,7 +282,7 @@ function validarCapacidadeUH() {
             .text(
                 'O número de hóspedes (' + totalHospedes +
                 ') excede o limite desta unidade (' + capacidade +
-                '), incluindo a tolerância de 1 criança de até 6 anos. Reduza os ocupantes ou selecione outra unidade.'
+                '), incluindo a tolerância de até 2 crianças de até 6 anos. Reduza os ocupantes ou selecione outra unidade.'
             )
             .show();
     } else if (semCapacidade) {
