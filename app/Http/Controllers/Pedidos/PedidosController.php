@@ -1486,6 +1486,8 @@ public function confimrarPedido(Request $request){
 
 public function store(Request $request)
 {
+    // Define o modo antes de executar as validações do pedido.
+    $isEdicao = !empty($request->id);
     
     date_default_timezone_set('America/Sao_Paulo');
     $usuario = Auth::user();
@@ -1741,7 +1743,6 @@ public function store(Request $request)
     |--------------------------------------------------------------------------
     */
 
-    $isEdicao = !empty($request->id);
     $pedidoAtual = null;
 
     if ($isEdicao) {
