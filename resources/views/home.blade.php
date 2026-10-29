@@ -198,14 +198,12 @@
                     @if(!$mes['temporada_definida'])
                     <small class="d-block gh-muted">Temporada não identificada no primeiro dia do mês; o limite exibido é uma referência.</small>
                     @elseif($mes['alta'])
-                    <small class="d-block gh-muted">Alta temporada · limite de apartamentos conforme configuração</small>
+                    <small class="d-block gh-muted">Alta temporada · 1 pedido por mês, qualquer UH</small>
                     @else
-                    <small class="d-block gh-muted">Baixa temporada</small>
+                    <small class="d-block gh-muted">Baixa temporada · 2 pedidos por mês, qualquer UH</small>
                     @endif
-                    <a class="gh-label" href="{{ route('hospede.meuspedidos', ['mes' => $mes['chave'], 'categoria' => 'comum']) }}" title="Ver apartamentos e casas deste mês"><span>Apartamento / Casa <i class="fa fa-arrow-right"></i></span><strong>{{ $mes['comuns'] }} / {{ $mes['limite_comum'] ?? '—' }}</strong></a>
-                    <div class="gh-meter"><span style="width:{{ $mes['limite_comum'] ? min(100, ($mes['comuns'] / max(1,$mes['limite_comum'])) * 100) : 0 }}%"></span></div>
-                    <a class="gh-label" href="{{ route('hospede.meuspedidos', ['mes' => $mes['chave'], 'categoria' => 'camping']) }}" title="Ver Camping e Motorhome deste mês"><span>Camping / Motorhome <i class="fa fa-arrow-right"></i></span><strong>{{ $mes['camping'] }} / 2</strong></a>
-                    <div class="gh-meter"><span style="width:{{ min(100,($mes['camping'] / 2) * 100) }}%"></span></div>
+                    <a class="gh-label" href="{{ route('hospede.meuspedidos', ['mes' => $mes['chave']]) }}" title="Ver todos os pedidos deste mês"><span>Todos os tipos de UH <i class="fa fa-arrow-right"></i></span><strong>{{ $mes['total'] }} / {{ $mes['limite'] }}</strong></a>
+                    <div class="gh-meter"><span style="width:{{ min(100, ($mes['total'] / max(1, $mes['limite'])) * 100) }}%"></span></div>
                 </div>
                 @endforeach
                 <small class="gh-muted">Em períodos que atravessam temporadas, o limite aplicável é definido pelas diárias do pedido. A consulta acima é informativa.</small>
