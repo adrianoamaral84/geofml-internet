@@ -1104,7 +1104,7 @@ public function confimrarPedido(Request $request){
 
     $erroCota = \App\Services\LimiteMensalPedidos::mensagem(
         (int) $usuario->id, $dataInicio, (int) $request->tipo,
-        $possuiAltaTemporada, 1, ($isEdicao ? $pedidoAtual->id : null)
+        $possuiAltaTemporada, 1, null
     );
 
     if ($erroCota !== null) {
