@@ -8,9 +8,10 @@ use Carbon\Carbon;
 class LimiteMensalPedidos
 {
     /**
-     * Valida separadamente UHs comuns e Camping/Motorhome.
-     * Os pedidos negados (1) e cancelados pelo usuario (6) nao consomem cota.
-     * A competencia e determinada pelo mes da data de entrada.
+     * Limite unico por usuario e mes da entrada, independente do tipo de UH.
+     * Alta temporada: 1 pedido. Baixa temporada: 2 pedidos.
+     * Negados (1) e cancelados (6) nao consomem cota.
+     * O proprio pedido e excluido quando se trata de edicao.
      */
     public static function mensagem(int $usuarioId, Carbon $entrada, int $tipoUh, bool $altaTemporada, int $limiteAlta, ?int $ignorarPedidoId = null): ?string
     {
@@ -23,18 +24,10 @@ class LimiteMensalPedidos
             $consulta->where('id', '<>', $ignorarPedidoId);
         }
 
-        if (in_array($tipoUh, [11, 12], true)) {
-            $total = (clone $consulta)->whereIn('tipo_und_id', [11, 12])->count();
-            return $total >= 2
-                ? 'Você já alcançou o limite de 2 pedidos de Camping e/ou Motorhome neste mês.'
-                : null;
-        }
+        $limite = $altaTemporada ? 1 : 2;
 
-        $total = (clone $consulta)->whereNotIn('tipo_und_id', [11, 12])->count();
-        $limite = $altaTemporada ? $limiteAlta : 2;
-
-        return $total >= $limite
-            ? 'Você já alcançou o limite de ' . $limite . ' pedido(s) de apartamento/casa neste mês.'
+        return $consulta->count() >= $limite
+            ? 'Você já alcançou o limite de ' . $limite . ' pedido(s) neste mês, independentemente do tipo de hospedagem.'
             : null;
     }
     /**
