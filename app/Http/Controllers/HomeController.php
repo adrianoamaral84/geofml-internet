@@ -81,17 +81,13 @@ class HomeController extends Controller
             $temporada = \App\Temporada::whereDate('data_inicio', '<=', $mes->toDateString())
                 ->whereDate('data_termino', '>=', $mes->toDateString())->first();
             $alta = $temporada && (int) $temporada->tipo_temporada_id === 1;
-            $configuracao = \App\QuantidadeReserva::first();
-            $limiteComum = $alta ? ($configuracao ? (int) $configuracao->reservas : null) : 2;
             $meses->push([
                 'titulo' => $mes->locale('pt_BR')->translatedFormat('F/Y'),
                 'chave' => $mes->format('Y-m'),
                 'alta' => $alta,
                 'temporada_definida' => (bool) $temporada,
-                'comuns' => $porMes->filter(fn ($p) => !in_array((int) $p->tipo_und_id, [11, 12], true))->count(),
-                'camping' => $porMes->filter(fn ($p) => in_array((int) $p->tipo_und_id, [11, 12], true))->count(),
-                'limite_comum' => $limiteComum,
-                'limite_camping' => 2,
+                'total' => $porMes->count(),
+                'limite' => $alta ? 1 : 2,
             ]);
         }
 
