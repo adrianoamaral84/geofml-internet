@@ -1272,82 +1272,15 @@ public function confirmaEdicao(Request $request)
     |
     */
 
-    $consultaPedidosDoMes =
-        \App\Hospede::where(
-            'user_id',
-            $usuario->id
-        )
-        ->where(
-            'id',
-            '<>',
-            $pedidoAtual->id
-        )
-        ->whereYear(
-            'data_inicio',
-            $dataInicio->year
-        )
-        ->whereMonth(
-            'data_inicio',
-            $dataInicio->month
-        );
-
-    $pedidosDoMes =
-        (clone $consultaPedidosDoMes)->whereNotIn('tipo_und_id', [11, 12])->whereNotIn('status', [1, 6])->count();
-
-    $pedidosCampingMotorhome =
-        (clone $consultaPedidosDoMes)
-            ->whereIn(
-                'tipo_und_id',
-                [11, 12]
-            )
-            ->whereNotIn('status', [1, 6])
-            ->count();
-
-    $tipoCampingMotorhome = in_array(
-        (int) $request->tipo,
-        [11, 12],
-        true
+    $erroCota = \App\Services\LimiteMensalPedidos::mensagem(
+        (int) $usuario->id, $dataInicio, (int) $request->tipo,
+        $possuiAltaTemporada, 1, $pedidoAtual->id
     );
 
-    /*
-    |--------------------------------------------------------------------------
-    | Limite de Camping/Motor-Home
-    |--------------------------------------------------------------------------
-    */
-
-    if ($tipoCampingMotorhome) {
-        if ($pedidosCampingMotorhome >= 2) {
-            return redirect()
-                ->back()
-                ->withInput()
-                ->withErrors([
-                    'tipo' =>
-                        'Você já alcançou o limite de 2 pedidos '
-                        . 'para Camping e/ou Motor-Home neste mês.',
-                ]);
-        }
-    } else {
-        /*
-        |--------------------------------------------------------------------------
-        | Limite conforme a temporada
-        |--------------------------------------------------------------------------
-        */
-
-        $limiteMensal = $possuiAltaTemporada
-            ? (int) $quantidadeReservas->reservas
-            : 2; // Baixa temporada: duas UHs comuns por usuario/mes.
-
-        if ($pedidosDoMes >= $limiteMensal) {
-            return redirect()
-                ->back()
-                ->withInput()
-                ->withErrors([
-                    'peridoinicial' =>
-                        'Você já alcançou o limite de '
-                        . $limiteMensal
-                        . ' pedido(s) para esse mês.',
-                ]);
-        }
+    if ($erroCota !== null) {
+        return redirect()->back()
+            ->withInput()
+            ->withErrors(['peridoinicial' => $erroCota]);
     }
 
     /*
@@ -2433,69 +2366,15 @@ public function gravaEdicao(Request $request)
             ->withInput();
     }
 
-    $consultaPedidosDoMes = \App\Hospede::where(
-            'user_id',
-            $usuario->id
-        )
-        ->where(
-            'id',
-            '<>',
-            $hospedagem->id
-        )
-        ->whereYear(
-            'data_inicio',
-            $dataInicio->year
-        )
-        ->whereMonth(
-            'data_inicio',
-            $dataInicio->month
-        );
-
-    $pedidosDoMes =
-        (clone $consultaPedidosDoMes)->whereNotIn('tipo_und_id', [11, 12])->whereNotIn('status', [1, 6])->count();
-
-    $pedidosCampingMotorhome =
-        (clone $consultaPedidosDoMes)
-            ->whereIn(
-                'tipo_und_id',
-                [11, 12]
-            )
-            ->whereNotIn('status', [1, 6])
-            ->count();
-
-    $tipoCampingMotorhome = in_array(
-        (int) $request->tipo,
-        [11, 12],
-        true
+    $erroCota = \App\Services\LimiteMensalPedidos::mensagem(
+        (int) $usuario->id, $dataInicio, (int) $request->tipo,
+        $possuiAltaTemporada, 1, $hospedagem->id
     );
 
-    if ($tipoCampingMotorhome) {
-        if ($pedidosCampingMotorhome >= 2) {
-            return redirect()
-                ->back()
-                ->withInput()
-                ->withErrors([
-                    'tipo' =>
-                        'Você já alcançou o limite de 2 pedidos '
-                        . 'para Camping e/ou Motor-Home neste mês.',
-                ]);
-        }
-    } else {
-        $limiteMensal = $possuiAltaTemporada
-            ? (int) $quantidadeReservas->reservas
-            : 2; // Baixa temporada: duas UHs comuns por usuario/mes.
-
-        if ($pedidosDoMes >= $limiteMensal) {
-            return redirect()
-                ->back()
-                ->withInput()
-                ->withErrors([
-                    'peridoinicial' =>
-                        'Você já alcançou o limite de '
-                        . $limiteMensal
-                        . ' pedido(s) para esse mês.',
-                ]);
-        }
+    if ($erroCota !== null) {
+        return redirect()->back()
+            ->withInput()
+            ->withErrors(['peridoinicial' => $erroCota]);
     }
 
     /*
